@@ -767,7 +767,7 @@ a {
  */
 html {
   box-sizing: border-box;
-  filter: grayscale(100%);
+  filter: grayscale(100%); !important
 }
 *,
 *::before,
