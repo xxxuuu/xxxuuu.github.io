@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="🗒随便写点东西的地方">
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/three-center-in-two-places/">
+                  <h2 class="post-title">云上两地三中心分布式容灾架构设计与实现</h2>
+                </a>
+                <div class="post-date">
+                  2020-03-22
+                </div>
+                <div class="post-abstract">
+                  <p>最近给忽悠去了华为的鲲鹏创新大赛，要求设计一个分布式的在线教学管理系统，于是乎顺便开个坑</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/2019summary/">
+                  <h2 class="post-title">蒟蒻的2019年度总结</h2>
+                </a>
+                <div class="post-date">
+                  2020-01-01
+                </div>
+                <div class="post-abstract">
+                  <p>随着2019年最后一晚的落幕，21世纪的10年代也结束了，今年的我无论是在技术上还是别的方面，都成长了许多。以本文记录我的技术路程，迎接新的一年</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/no-silver-bullet/">
+                  <h2 class="post-title">没有银弹</h2>
+                </a>
+                <div class="post-date">
+                  2019-12-14
+                </div>
+                <div class="post-abstract">
+                  <blockquote>
+<p>“没有任何一种单纯的技术或管理上的进步，能够独立地承诺在十年内大幅度地提高生成率、可靠性和简洁性。”<br>
+—— Fred Brooks</p>
+</blockquote>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/blog-cd/">
+                  <h2 class="post-title">Blog 之持续部署</h2>
+                </a>
+                <div class="post-date">
+                  2019-10-31
+                </div>
+                <div class="post-abstract">
+                  <p>原来本 blog 是在 GitHub Pages 上静态托管的，奈何速度过慢，CDN 效果一般（也许是我配置问题？）。又不想在托管在 Coding Pages 上，便计划将其通过 持续部署（Continuous Deployment）部署在阿里云的服务器上。</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/javascript-this/">
+                  <h2 class="post-title">JavaScript 中的 this 之探讨</h2>
+                </a>
+                <div class="post-date">
+                  2019-10-22
+                </div>
+                <div class="post-abstract">
+                  <p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/base-mean/">
+                  <h2 class="post-title">分布式系统 BASE 理论</h2>
+                </a>
+                <div class="post-date">
+                  2019-06-02
+                </div>
+                <div class="post-abstract">
+                  <p>BASE 理论是对 CAP 理论进行权衡后得出的选择，是 ebay 架构师于2008年提出的，通过牺牲一部分一致性、来大幅度提升可用性。是目前绝大多数分布式系统的选择。</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/cap-theorem/">
+                  <h2 class="post-title">分布式系统 CAP 理论</h2>
+                </a>
+                <div class="post-date">
+                  2019-05-28
+                </div>
+                <div class="post-abstract">
+                  <p>CAP 理论是分布式系统的基本定理，也是我们理解分布式系统的起点。</p>
+
+                </div>
+              </div>
+              
+                <a class="right" href="https://xqinger.com/post/cap-theorem/">
+                  <div class="feature-container" style="background-image: url('https://xqinger.com/post-images/cap-theorem.jpg')">
+                  </div>
+                </a>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/microservice-concept/">
+                  <h2 class="post-title">微服务架构概念与基础知识</h2>
+                </a>
+                <div class="post-date">
+                  2019-05-23
+                </div>
+                <div class="post-abstract">
+                  <p>“容器和微服务是计算的未来” ——Eric Brewer</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/p-np-npc-problem/">
+                  <h2 class="post-title">P、NP 和 NPC 问题</h2>
+                </a>
+                <div class="post-date">
+                  2019-04-26
+                </div>
+                <div class="post-abstract">
+                  <p>理论计算机科学中最经典的问题</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/android-tensorflowlite/">
+                  <h2 class="post-title">使用 TensorFlow Lite 将 TensorFlow 模型部署到移动端（Android）</h2>
+                </a>
+                <div class="post-date">
+                  2019-04-23
+                </div>
+                <div class="post-abstract">
+                  <p>在工作中需要将深度学习模型部署到移动端上运行，感觉官方文档和网上的资料也不是很好，就自己记录一下</p>
+
+                </div>
+              </div>
+              
+                <a class="right" href="https://xqinger.com/post/android-tensorflowlite/">
+                  <div class="feature-container" style="background-image: url('https://xqinger.com/post-images/android-tensorflowlite.jpeg')">
+                  </div>
+                </a>
+              
+            </article>
+          
+
+          <div class="pagination-container">
+  
+  
+    <a href="https://xqinger.com/page/2" class="next">下一页 <i class="icon-arrow-ios-forward-outline"></i></a>
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

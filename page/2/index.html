@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="🗒随便写点东西的地方">
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+    
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/docker-container-move/">
+                  <h2 class="post-title">Docker 容器的迁移</h2>
+                </a>
+                <div class="post-date">
+                  2019-04-03
+                </div>
+                <div class="post-abstract">
+                  <p>最近需要将一台服务器上的应用和数据迁移到另一台服务器上，由于全部使用了 <code>Docker</code> 部署，所以水篇文章</p>
+
+                </div>
+              </div>
+              
+                <a class="right" href="https://xqinger.com/post/docker-container-move/">
+                  <div class="feature-container" style="background-image: url('https://xqinger.com/post-images/docker-container-move.jpeg')">
+                  </div>
+                </a>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/2018summary/">
+                  <h2 class="post-title">蒟蒻的2018年度总结</h2>
+                </a>
+                <div class="post-date">
+                  2018-12-31
+                </div>
+                <div class="post-abstract">
+                  <p>又是一年过去了，2018算是人生中最重要的转折点之一，总结一下今年的经历和感想，也算是记录我的技术路程</p>
+
+                </div>
+              </div>
+              
+                <a class="right" href="https://xqinger.com/post/2018summary/">
+                  <div class="feature-container" style="background-image: url('https://xqinger.com/post-images/2018summary.jpeg')">
+                  </div>
+                </a>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/java-quote/">
+                  <h2 class="post-title">Java 中的引用关系</h2>
+                </a>
+                <div class="post-date">
+                  2018-06-22
+                </div>
+                <div class="post-abstract">
+                  <p>水文一篇</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/tomcat-arrange-projects/">
+                  <h2 class="post-title">Tomcat 下部署多个不同端口的项目</h2>
+                </a>
+                <div class="post-date">
+                  2018-06-04
+                </div>
+                <div class="post-abstract">
+                  <p>在同一个 <code>Tomcat</code> 中部署多个不同端口的项目</p>
+
+                </div>
+              </div>
+              
+                <a class="right" href="https://xqinger.com/post/tomcat-arrange-projects/">
+                  <div class="feature-container" style="background-image: url('https://xqinger.com/post-images/tomcat-arrange-projects.png')">
+                  </div>
+                </a>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/delete-if-else/">
+                  <h2 class="post-title">删掉你那一堆if else——表驱动法</h2>
+                </a>
+                <div class="post-date">
+                  2018-04-14
+                </div>
+                <div class="post-abstract">
+                  <p>优雅地重构 <code>if else</code></p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/android-drag-demo/">
+                  <h2 class="post-title">Android 中 View 拖拽的简单实现</h2>
+                </a>
+                <div class="post-date">
+                  2018-04-08
+                </div>
+                <div class="post-abstract">
+                  <p>实现 <code>View</code> 拖拽的的简易 <code>Demo</code></p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/hello-kotlin/">
+                  <h2 class="post-title">Kotlin 初体验</h2>
+                </a>
+                <div class="post-date">
+                  2018-03-21
+                </div>
+                <div class="post-abstract">
+                  <p>在2017年的Google IO开发者大会上，Google正式宣布了Kotlin成为Android官方编程语言。</p>
+
+                </div>
+              </div>
+              
+                <a class="right" href="https://xqinger.com/post/hello-kotlin/">
+                  <div class="feature-container" style="background-image: url('https://xqinger.com/post-images/hello-kotlin.png')">
+                  </div>
+                </a>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/simple-android-safe/">
+                  <h2 class="post-title">Android 应用安全防护的几种基本方法</h2>
+                </a>
+                <div class="post-date">
+                  2018-03-16
+                </div>
+                <div class="post-abstract">
+                  <p>前段时间由于项目需要给APP进行防破解工作，接触了对我来说相当陌生的安全技术，也趁此机会总结一下。</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+            <article class="post-item">
+              <div class="left">
+                <a href="https://xqinger.com/post/fragment-lazy-load/">
+                  <h2 class="post-title">Fragment 懒加载实现</h2>
+                </a>
+                <div class="post-date">
+                  2018-03-10
+                </div>
+                <div class="post-abstract">
+                  <p><code>Android</code> 中 <code>Fragment</code> 懒加载的实现及封装</p>
+
+                </div>
+              </div>
+              
+            </article>
+          
+
+          <div class="pagination-container">
+  
+    <a href="https://xqinger.com/" class="prev"><i class="icon-arrow-ios-back-outline"></i> 上一页</a>
+  
+  
+</div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>关于 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="我是谁
+
+来自深圳职业技术学院的一名软件专业大二学生
+半吊子Web开发
+
+兴趣爱好
+
+逛技术论坛、Github等
+向小白进行技术传销
+
+联系我
+
+Wechat: x751736277
+Email: 751736277@qq.com
+
+
+Se..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">关于</h2>
+            <div class="post-date">2019-01-25</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="我是谁">我是谁</h2>
+<ul>
+<li>来自<a href="https://www.szpt.edu.cn">深圳职业技术学院</a>的一名软件专业大二学生</li>
+<li>半吊子Web开发</li>
+</ul>
+<h2 id="兴趣爱好">兴趣爱好</h2>
+<ul>
+<li>逛技术论坛、Github等</li>
+<li>向小白进行技术传销</li>
+</ul>
+<h2 id="联系我">联系我</h2>
+<ul>
+<li>Wechat: x751736277</li>
+<li>Email: 751736277@qq.com</li>
+</ul>
+<blockquote>
+<p>Set your course by the stars, not by the lights of every passing ship.<br>
+——Omar N. Bradley</p>
+</blockquote>
+
+            </div>
+            
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

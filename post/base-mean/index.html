@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>分布式系统 BASE 理论 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="BASE 理论是对 CAP 理论进行权衡后得出的选择，是 ebay 架构师于2008年提出的，通过牺牲一部分一致性、来大幅度提升可用性。是目前绝大多数分布式系统的选择。
+
+1. BASE 理论
+BASE 理论是指：
+
+Basically A..." />
+    <meta name="keywords" content="分布式,架构" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">分布式系统 BASE 理论</h2>
+            <div class="post-date">2019-06-02</div>
+            
+            <div class="post-content" v-pre>
+              <p>BASE 理论是对 CAP 理论进行权衡后得出的选择，是 ebay 架构师于2008年提出的，通过牺牲一部分一致性、来大幅度提升可用性。是目前绝大多数分布式系统的选择。</p>
+<!-- more -->
+<h1 id="1-base-理论">1. BASE 理论</h1>
+<p>BASE 理论是指：</p>
+<ul>
+<li><strong>Basically Available 基本可用</strong></li>
+<li><strong>Soft State 软状态</strong></li>
+<li><strong>Eventual Consistency 最终一致性</strong></li>
+</ul>
+<h2 id="11-basically-available-基本可用">1.1 Basically Available 基本可用</h2>
+<p>基本可用指的是当系统出现故障时，允许损失部分可用性（功能、响应时间等），但核心功能仍然可用。</p>
+<h2 id="12-soft-state-软状态">1.2 Soft State 软状态</h2>
+<p>软状态是允许系统中的数据存在中间状态而不影响系统整体可用性。</p>
+<p>通俗点说：除非刷新，否则信息（状态）会过期或被系统丢失，但系统仍然能正常运行。</p>
+<p>相反地，当系统拥有强一致性时，数据所处的状态就是<strong>硬状态（Hard State）</strong>。</p>
+<p>软状态的定义比较模糊，想有更详细的了解可以浏览以下资料：</p>
+<blockquote>
+<p><a href="https://stackoverflow.com/questions/4851242/what-does-soft-state-in-base-mean">What does 'soft-state' in BASE mean? - Stack Overflow</a><br>
+<a href="http://mercury.lcs.mit.edu/~jnc/tech/hard_soft.html">&quot;Soft&quot; and &quot;Hard&quot; State - MIT</a></p>
+</blockquote>
+<h2 id="13-eventual-consistency-最终一致性">1.3 Eventual Consistency 最终一致性</h2>
+<p>最终一致性也称为乐观复制，是弱一致性的特殊形式，指的是能保证数据在更新前，返回最新值。</p>
+<p>而一致性一般又分为五种：</p>
+<h3 id="131-causal-consistency-因果一致性">1.3.1 Causal Consistency 因果一致性</h3>
+<p>因果一致性指的是：如果节点A在更新完某个数据后通知了节点B，那么节点B之后对该数据的访问和修改都是基于A更新后的值。于此同时，和节点A无因果关系的节点C的数据访问则没有这样的限制。</p>
+<h3 id="132-read-your-writes-读己之所写">1.3.2 Read your Writes 读己之所写</h3>
+<p>读己之所写指的是：节点A更新一个数据后，它自身总是能访问到自身更新过的最新值，而不会看到旧值。其实也算一种因果一致性。</p>
+<h3 id="133-session-consistency-会话一致性">1.3.3 Session Consistency 会话一致性</h3>
+<p>会话一致性将对系统数据的访问过程框定在了一个会话当中：系统能保证在同一个有效的会话中实现 “读己之所写” 的一致性，也就是说，执行更新操作之后，客户端能够在同一个会话中始终读取到该数据项的最新值。</p>
+<h3 id="134-monotonic-read-consistency-单调读一致性">1.3.4 Monotonic Read Consistency 单调读一致性</h3>
+<p>单调读一致性指的是：如果一个节点从系统中读取出一个数据项的某个值后，那么系统对于该节点后续的任何数据访问都不应该返回更旧的值。</p>
+<h3 id="135-monotonic-write-consistency-单调写一致性">1.3.5 Monotonic Write Consistency 单调写一致性</h3>
+<p>单调写一致性指的是：一个系统要能够保证来自同一个节点的写操作被顺序的执行。</p>
+<h1 id="2-acid-与-base">2. ACID 与 BASE</h1>
+<p>在传统的关系型数据库中，常常会要求拥有 ACID 性质（如事务），ACID 表示：</p>
+<ul>
+<li><strong>Atomicity 原子性</strong> （事务操作要么全部执行，要么全不执行）</li>
+<li><strong>Consistency 一致性</strong> （数据之间保持一致性约束）</li>
+<li><strong>Isolation 独立性</strong> （每个事务之间不会互相干扰）</li>
+<li><strong>Durability 持久性</strong> （事务对数据库的影响永远不会丢失）</li>
+</ul>
+<p>ACID 和 BASE 可以说是两种截然相反的设计方向，ACID 要求了强一致性， BASE 放弃一部分一致性以提高系统伸缩性和性能。但在具体系统设计中，由于场景和对系统的要求不同，常常会结合使用。就连关系型数据库也有部分功能采用 BASE 设计。</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xqinger.com/tag/pYvZx8dA5/" class="tag">
+                    分布式
+                  </a>
+                
+                  <a href="https://xqinger.com/tag/UwyCxVLC-/" class="tag">
+                    架构
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xqinger.com/post/cap-theorem/">
+                  <h3 class="post-title">
+                    分布式系统 CAP 理论
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

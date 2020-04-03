@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>JavaScript 中的 this 之探讨 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="对于 JavaScript，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 JavaScript 中的 this。
+
+this 的动态指向性
+在大多数常见的面向对象的语言中，t..." />
+    <meta name="keywords" content="JavaScript,前端" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">JavaScript 中的 this 之探讨</h2>
+            <div class="post-date">2019-10-22</div>
+            
+            <div class="post-content" v-pre>
+              <p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
+<!-- more -->
+<h2 id="this-的动态指向性">this 的动态指向性</h2>
+<p>在大多数常见的面向对象的语言中，<code>this</code> 通常指向类的实例，如 <code>Java</code> 的 <code>this</code>, <code>Python</code> 的 <code>self</code>，<code>PHP</code> 的 <code>$this</code>。</p>
+<p>于是乎，大多数人在接触 <code>JavaScript</code> 时也下意识认为 <code>this</code> 是指向类的实例。实际上在 <code>JavaScript</code> 里根本就没有真正意义上的类，也不区分类和实例的概念，是通过 <code>prototype</code> 来实现的面向对象（在 ES6 里已经引入了 <code>class</code> 关键字，但本质上还只是 <code>prototype</code> 的语法糖）。</p>
+<h2 id="默认绑定">默认绑定</h2>
+<p>在浏览器的 <code>Developer Tools</code> 中的 <code>Console</code> 输入 <code>this</code> 并回车，会输出以下信息：</p>
+<pre><code class="language-JSON">Window {parent: Window, postMessage: ƒ, blur: ƒ, focus: ƒ, close: ƒ, …}
+</code></pre>
+<p>当 <code>this</code> 没有在任何其它对象中时，默认指向全局对象（全局作用域）。在浏览器中这个全局对象就是 <code>window</code>。（在 <code>Node.js</code> 环境中没有全局对象，所以会是 <code>undefined</code>）</p>
+<p><strong>这种默认指向全局对象的方式就是 <code>this</code> 的默认绑定。</strong></p>
+<p>但默认绑定常常会带来更多的问题，任何代码都可能污染全局对象。不应该使用全局变量来保存数据。所以 ES5 引入了<strong>严格模式</strong>。</p>
+<p>严格模式使用 <code>&quot;use strict&quot;;</code> 声明，会取消默认绑定：</p>
+<pre><code class="language-JavaScript">&quot;use strict&quot;;
+
+console.log(this);  // undefined
+</code></pre>
+<h2 id="隐式绑定">隐式绑定</h2>
+<p>隐式绑定很简单，<strong>当函数作为一个对象的属性时，该函数的 <code>this</code> 指向该对象。</strong></p>
+<pre><code class="language-JavaScript">var hello = {
+  str: 'world',
+  print: function() {
+    console.log('hello', this.str);
+  }
+}
+hello.print();  // hello world
+</code></pre>
+<p>默认绑定或许也可以看成全局函数默认作为全局对象的一个属性，从而使得全局函数的 <code>this</code> 指向全局对象。</p>
+<h2 id="显式绑定">显式绑定</h2>
+<p>在 <code>React</code> 中常常会看到类似的代码：</p>
+<pre><code class="language-JavaScript">class Test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.testBtnClick = this.testBtnClick.bind(this);
+  }
+  
+  testBtnClick() {
+    console.log('click');
+  }
+  
+  render() {
+    return (
+      &lt;div&gt; 
+        &lt;button onClick={this.testBtnClick}&gt;test button&lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+
+ReactDOM.render(
+  &lt;Test/&gt;,
+  document.getElementById('example')
+);
+</code></pre>
+<p>其中的第四行 <code>this.testBtnClick = this.testBtnClick.bind(this);</code> 显式地绑定了 <code>testBtnClick</code> 这个函数的 <code>this</code>。</p>
+<p>在 <code>Function.prototype</code> 中有三个方法 <code>call</code>，<code>apply</code>，<code>bind</code> 都是用于显式绑定的。</p>
+<p><strong>显式绑定是将 <code>this</code> 显式地绑定到一个上下文中。</strong> 这样能避免代码中的错误绑定和丢失绑定问题，同时也更便于执行重构和实现一些设计模式。</p>
+<p><code>call</code> 和 <code>apply</code> 的作用都一样，使用指定的上下文对象运行方法，不同的只是传参方式。</p>
+<p>考虑下面的代码：</p>
+<pre><code class="language-JavaScript">var test1 = {
+  name: '',
+  init: function() {
+    this.name = 'aaa';
+  },
+  print: function() {
+    console.log(&quot;hello1&quot;, this.name);
+  }
+}
+
+var test2 = {
+  name: '',
+  init: function() {
+    this.name = 'bbb';
+  },
+  print: function() {
+    console.log(&quot;hello2&quot;, this.name);
+  }
+}
+
+test1.init();
+test1.print();  // hello1 aaa
+
+test2.init();
+test2.print();  // hello2 bbb
+
+test2.print.call(test1);    // hello2 aaa
+</code></pre>
+<p>在最后一行，通过 <code>call</code> 使用 <code>test1</code> 的上下文执行 <code>test2</code> 的 <code>print</code>，此时在 <code>print</code> 里取到的 <code>this</code> 就是 <code>test1</code>。</p>
+<p>假设调用的方法有参数，通过下面的方式传递参，这也是 <code>call</code> 和 <code>apply</code> 唯一的区别：</p>
+<pre><code class="language-JavaScript">test2.print.call(test1, param1, param2);
+test2.print.apply(test1, [param1, param2]);
+</code></pre>
+<p>而 <code>bind</code> 的作用是返回一个绑定指定上下文对象的新方法</p>
+<p>修改改改的例子：</p>
+<pre><code class="language-JavaScript">var test1 = {
+  name: '',
+  init: function() {
+    this.name = 'aaa';
+  },
+  print: function() {
+    console.log(&quot;hello1&quot;, this.name);
+  }
+}
+
+var test2 = {
+  name: '',
+  init: function() {
+    this.name = 'bbb';
+  },
+  print: function() {
+    console.log(&quot;hello2&quot;, this.name);
+  }
+}
+
+test1.init();
+test2.init();
+
+var newPrint = test2.print.bind(test1);
+newPrint(); // hello2 aaa
+
+// 或者直接赋值回去
+test2.print = test2.print.bind(test1);
+test2.print();  // hello2 aaa
+</code></pre>
+<p>在实际中会有一个常见的问题，在控件的事件回调方法里传入我们的函数，函数中通过 <code>this</code> 调用当前对象的某些属性或方法。</p>
+<p>而当回调执行时，是在浏览器中运行的，上下文被改变。此时函数里的 <code>this</code> 丢失绑定指向 <code>window</code>，就会出现错误。这也正是 <code>React</code> 常在 <code>constructor</code> 中使用 <code>bind</code> 显式绑定函数的 <code>this</code> 的原因。</p>
+<h2 id="new-绑定">new 绑定</h2>
+<p>在 ES6 前，通常用这种原型链方式创建一个对象：</p>
+<pre><code class="language-JavaScript">function Hello(name) {
+  this.name = name || 'world';
+}
+Hello.prototype.print = function() {
+  console.log('hello', this.name);
+};
+
+var h = new Hello();
+h.print();  // hello world
+</code></pre>
+<p>构造函数默认返回 <code>this</code>，并且该 <code>this</code> 绑定指向新创建的对象。</p>
+<p>所以通过 <code>new</code> 创建的对象，<code>this</code> 绑定在这个新创建的对象上。</p>
+<h2 id="箭头函数">箭头函数</h2>
+<p>在各种事件和 HTTP 请求的回调中可能会用到 <code>this</code>，但就会发生前面讲的丢失绑定问题。</p>
+<p>但箭头函数就可以解决该问题，箭头函数的 <code>this</code> 总是指向词法作用域，即其宿主。</p>
+<p>例如以下代码：</p>
+<pre><code class="language-JavaScript">var Hello1 = {
+  str: 'world',
+  print: function() {
+    var p = function() {
+      console.log('hello', this.str);
+    }
+    return p();
+  }
+}
+
+var Hello2 = {
+  str: 'world',
+  print: function() {
+    var p = () =&gt; {
+      console.log('hello', this.str);
+    }
+    return p();
+  }
+}
+
+Hello1.print(); // hello undefined
+Hello2.print(); // hello world
+</code></pre>
+<h2 id="总结">总结</h2>
+<ol>
+<li>默认绑定会指向全局对象，带来不可控的影响。避免默认绑定或使用严格模式</li>
+<li>隐式绑定和 <code>new</code> 绑定都可以确保 <code>this</code> 能得到应有的指向</li>
+<li>在某些情况下，也需要显式绑定来修改和确保 <code>this</code> 的指向为我们所想</li>
+</ol>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xqinger.com/tag/bmeKbyfXj/" class="tag">
+                    JavaScript
+                  </a>
+                
+                  <a href="https://xqinger.com/tag/UUuPOKes0/" class="tag">
+                    前端
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xqinger.com/post/base-mean/">
+                  <h3 class="post-title">
+                    分布式系统 BASE 理论
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

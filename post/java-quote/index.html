@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Java 中的引用关系 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="水文一篇
+
+引用关系
+Java的引用分为四种：
+
+强引用（Strong Referenece）
+软引用（Soft Reference）
+弱引用（Weak Reference）
+虚引用（Phantom Reference）
+
+这四种引用强度依..." />
+    <meta name="keywords" content="Java" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Java 中的引用关系</h2>
+            <div class="post-date">2018-06-22</div>
+            
+            <div class="post-content" v-pre>
+              <p>水文一篇</p>
+<!-- more -->
+<h2 id="引用关系">引用关系</h2>
+<p>Java的引用分为四种：</p>
+<ol>
+<li><strong>强引用（Strong Referenece）</strong></li>
+<li><strong>软引用（Soft Reference）</strong></li>
+<li><strong>弱引用（Weak Reference）</strong></li>
+<li><strong>虚引用（Phantom Reference）</strong></li>
+</ol>
+<p>这四种引用强度依次减弱。</p>
+<h2 id="强引用">强引用</h2>
+<p>强引用是在代码中普遍存在的，类似<code>Object obj = new Object()</code>这类的引用，只要强引用还在，垃圾收集器永远不会回收掉被引用的对象。</p>
+<h2 id="软引用">软引用</h2>
+<p>软引用用来描述一些还有用，但并非必须的对象，对于软引用关联着的对象，在系统将要发生内存溢出异常之前，将会把这些对象列进回收范围之中并进行第二次回收。如果这次回收还是没有足够内存，才会抛出内存溢出异常。在<code>JDK1.2</code>之后，提供了<code>SoftReference</code>类来实现软引用。</p>
+<p>适合用来实现缓存：比如网页缓存、图片缓存等。</p>
+<h2 id="弱引用">弱引用</h2>
+<p>弱引用也是用来描述非必须对象的，但是它的强度比软引用更弱一些，被弱引用关联的对象只能生存到下一次垃圾收集发生之前。但垃圾收集器工作时，无论当前内存是否足够，都会回收掉被弱引用关联的对象。在<code>JDK1.2</code>之后，提供了<code>WeakReference</code>类来实现弱引用。</p>
+<h2 id="虚引用">虚引用</h2>
+<p>虚引用也称为幽灵引用或者幻影引用，它是最弱的一种引用关系。一个对象是否有虚引用的存在，完全不会对其生存时间构成影响，也无法通过虚引用取得一个对象实例。为一个对象设置虚引用关联的唯一目的就是希望能在这个对象被收集器回收时收到一个系统通知。在<code>JDK1.2</code>之后，提供了<code>PhantomReference</code>类来实现虚引用。</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xqinger.com/tag/5S8q_OVUH/" class="tag">
+                    Java
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xqinger.com/post/tomcat-arrange-projects/">
+                  <h3 class="post-title">
+                    Tomcat 下部署多个不同端口的项目
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

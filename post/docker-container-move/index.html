@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Docker 容器的迁移 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="最近需要将一台服务器上的应用和数据迁移到另一台服务器上，由于全部使用了 Docker 部署，所以水篇文章
+
+1. 通过云端仓库迁移
+1.1 备份容器
+首先将容器进行备份，创建一个新的镜像（commit 会将对容器的变更保存下来，生成新的镜像..." />
+    <meta name="keywords" content="Docker,运维" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Docker 容器的迁移</h2>
+            <div class="post-date">2019-04-03</div>
+            
+              <div class="feature-container" style="background-image: url('https://xqinger.com/post-images/docker-container-move.jpeg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p>最近需要将一台服务器上的应用和数据迁移到另一台服务器上，由于全部使用了 <code>Docker</code> 部署，所以水篇文章</p>
+<!-- more -->
+<h2 id="1-通过云端仓库迁移">1. 通过云端仓库迁移</h2>
+<h3 id="11-备份容器">1.1 备份容器</h3>
+<p>首先将容器进行备份，创建一个新的镜像（commit 会将对容器的变更保存下来，生成新的镜像）:</p>
+<pre><code>docker commit 容器ID 备份后的镜像名:标签
+</code></pre>
+<h3 id="12-将容器推送到云端仓库">1.2 将容器推送到云端仓库</h3>
+<p>登录 docker 仓库（阿里云有免费的）</p>
+<pre><code>docker login 地址
+</code></pre>
+<p>标记镜像到仓库（重命名）</p>
+<pre><code>docker tag 镜像ID 仓库/名称:标签
+</code></pre>
+<p>推送镜像</p>
+<pre><code>docker push 仓库/名称:标签
+</code></pre>
+<h3 id="13-拉取镜像并部署">1.3 拉取镜像并部署</h3>
+<p>从云端仓库拉取镜像</p>
+<pre><code>docker pull 仓库/名称:标签
+</code></pre>
+<p>从镜像启动容器</p>
+<pre><code>docker run 仓库/名称:标签
+</code></pre>
+<h2 id="2-通过镜像文件迁移">2. 通过镜像文件迁移</h2>
+<h3 id="21-备份容器">2.1 备份容器</h3>
+<p>首先将容器进行备份，创建一个新的镜像:</p>
+<pre><code>docker commit 容器ID 备份后的镜像名:标签
+</code></pre>
+<h3 id="22-导出为文件">2.2 导出为文件</h3>
+<p>将镜像打包为 tar 文件</p>
+<pre><code>docker save -o 目录 镜像
+</code></pre>
+<h3 id="23-导入镜像">2.3 导入镜像</h3>
+<p>将 tar 传输到另一台服务器后，导入 tar 包</p>
+<pre><code>docker load -i tar文件
+</code></pre>
+<p>然后启动镜像即可</p>
+<pre><code>docker run 镜像
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xqinger.com/tag/AlAERsB8l/" class="tag">
+                    Docker
+                  </a>
+                
+                  <a href="https://xqinger.com/tag/aHm7gsbn_/" class="tag">
+                    运维
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xqinger.com/post/2018summary/">
+                  <h3 class="post-title">
+                    蒟蒻的2018年度总结
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

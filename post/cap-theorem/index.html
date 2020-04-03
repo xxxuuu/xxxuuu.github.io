@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>分布式系统 CAP 理论 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="CAP 理论是分布式系统的基本定理，也是我们理解分布式系统的起点。
+
+1. CAP 理论
+1998 年，加州大学的计算机科学家 Eric Brewer 提出，分布式系统有三个指标：
+
+Consistency 一致性
+Availability..." />
+    <meta name="keywords" content="分布式,架构" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">分布式系统 CAP 理论</h2>
+            <div class="post-date">2019-05-28</div>
+            
+              <div class="feature-container" style="background-image: url('https://xqinger.com/post-images/cap-theorem.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p>CAP 理论是分布式系统的基本定理，也是我们理解分布式系统的起点。</p>
+<!-- more -->
+<h1 id="1-cap-理论">1. CAP 理论</h1>
+<p>1998 年，加州大学的计算机科学家 <em>Eric Brewer</em> 提出，分布式系统有三个指标：</p>
+<ul>
+<li><strong>Consistency 一致性</strong></li>
+<li><strong>Availability 可用性</strong></li>
+<li><strong>Partition tolerance 分区容错性</strong></li>
+</ul>
+<p>并且在分布式系统中，三者不可兼得。这就是 CAP 定理</p>
+<figure data-type="image" tabindex="1"><img src="https://xqinger.com/post-images/1559031332586.jpg" alt="CAP理论" loading="lazy"></figure>
+<h2 id="11-consistency-一致性">1.1 Consistency 一致性</h2>
+<p>一致性指的是在分布式系统中，是否<strong>所有</strong>节点都拥有数据的最新版本。</p>
+<p>当其中一个节点的数据被更新时，如果其它节点的数据没有得到更新，用户再读取到的可能就是其它节点的旧数据，此时就出现了数据不一致的情况。</p>
+<p>如果能保证当某一节点更新时，所有用户都能读取到数据的最新版本，就能说该分布式系统拥有<strong>强一致性</strong>。</p>
+<p>从 CAP理论 我们可以得知三者无法兼得，但选择 AP 并不意味着完全放弃 C，只是无法实现强一致性。一致性是分为多个级别的：</p>
+<ul>
+<li><strong>强一致性</strong>：保证所有节点都拥有数据的最新版本，用户读取的永远是最新值</li>
+<li><strong>弱一致性</strong>：无法保证立刻能取得最新值，但在一定时间后或许能实现一致</li>
+<li><strong>最终一致性</strong>：弱一致性的特殊形式，指的是能保证数据在更新前，返回最新值。最终一致性是目前在工业界在大型分布式系统上广泛使用的一种一致性模型</li>
+</ul>
+<h2 id="12-availability-可用性">1.2 Availability 可用性</h2>
+<p>可用性指的是在分布式系统中，系统提供的服务必须一直处于可用的状态，对用户的所有请求都必须能在有限时间内响应。</p>
+<p>其中，<strong>有限时间</strong>指的是在系统设计之初就就设定好的指标。<strong>响应</strong>指的是系统在处理完后应该返回一个明确的结果而不该令用户感到困惑。</p>
+<p>和一致性一样，这里的可用性指的是<strong>极致可用性</strong>。可用性的值域可以定义成0到100%的连续区间。</p>
+<h2 id="13-partition-tolerance-分区容错性">1.3 Partition tolerance 分区容错性</h2>
+<p>在分布式系统中，一般节点在各个网络中应该是连通的，然而由于网络或其它原因，节点之间的通信可能会失败，网络就给划分成了若干区域，这些区域就是分区。</p>
+<p>假设当某项数据只存储在系统的一个节点中，当出现分区时，这个数据就可能无法被访问；或者用户的某些操作在系统中涉及多个节点，但由于分区使得操作无法进行，这些都是难以接受的。所以分区容错性就是在网络出现分区时，系统依然能够正常运行，或者说依然能保证一致性或可用性。</p>
+<p>准确的定义是：</p>
+<blockquote>
+<p>In order to model partition tolerance, the network will be allowed to losearbitrarily many messages sent from one node to another.</p>
+</blockquote>
+<p><strong>系统能够容忍节点间通信时丢失任意多的消息</strong></p>
+<h1 id="2-矛盾与选择">2. 矛盾与选择</h1>
+<p>CAP 理论告诉我们，一致性、可用性和分区容错性无法兼得，为什么三者无法同时成立呢？我们先来考虑能选择的三种情况。</p>
+<h2 id="21-ca">2.1 CA</h2>
+<p>放弃分区容错性，强一致性和极致可用性是可以保证的，但这意味着不允许系统中存在分区。实际上这在分布式系统中几乎是不可能的，由于各种天灾人祸，分区无法避免。所以 CA 系统基本就是传统的单机系统。或者说，分布式系统无法舍弃 P ，我们也默认 P 是必须实现的。</p>
+<h2 id="22-cp">2.2 CP</h2>
+<p>降低对可用性的要求，追求强一致性和分区容错性。相当于对数据的任何操作都需要在节点间同步，而分区问题可能导致同步时间无限延长，可用性便降低了。</p>
+<h2 id="23-ap">2.3 AP</h2>
+<p>追求可用性并允许分区，则当分区发生时，为了能够保持可用性，每个节点只能用本地的可能是过时的数据来提供服务，这就放弃了强一致性。AP 还是目前大多数分布式系统的选择。</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xqinger.com/tag/pYvZx8dA5/" class="tag">
+                    分布式
+                  </a>
+                
+                  <a href="https://xqinger.com/tag/UwyCxVLC-/" class="tag">
+                    架构
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xqinger.com/post/microservice-concept/">
+                  <h3 class="post-title">
+                    微服务架构概念与基础知识
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

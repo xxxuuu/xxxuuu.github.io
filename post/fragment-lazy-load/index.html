@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Fragment 懒加载实现 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="Android 中 Fragment 懒加载的实现及封装
+
+关于懒加载
+我们常用的多页面布局是利用TabLayout+Fragment+ViewPager组合完成的。
+而ViewPager是预先加载机制，ViewPager会预先加载当前界面..." />
+    <meta name="keywords" content="Android" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Fragment 懒加载实现</h2>
+            <div class="post-date">2018-03-10</div>
+            
+            <div class="post-content" v-pre>
+              <p><code>Android</code> 中 <code>Fragment</code> 懒加载的实现及封装</p>
+<!-- more -->
+<h2 id="关于懒加载">关于懒加载</h2>
+<p>我们常用的多页面布局是利用<code>TabLayout</code>+<code>Fragment</code>+<code>ViewPager</code>组合完成的。</p>
+<p>而<code>ViewPager</code>是预先加载机制，<code>ViewPager</code>会预先加载当前界面左侧和右侧的<code>View</code>以便切换时快速访问</p>
+<figure data-type="image" tabindex="1"><img src="https://xqinger.com/post-images/1557031841043.jpg" alt="ViewPager加载机制" loading="lazy"></figure>
+<p>在界面需要的数据量少的时候，预加载能实现无缝切换的效果。但数据量一多，反而会拖慢速度、耗费资源，极大影响用户体验。</p>
+<p>所以在这种情况下，懒加载登场了。</p>
+<p>懒加载是APP中常用的一种加载方式，像知乎就使用了懒加载。</p>
+<p>相比于普通的加载方式，懒加载只有在用户<strong>看到</strong>界面时才会加载数据，这样能最大程度减小资源消耗。特别是对于手机来说，本来就少的可怜的内存和流量是十分珍贵的。</p>
+<p>接下来，我们同样利用<code>TabLayout</code>+<code>Fragment</code>+<code>ViewPager</code>来实现多页面切换的懒加载。</p>
+<hr>
+<h2 id="具体实现">具体实现</h2>
+<p>在<code>Fragment</code>中有一个方法<code>setUserVisibleHint()</code>，在<code>Fragment</code>的可见状态变更时该方法会被调用。</p>
+<p>这个方法就是懒加载的实现关键。</p>
+<p>我们定义变量<code>isVisibleToUser</code>来存储<code>Fragment</code>的可见状态：</p>
+<pre><code class="language-Java">public void setUserVisibleHint(boolean isVisibleToUser)
+{
+    super.setUserVisibleHint(isVisibleToUser);
+    this.isVisibleToUser = isVisibleToUser;
+    lazyInitData();
+}
+</code></pre>
+<blockquote>
+<p>由于<code>setUserVisibleHint()</code>的回调时机与<code>Fragment</code>的生命周期并没有100%关联。因此 引入另一个标志位<code>isPrepareView</code>判断<code>View</code>是否加载完成 以避免空指针</p>
+</blockquote>
+<pre><code class="language-Java">public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+{
+    super.onViewCreated(view, savedInstanceState);
+    isPrepareView = true;
+}
+</code></pre>
+<p>接着，进行数据初始化，引入第二个标志位<code>isInitData</code>。在数据加载完成之后，将其赋值为<code>true</code>。</p>
+<p>至此，我们的懒加载方法考虑了所有条件。也就是当<code>isVisibleToUser</code>为<code>true</code>、<code>isInitData</code>为<code>false</code>、<code>isPrepareView</code>为<code>true</code>时。</p>
+<p>接着完成数据加载方法，并且加载后为了防止重复调用，将<code>isInitData</code>赋值为<code>true</code>。</p>
+<pre><code class="language-Java">private void lazyInitData()
+{
+    //全部符合条件才进行加载
+    if(!isInitData &amp;&amp; isPrepareView &amp;&amp; isVisibleToUser)
+    {
+        isInitData = true;
+        initData();
+    }
+}
+</code></pre>
+<p><code>lazyInitData()</code>的调用时机，首先是在<code>setUserVisibleHint()</code>：</p>
+<pre><code class="language-Java">public void setUserVisibleHint(boolean isVisibleToUser)
+{
+    super.setUserVisibleHint(isVisibleToUser);
+    this.isVisibleToUser = isVisibleToUser;
+    lazyInitData();
+}
+</code></pre>
+<p>然后，为了防止在某些情况下<code>setUserVisibleHint()</code>在<code>onCreateView()</code>之前被调用，导致不主动加载数据。</p>
+<p>我们需要在<code>View</code>创建完成后再执行一次该方法：</p>
+<pre><code class="language-Java">public void onActivityCreated(@Nullable Bundle savedInstanceState)
+{
+    super.onActivityCreated(savedInstanceState);
+    lazyInitData();
+}
+</code></pre>
+<p>当<code>Fragment</code>被回收后，如果没有做缓存处理，就需要重置状态，不然再次划回去就不会自动加载数据。<br>
+在<code>onDestroy()</code>和<code>onDestroyView()</code>方法中将<code>isInitData</code>和<code>isPrepareView</code>重新赋值为<code>false</code>：</p>
+<pre><code class="language-Java">@Override
+public void onDestroy()
+{
+    isInitData = false;
+    isPrepareView = false;
+    super.onDestroy();
+}
+
+@Override
+public void onDestroyView()
+{
+    isInitData = false;
+    isPrepareView = false;
+    super.onDestroyView();
+}
+</code></pre>
+<p>至此，<code>Fragment</code>的懒加载已经实现完毕。</p>
+<hr>
+<h2 id="封装">封装</h2>
+<p>为了更好的复用性以及遵守面向对象思想，我们对懒加载的实现进行封装。</p>
+<p>创建一个继承<code>Fragment</code>的抽象类，实现懒加载主要方法；</p>
+<p>任何需要懒加载功能的<code>Fragment</code>只需要继承该类并重写相关方法即可实现。</p>
+<p>该类代码如下：</p>
+<pre><code class="language-Java">/**
+ * 抽象封装的懒加载Fragment
+ */
+public abstract class AbsLazyFragment extends Fragment
+{
+    private boolean isPrepareView = false;  //用来确定View是否创建完成
+    private boolean isInitData = false;     //数据是否加载完成
+    private boolean isVisibleToUser = false;//Fragment是否可见
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState)
+    {
+        return super.onCreateView(inflater, container, savedInstanceState);
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState)
+    {
+        super.onViewCreated(view, savedInstanceState);
+        isPrepareView = true;
+    }
+
+    /**
+     * 由子类实现具体的加载数据方法
+     */
+    abstract void initData();
+
+    /**
+     * 懒加载
+     */
+    private void lazyInitData()
+    {
+        //全部符合条件才进行加载
+        if(!isInitData &amp;&amp; isPrepareView &amp;&amp; isVisibleToUser)
+        {
+            isInitData = true;
+            initData();
+        }
+    }
+
+    /**
+     * Fragment可见状态变化时该方法被调用
+     * @param isVisibleToUser
+     */
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser)
+    {
+        super.setUserVisibleHint(isVisibleToUser);
+        this.isVisibleToUser = isVisibleToUser;
+        lazyInitData();
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+        lazyInitData();
+    }
+    
+    //Fragment给回收后需重新加载
+    @Override
+    public void onDestroy()
+    {
+        isInitData = false;
+        isPrepareView = false;
+        super.onDestroy();
+    }
+
+    @Override
+    public void onDestroyView()
+    {
+        isInitData = false;
+        isPrepareView = false;
+        super.onDestroyView();
+    }
+}
+</code></pre>
+<p>子类通过继承抽象类实现懒加载：</p>
+<pre><code class="language-Java">public class CustomFragment extends AbsLazyFragment implements SwipeRefreshLayout.OnRefreshListener
+{
+    private SwipeRefreshLayout sl;
+    private TextView tv;
+
+    private int uid;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Nullable
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState)
+    {
+        View view = inflater.inflate(R.layout.fragment_custom, container, false);
+        sl = (SwipeRefreshLayout)view.findViewById(R.id.fragment_sl);
+        tv = (TextView)view.findViewById(R.id.fragment_tv);
+
+        sl.setOnRefreshListener(this);
+        sl.setRefreshing(false);
+
+        return view;
+    }
+
+    public int getUid()
+    {
+        return uid;
+    }
+
+    public void setUid(int uid)
+    {
+        this.uid = uid;
+    }
+
+    @Override
+    public void onRefresh()
+    {
+        initData();
+    }
+
+    /**
+     * 重写加载数据方法
+     */
+    @Override
+    void initData()
+    {
+        tv.setText(&quot;&quot;);
+        sl.setRefreshing(true);
+        sl.postDelayed(new Runnable()   //模拟耗时操作
+        {
+            @Override
+            public void run()
+            {
+                tv.setText(&quot;fragment&quot; + getUid());
+                sl.setRefreshing(false);
+            }
+        }, 2000);
+    }
+
+}
+</code></pre>
+<h2 id="demo地址">Demo地址</h2>
+<blockquote>
+<p><a href="https://github.com/xxxuuu/LazyLoadDemo">GitHub</a></p>
+</blockquote>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xqinger.com/tag/wX1veamLT/" class="tag">
+                    Android
+                  </a>
+                
+              </div>
+            
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>

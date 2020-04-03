@@ -1,0 +1,892 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://xqinger.com</id>
+    <title>某不科學の技術博客</title>
+    <updated>2020-04-03T16:33:41.343Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://xqinger.com"/>
+    <link rel="self" href="https://xqinger.com/atom.xml"/>
+    <subtitle>🗒随便写点东西的地方</subtitle>
+    <logo>https://xqinger.com/images/avatar.png</logo>
+    <icon>https://xqinger.com/favicon.ico</icon>
+    <rights>All rights reserved 2020, 某不科學の技術博客</rights>
+    <entry>
+        <title type="html"><![CDATA[云上两地三中心分布式容灾架构设计与实现]]></title>
+        <id>https://xqinger.com/post/three-center-in-two-places/</id>
+        <link href="https://xqinger.com/post/three-center-in-two-places/">
+        </link>
+        <updated>2020-03-21T16:16:35.000Z</updated>
+        <summary type="html"><![CDATA[<p>最近给忽悠去了华为的鲲鹏创新大赛，要求设计一个分布式的在线教学管理系统，于是乎顺便开个坑</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>最近给忽悠去了华为的鲲鹏创新大赛，要求设计一个分布式的在线教学管理系统，于是乎顺便开个坑</p>
+<!-- more -->
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[蒟蒻的2019年度总结]]></title>
+        <id>https://xqinger.com/post/2019summary/</id>
+        <link href="https://xqinger.com/post/2019summary/">
+        </link>
+        <updated>2020-01-01T15:21:25.000Z</updated>
+        <summary type="html"><![CDATA[<p>随着2019年最后一晚的落幕，21世纪的10年代也结束了，今年的我无论是在技术上还是别的方面，都成长了许多。以本文记录我的技术路程，迎接新的一年</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>随着2019年最后一晚的落幕，21世纪的10年代也结束了，今年的我无论是在技术上还是别的方面，都成长了许多。以本文记录我的技术路程，迎接新的一年</p>
+<!-- more -->
+<h2 id="0x00-算法">0x00 算法</h2>
+<p>从一开始的算法来说吧，原本上大学前计划和胡神一起打 ACM，但最终我还是弃坑了。其实在这方面感觉自己还是一个比较势利的人，ACM 需要的付出时间和精力太多。而我又不愿放下其他方面，这样的状态不可能有一个好的训练效果，而 ACM 如果没能在区域赛拿到牌子，就是一件性价比极低的事情。既耗费了大量时间，也没有得到一个好的回报。</p>
+<p>弃坑后有一段时间还是觉得挺对不起胡神的，对他来说，这些就是他的全部了吧。我真的很佩服他能一直坚持下去。现在看到他带新生搞的也还行，我脸皮又厚，也就无所谓了，在这里也祝愿他能追求到自己想要的。</p>
+<p>也得益于大一开学前短暂的训练经历，吃着这些老本在 2019 年上半年的算法竞赛中还是取得了一些小成绩：</p>
+<ul>
+<li>蓝桥杯省赛一等奖第二名（2019-3-24）</li>
+<li>团体程序设计天梯赛全国高校一等奖，全国团队一等奖，广东团队特等奖（2019-3-30）</li>
+<li>蓝桥杯国赛一等奖第四名（2019-05-25）</li>
+</ul>
+<h2 id="0x01-技能大赛">0x01 技能大赛</h2>
+<p>作为中职免试生，我很清楚在当前国内职教环境下的竞赛红利。所以就算在我十分了解技能大赛的水平、含金量以及各种潜规则后，我还是选择了在深职继续参加技能大赛，计划是大一一步到位拿下国一，之后就不再碰了。</p>
+<p>这次参加的赛项是人工智能，也借此学习了一些相关的机器学习知识与 TensorFlow 等框架。结果技能大赛果然没让我失望，比赛内容不过是搭建环境、数据标注、仅有的编程内容也就只是给点云排个序而已。</p>
+<p>在财大气粗的深职搞技能大赛，也让我更加深刻地见识到强校与弱校的差别，花钱买设备、培训后，比赛对于我们来说几乎是透明的，每一步都了如指掌。而之前在中职，学校没钱买设备、参加培训。我们了解到的比赛内容也就只有那份模糊不清的样题。</p>
+<p>在深职有了学校的支持，我们当然也就轻而易举地拿下省一。不过可惜的是之后被告知国赛取消，确实是打乱了我的计划。还在犹豫要不要继续参加 AI 技能大赛，结果到了大二上学期末时，老师告知新增了个 Web 开发的赛项，我对 Web开发也比较熟悉，而且在查过资料后了解到别的省份之前就举办过了，这种成熟领域有国赛可能性是非常大的，便跳槽了过去。</p>
+<p>前两天工程师来培训后，我们拿到了样题，看了眼也确实都是已经掌握的技术，就等熟悉下具体细节了，对于这个赛项还是非常有信心的。</p>
+<h2 id="0x02-web开发">0x02 Web开发</h2>
+<p>在去年的总结中就谈到，中职由于竞赛的关系，一直接触的 Android 开发。但后来逐渐觉得 Android开发没啥前途，现在看来也确实是这样，去年五月 Kotlin 还来势汹汹，到现在 Native 开发已经被 Flutter 一个跨端框架逐渐占领市场，Android 开发在发展上技术迭代过快但深度又不足，移动互联网的红利期也早已过去。</p>
+<p>对我来说 Web 开发更能提起我的兴趣（特别是后端）。于是也毅然转向了 Web 这块，点了大半年的技能树。还是掌握了不少东西的，也可以算全<s>栈</s>菜工程师了。</p>
+<p>虽然大部分都是都是不算 hard 的框架和中间件，但通过阅读源码和学习设计模式，还是接触到了很多软件设计方面的思想，可以说是受益匪浅。</p>
+<p>还学习了函数范式，其思想非常有意思，让我有种「噢~ 原来程序还可以这样写」的感觉。</p>
+<h2 id="0x03-基础巩固-and-科班理论">0x03 基础巩固 and 科班理论</h2>
+<p>没有人愿意止步于框架仔与码农，但专科的确严重缺乏理论课程。</p>
+<p>之前在知乎看到一位 T 大同学的简历，里面有一句话：</p>
+<blockquote>
+<p>实现了在自己写的 CPU 上运行自己写的操作系统，以及自己实现的编译器生成的程序</p>
+</blockquote>
+<p>这句话确实深深震撼到了我，强校的本科生与我们的差距是如此之大。于是，我也给自己定了一个毕业前的小目标，不论深度，至少能做到这句话的一半：</p>
+<blockquote>
+<p>在自己写的操作系统上运行自己实现的编译器生成的程序</p>
+</blockquote>
+<p>于是在大二上学期，稍微补了下基础。例如 Spring 系列框架原理与实现，Java 的 JVM，IO，多线程等等等等。随后开始学习计算机组成原理与计算机网络。这个阶段完成后就开始学习编译原理与操作系统，朝着毕业目标去努力。</p>
+<h2 id="0x04-职业生涯发展与其他">0x04 职业生涯发展与其他</h2>
+<p>无论是我们国家还是深职，都一直推行所谓的创新创业教育，我对这并不感冒，在我看来更多不过是应对日益增多的高校毕业生与逐渐凸显的老龄化问题带来的工作岗位减少与失业率上升的缓解政策而已。当然由于学校强推与老师忽悠，我也参加过互联网+、计算机设计大赛之类的双创赛，在挑战杯也挂了个名混了个奖项：</p>
+<ul>
+<li>第十五届 “挑战杯” 广东大学生课外学术科技作品竞赛二等奖（2019-05）</li>
+</ul>
+<p>我确实是一个很纯粹的技术人，没有什么能比做技术更让我开心。但人总要向现实低头，在课余时间我还是会做一些外包来赚赚零花钱。不过和之前的大学作业与过家家玩具比起来，现在都是参与到公司中做真正的商业项目。当然，外包还是外包，没什么技术含量，只不过数万行的代码屎山变成了数十万行而已。</p>
+<p>在这一过程中我也渐渐了解到「软件工程」的重要性，项目开发是需要管理的，只有技术是不行的。在自己的项目里我也开始使用一些项目管理解决方案来进行开发过程的管理，模仿大企业中的开发流程和规范。比起以前小作坊式开发，现在开发和维护效率有了很大提升，也显得更加“正式”了些。</p>
+<p>以后还是希望能进一个以技术为导向或技术氛围浓厚的互联网、科技企业中工作，像BAT这类大厂肯定是最好的（不过人家看不看得上我就另说了）</p>
+<h2 id="0x05-总结">0x05 总结</h2>
+<p>总有那么一瞬间感觉自己还在高三，拿起手机刚收到深职的面试通知。一眨眼原来已经大二了，在学校待的时间也只剩下最后一年，在这最后的一年里希望能把握好自己的机会，在技术上有所突破，插本也能考上心仪的学校吧</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[没有银弹]]></title>
+        <id>https://xqinger.com/post/no-silver-bullet/</id>
+        <link href="https://xqinger.com/post/no-silver-bullet/">
+        </link>
+        <updated>2019-12-14T13:44:50.000Z</updated>
+        <summary type="html"><![CDATA[<blockquote>
+<p>“没有任何一种单纯的技术或管理上的进步，能够独立地承诺在十年内大幅度地提高生成率、可靠性和简洁性。”<br>
+—— Fred Brooks</p>
+</blockquote>
+]]></summary>
+        <content type="html"><![CDATA[<blockquote>
+<p>“没有任何一种单纯的技术或管理上的进步，能够独立地承诺在十年内大幅度地提高生成率、可靠性和简洁性。”<br>
+—— Fred Brooks</p>
+</blockquote>
+<!-- more -->
+<p>在所有恐怖民间传说的妖怪中，最可怕的是狼人，因为它们可以完全出乎意料地从熟悉的面孔变成可怕的怪物。为了对付狼人，我们在寻找可以消灭它们的银弹。</p>
+<p>软件项目具有一些狼人的特性，常常看似简单明了的东西，却有可能变成一个落后进度、超出预算、存在大量缺陷的怪物。因此，我们听到了近乎绝望的寻求银弹的呼唤，寻求一种可以使软件成本像计算机硬件成本一样迅速降低的尚方宝剑。</p>
+<p>但正如开头 Fred Brooks 那句话，软件工程中，“没有银弹”。没有一种能够遏制软件向“怪物”变异、同时还可大幅提升开发效率和产品质量的武器。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Blog 之持续部署]]></title>
+        <id>https://xqinger.com/post/blog-cd/</id>
+        <link href="https://xqinger.com/post/blog-cd/">
+        </link>
+        <updated>2019-10-30T17:08:52.000Z</updated>
+        <summary type="html"><![CDATA[<p>原来本 blog 是在 GitHub Pages 上静态托管的，奈何速度过慢，CDN 效果一般（也许是我配置问题？）。又不想在托管在 Coding Pages 上，便计划将其通过 持续部署（Continuous Deployment）部署在阿里云的服务器上。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>原来本 blog 是在 GitHub Pages 上静态托管的，奈何速度过慢，CDN 效果一般（也许是我配置问题？）。又不想在托管在 Coding Pages 上，便计划将其通过 持续部署（Continuous Deployment）部署在阿里云的服务器上。</p>
+<!-- more -->
+<p>本文介绍两种实现方法，一种是通过 <code>Jenkins</code> 实现，一种是自己通过 <code>Node.js</code> 编码实现。</p>
+<h2 id="1-jenkins-实现">1. Jenkins 实现</h2>
+<blockquote>
+<p>Jenkins 是开源 CI&amp;CD 软件领导者</p>
+</blockquote>
+<p>在 Jenkins 官网上的介绍有这么一句话，简单粗暴地说明了 Jenkins 的用途及其地位。</p>
+<h3 id="11-jenkins-安装">1.1 Jenkins 安装</h3>
+<p>首先安装 Jenkins, 其实官方文档都很全面了，跟着做就好了。</p>
+<p>这里使用 Docker 部署。对 Docker 不熟练的自行补课。</p>
+<pre><code class="language-shell">sudo docker run \
+  -u root \
+  -d \ 
+  -p 9000:8080 \ 
+  -v /www/wwwroot/jenkins:/var/jenkins_home \ 
+  -v /var/run/docker.sock:/var/run/docker.sock \ 
+  jenkinsci/blueocean 
+</code></pre>
+<p>Jenkins 安装完成后，访问其网址（ docker run 里 <code>-v 9000:8080</code> 的 9000 就是其端口 ）。</p>
+<p>第一次进入会要求输入随机生成的解锁密码，访问页面上给出的路径文件得到初始密码，复制进去即可。</p>
+<p>接下来是安装插件，使用推荐的设置即可。再创建管理员用户。</p>
+<p>至此，Jenkins 的安装完成</p>
+<h3 id="12-新建-jenkins-项目-与-配置">1.2 新建 Jenkins 项目 与 配置</h3>
+<p>来到部署好的 Jenkins 主页</p>
+<figure data-type="image" tabindex="1"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191123220959.png?x-oss-process=style/compress" alt="Jenkins主页" loading="lazy"></figure>
+<p>点击新建任务，我们的项目很简单，命名后选择 Freestyle Project 就可以了<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124000729.png?x-oss-process=style/compress" alt="新建任务" loading="lazy"></p>
+<p>然后配置我们的项目：</p>
+<p>描述随便填，下面的 Github 项目打钩，填仓库地址<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124001132.png?x-oss-process=style/compress" alt="配置1" loading="lazy"></p>
+<p>下面源码管理同样选择 Git，配置仓库地址和分支。源码库浏览器选择 githubweb，这里的 URL 注意要是 <code>.git</code> 后缀的。构建被触发后 Jenkins 会自动从该地址 clone 源码到 Jenkins 目录下的 <code>workspace/项目名</code> 文件夹，也可以在项目详情中直接访问该文件夹。<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124001216.png?x-oss-process=style/compress" alt="配置2" loading="lazy"></p>
+<p>构建触发器这里有两个比较常用，一个是 GiHub hook 触发，一个是轮询仓库，有更新就触发</p>
+<p>Github hook 可以在 Github 仓库中配置，当执行某种操作（如push，releases）后就会自动访问指定的 <code>URL</code>，而 Jenkins 的这个 Github hook URL 被访问到后，就会触发构建。</p>
+<p>轮询中的定时器语法类似 <code>crontab</code>，例如这里的就是每隔 5 分钟检测一次仓库。本项目我们只用到 Github hook，轮询只是个语法演示<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124002325.png?x-oss-process=style/compress" alt="配置3" loading="lazy"></p>
+<p>最后面的构建是用来设置触发构建后执行的操作，因为 Jenkins 会自动 clone 代码，这里就只是简单的输出意思一下<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124012428.png?x-oss-process=style/compress" alt="配置4" loading="lazy"></p>
+<p>点击保存，项目新建完成。当然还可以做别的设置，如自动化测试、构建成功\失败的邮件提醒等等等等，这里不做过多演示。</p>
+<p>接下来我们去配置仓库的 Github Webhooks，进入仓库的 Settings -&gt; Webhooks -&gt; add webhook。URL 默认是 <code>Jenkins地址/github-webhook/</code>，其他设置默认值即可。</p>
+<figure data-type="image" tabindex="2"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124003618.png?x-oss-process=style/compress" alt="Github仓库Webhooks配置" loading="lazy"></figure>
+<p>尝试对仓库提交更新，若配置无误，下方的 Recent Deliveries 会显示 hook 的记录，并且左边有个绿勾表示成功执行，同样在 commits 里也能看到提交后面的绿勾，表示这次提交已经被成功 hook</p>
+<figure data-type="image" tabindex="3"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124003937.png?x-oss-process=style/compress" alt="Recent Deliveries" loading="lazy"></figure>
+<p>接下来回到 Jenkins，就会看到左下角的构建队列正在进行构建。</p>
+<figure data-type="image" tabindex="4"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124004431.png?x-oss-process=style/compress" alt="构建队列" loading="lazy"></figure>
+<p>点击构建ID，进入到构建详情，点击控制台输出。就能看到正在执行拉取，之后会执行之前的构建脚本</p>
+<figure data-type="image" tabindex="5"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124004516.png?x-oss-process=style/compress" alt="构建控制台输出" loading="lazy"></figure>
+<h3 id="13-jenkins-中-git-clone-错误">1.3 Jenkins 中 git clone 错误</h3>
+<p>有时候在构建过程中可能会发生如下错误：<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124004937.png?x-oss-process=style/compress" alt="clone错误" loading="lazy"></p>
+<p>这可能是因为 Github 访问较慢而 clone 超时。回到项目设置里的源码管理，添加额外行为（	Additional Behaviours），选择高级的克隆行为（Advanced clone behaviours），将超时时间设置为一个较长的值即可<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124005323.png?x-oss-process=style/compress" alt="设置超时时间" loading="lazy"></p>
+<h3 id="14-其他配置">1.4 其他配置</h3>
+<p>Jenkins 已经构建完成，接下来该做些其它设置了。<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124015653.png?x-oss-process=style/compress" alt="构建完成" loading="lazy"></p>
+<p>首先是域名，域名原本解析到 Github Pages 的指定 IP，现在更改回到本服务器</p>
+<p>二是服务器的搭建，由于之前通过 Docker 安装 Jenkins 时指定了 Volume，所以可以直接在宿主机上同步容器内的对应目录数据。在 Nginx 中对该目录配置成静态站点即可<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124015102.png?x-oss-process=style/compress" alt="Nginx配置" loading="lazy"></p>
+<p>再次访问 <a href="https://xqinger.com">blog</a>，可以看到主页加载速度已经从原来的将近 10s 提升到 28ms<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20191124015354.png?x-oss-process=style/compress" alt="主页加载耗时" loading="lazy"></p>
+<p>至此，Jenkins 实现 Blog 持续部署的部分已经结束。往后只需要往 Github 仓库中 push，Jenkins 便会将剩下的一切做好，这是一个完全无感的过程，也算是践行了 DevOps（笑</p>
+<h2 id="2-nodejs-编码实现">2. Node.js 编码实现</h2>
+<p>自己实现的原理也很简单，和上面的 Jenkins 一样，只需要编写一个接收 Github Webhooks 的接口，接收到 hook 再执行操作即可。</p>
+<p>先设计大致的功能：</p>
+<ul>
+<li>接收到 hook 时把项目 pull 下来</li>
+<li>有基础的配置，如运行端口、拉取路径、分支等</li>
+<li>拉取后可以执行指定 shell 文件</li>
+</ul>
+<h3 id="21-http监听">2.1 HTTP监听</h3>
+<p>翻阅 <a href="https://developer.github.com/webhooks/">Github Webhooks文档</a> ，可以看到，Github Webhooks 在触发指定事件后，会发送一个 POST 请求。</p>
+<p>所以我们只需要加载配置文件 <code>config.json</code> 获取配置，然后监听对应端口的 <code>POST</code> 请求</p>
+<pre><code class="language-JSON">{
+  &quot;clone_path&quot;: &quot;repos&quot;,
+  &quot;listen_port&quot;: 80
+}
+</code></pre>
+<pre><code class="language-JavaScript">let http = require('http');
+let querystring = require('querystring');
+let config = require('./config');
+
+// 默认clone路径
+let gitClonePath = './';
+// 默认端口
+let listenPort = 80;
+
+/**
+ * 初始化配置
+ */
+let initConfig = function() {
+    gitClonePath = config['clone_path'] || gitClonePath;
+    listenPort = config['listen_port'] || listenPort;
+};
+
+initConfig();
+http.createServer((req, res) =&gt; {
+    if(req.method !== 'POST') {
+        return;
+    }
+
+    let dataList = [];
+
+    req.on('data', buffer =&gt; {
+        dataList.push(buffer);
+    });
+    req.on('end', () =&gt; {
+        // 接收到的数据二进制流
+        let data = Buffer.concat(dataList).toString();
+    });
+    res.end();
+}).listen(listenPort);
+</code></pre>
+<h3 id="22-接收数据并拉取仓库">2.2 接收数据并拉取仓库</h3>
+<p>在文档的 <code>Webhook payload example</code> 里可以看到 <code>POST</code> 过来的数据格式，内容非常多，但我们的功能比较简单，只用获取其中的 <code>clone_url</code> 和 <code>name</code> 进行然后拉取项目到配置中的目录即可，添加以下代码：</p>
+<pre><code class="language-JavaScript">let exec = require('child_process').exec;
+let fs = require('fs');
+
+/**
+ * 执行命令并默认输出
+ * @param command 执行的命令
+ */
+let simpleExec = function(command) {
+    return new Promise((resolve, reject) =&gt; {
+        exec(command, (err, stdout, stderr) =&gt; {
+            if (err) {
+                console.log(stderr);
+            } else {
+                console.log(stdout);
+            }
+            resolve();
+        });
+    });
+};
+
+/**
+ * 拉取远程仓库
+ * @param clonePath 本地clone地址
+ * @param cloneUrl 远程仓库clone url
+ * @param repoName 仓库名
+ */
+let cloneRepo = async function(clonePath, cloneUrl, repoName) {
+    let repoPath = clonePath + '/' + repoName;
+    let pullCommand = 'cd ' + repoPath + ' &amp;&amp; git pull'
+    // 存在就pull，不存在clone
+    try {
+        fs.statSync(repoPath + '/.git/').isDirectory()
+    } catch (e) {
+        await simpleExec('git clone '  + cloneUrl + ' ' + repoPath);
+        return;
+    }
+    await simpleExec(pullCommand);
+};
+
+// ...中间省略
+
+req.on('end', () =&gt; {
+    // 接收到的数据二进制流
+    let data = Buffer.concat(dataList).toString();
+    // payload数据
+    let payload = JSON.parse(querystring.parse(data)['payload']);
+    // 仓库名和clone地址
+    let repoName = payload['repository']['name'];
+    let cloneUrl = payload['repository']['clone_url'];
+
+    (async () =&gt; {
+        await cloneRepo(gitClonePath, cloneUrl, repoName);
+    })();
+});
+</code></pre>
+<h3 id="23-安全性校验">2.3 安全性校验</h3>
+<p>涉及到执行命令，而且命令内容是动态传入的，肯定会有命令注入的问题。翻阅文档可以看到，请求头里有 <code>X-Hub-Signature</code> 这么一个参数，内容是对数据的 <code>HMAC-SHA1</code> 加密，而如果 hook 里配置了 <code>secret</code>，就会将其作为加密的 <code>token</code>。</p>
+<p>所以我们可以添加一个 <code>secret_token</code> 的配置项，然后在收到请求后对其进行校验，不通过则拒绝执行接下来的操作。杜绝命令注入的风险。同时还可以添加仓库的配置项，只有配置过的仓库才会执行。</p>
+<p>现在配置文件是下面这样的了：</p>
+<pre><code class="language-JSON">{
+  &quot;clone_path&quot;: &quot;repos&quot;,
+  &quot;listen_port&quot;: 80,
+  &quot;secret_token&quot;: &quot;token&quot;,
+  &quot;repo&quot;: {
+    &quot;xxxuuu.github.io&quot;: {
+    }
+  }
+}
+</code></pre>
+<p>在代码中添加校验：</p>
+<pre><code class="language-JavaScript">let crypto = require('crypto');
+
+/**
+ * SHA1加密
+ * @param str 待加密字符串
+ * @param token 密钥
+ * @return {string} 加密后字符串
+ */
+let sha1 = function(str, token) {
+    return crypto.createHmac('sha1', token).update(str).digest('hex');
+};
+
+// ...中间省略
+
+req.on('end', () =&gt; {
+    // 获取数据
+    // ...省略
+
+    // 密钥
+    let secret = req.headers['x-hub-signature'];
+
+    // 校验密钥
+    if(secret !== ('sha1='+ sha1(data, config['secret_token']))) {
+        return;
+    }
+
+    // 配置中没有这个仓库
+    if(!config.repo[repoName]) {
+        return;
+    }
+
+    // 拉取
+    // ...省略
+});
+</code></pre>
+<h3 id="24-拉取指定分支与执行-shell">2.4 拉取指定分支与执行 shell</h3>
+<p>再添加拉取指定分支和执行 shell 的功能，功能就全部完成了：</p>
+<pre><code class="language-JSON">{
+  &quot;clone_path&quot;: &quot;repos&quot;,
+  &quot;listen_port&quot;: 80,
+  &quot;secret_token&quot;: &quot;token&quot;,
+  &quot;repo&quot;: {
+    &quot;xxxuuu.github.io&quot;: {
+      &quot;branch&quot;: &quot;master&quot;,
+      &quot;shell&quot;: &quot;./run.sh&quot;
+    }
+  }
+}
+</code></pre>
+<p>拉取指定分支只是在 <code>cloneRepo</code> 中增加一个参数，<code>git pull</code> 和 <code>clone</code> 中指定分支。执行 shell 也只是执行命令运行配置路径中的 shell 文件</p>
+<pre><code class="language-JavaScript">/**
+ * 拉取远程仓库
+ * @param clonePath 本地clone地址
+ * @param cloneUrl 远程仓库clone url
+ * @param repoName 仓库名
+ * @param branch 远程仓库分支
+ */
+let cloneRepo = async function(clonePath, cloneUrl, repoName, branch) {
+    let repoPath = clonePath + '/' + repoName;
+    let pullCommand = 'cd ' + repoPath + ' &amp;&amp; git pull origin ' + branch + ':master';
+    // 存在就pull，不存在clone
+    try {
+        fs.statSync(repoPath + '/.git/').isDirectory()
+    } catch (e) {
+        await simpleExec('git clone -b ' + branch + ' ' + cloneUrl + ' ' + repoPath);
+        return;
+    }
+    await simpleExec(pullCommand);
+};
+
+// ...中间省略
+
+req.on('end', () =&gt; {
+    // 获取数据和校验
+    // ...省略
+
+    (async () =&gt; {
+        // 拉取
+        await cloneRepo(gitClonePath, cloneUrl, repoName, config.repo[repoName]['branch']);
+
+        // 执行shell
+        if(config.repo[repoName]['shell']) {
+            await simpleExec('sh ' + config.repo[repoName]['shell']);
+        }
+
+    })();
+});
+</code></pre>
+<h3 id="25-完善细节">2.5 完善细节</h3>
+<p>添加一些提示输出，大功告成：</p>
+<pre><code class="language-JavaScript">let http = require('http');
+let querystring = require('querystring');
+let config = require('./config');
+let exec = require('child_process').exec;
+let crypto = require('crypto');
+let fs = require('fs');
+
+// 默认clone路径
+let gitClonePath = './';
+// 默认端口
+let listenPort = 80;
+
+/**
+ * 初始化配置
+ */
+let initConfig = function() {
+    gitClonePath = config['clone_path'] || gitClonePath;
+    listenPort = config['listen_port'] || listenPort;
+};
+
+/**
+ * SHA1加密
+ * @param str 待加密字符串
+ * @param token 密钥
+ * @return {string} 加密后字符串
+ */
+let sha1 = function(str, token) {
+    return crypto.createHmac('sha1', token).update(str).digest('hex');
+};
+
+/**
+ * 执行命令并默认输出
+ * @param command 执行的命令
+ */
+let simpleExec = function(command) {
+    return new Promise((resolve, reject) =&gt; {
+        exec(command, (err, stdout, stderr) =&gt; {
+            if (err) {
+                console.log(stderr);
+            } else {
+                console.log(stdout);
+            }
+            resolve();
+        });
+    });
+};
+
+/**
+ * 拉取远程仓库
+ * @param clonePath 本地clone地址
+ * @param cloneUrl 远程仓库clone url
+ * @param repoName 仓库名
+ * @param branch 远程仓库分支
+ */
+let cloneRepo = async function(clonePath, cloneUrl, repoName, branch) {
+    let repoPath = clonePath + '/' + repoName;
+    let pullCommand = 'cd ' + repoPath + ' &amp;&amp; git pull origin ' + branch + ':master';
+    // 存在就pull，不存在clone
+    try {
+        fs.statSync(repoPath + '/.git/').isDirectory()
+    } catch (e) {
+        await simpleExec('git clone -b ' + branch + ' ' + cloneUrl + ' ' + repoPath);
+        return;
+    }
+    await simpleExec(pullCommand);
+};
+
+
+initConfig();
+http.createServer((req, res) =&gt; {
+    if(req.method !== 'POST') {
+        return;
+    }
+
+    let dataList = [];
+
+    req.on('data', buffer =&gt; {
+        dataList.push(buffer);
+    });
+    req.on('end', () =&gt; {
+        // 接收到的数据二进制流
+        let data = Buffer.concat(dataList).toString();
+        // payload数据
+        let payload = JSON.parse(querystring.parse(data)['payload']);
+        // 仓库名和clone地址
+        let repoName = payload['repository']['name'];
+        let cloneUrl = payload['repository']['clone_url'];
+        // 密钥
+        let secret = req.headers['x-hub-signature'];
+
+        // 校验密钥
+        if(secret !== ('sha1='+ sha1(data, config['secret_token']))) {
+            return;
+        }
+
+        // 配置中没有这个仓库
+        if(!config.repo[repoName]) {
+            return;
+        }
+
+        (async () =&gt; {
+            console.log('&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;');
+            console.log('[%s] %s正在部署...', new Date().toLocaleString(), repoName);
+
+            // 拉取
+            console.log('[%s] 拉取项目中...', new Date().toLocaleString());
+            await cloneRepo(gitClonePath, cloneUrl, repoName, config.repo[repoName]['branch']);
+            console.log('[%s] 拉取完毕', new Date().toLocaleString());
+
+            // 执行shell
+            if(config.repo[repoName]['shell']) {
+                console.log('[%s] 执行shell %s中...', new Date().toLocaleString(), config.repo[repoName]['shell']);
+                await simpleExec('sh ' + config.repo[repoName]['shell']);
+                console.log('[%s] 执行shell 完毕', new Date().toLocaleString());
+            }
+
+            console.log('[%s] 仓库%s部署完毕:)', new Date().toLocaleString(), repoName);
+            console.log('&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;');
+        })();
+    });
+    res.end();
+}).listen(listenPort);
+</code></pre>
+<h3 id="26-其他配置">2.6 其他配置</h3>
+<p>将项目部署到服务器后运行，在仓库中配置 webhooks（记得设置 secret ），之后的操作就和「1.4 其他配置」中的一样了。</p>
+<p>当然我们也可以更进一步直接在本项目中实现这个静态网站服务器，但我认为这类 web 程序和 <code>Nginx</code> 等接近网络层的 HTTP 服务器的应用场景还是有很大差别的，在应用层面去实现这些东西显然不太合适、也不专业，在维护上也是一大麻烦</p>
+<h3 id="27-开源地址">2.7 开源地址</h3>
+<p>使用 <code>Node.js</code> 的项目也上传到了 <a href="https://github.com/xxxuuu/node-github-hooks">Github</a>，有兴趣的同学可以参考一下</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript 中的 this 之探讨]]></title>
+        <id>https://xqinger.com/post/javascript-this/</id>
+        <link href="https://xqinger.com/post/javascript-this/">
+        </link>
+        <updated>2019-10-22T09:19:34.000Z</updated>
+        <summary type="html"><![CDATA[<p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
+<!-- more -->
+<h2 id="this-的动态指向性">this 的动态指向性</h2>
+<p>在大多数常见的面向对象的语言中，<code>this</code> 通常指向类的实例，如 <code>Java</code> 的 <code>this</code>, <code>Python</code> 的 <code>self</code>，<code>PHP</code> 的 <code>$this</code>。</p>
+<p>于是乎，大多数人在接触 <code>JavaScript</code> 时也下意识认为 <code>this</code> 是指向类的实例。实际上在 <code>JavaScript</code> 里根本就没有真正意义上的类，也不区分类和实例的概念，是通过 <code>prototype</code> 来实现的面向对象（在 ES6 里已经引入了 <code>class</code> 关键字，但本质上还只是 <code>prototype</code> 的语法糖）。</p>
+<h2 id="默认绑定">默认绑定</h2>
+<p>在浏览器的 <code>Developer Tools</code> 中的 <code>Console</code> 输入 <code>this</code> 并回车，会输出以下信息：</p>
+<pre><code class="language-JSON">Window {parent: Window, postMessage: ƒ, blur: ƒ, focus: ƒ, close: ƒ, …}
+</code></pre>
+<p>当 <code>this</code> 没有在任何其它对象中时，默认指向全局对象（全局作用域）。在浏览器中这个全局对象就是 <code>window</code>。（在 <code>Node.js</code> 环境中没有全局对象，所以会是 <code>undefined</code>）</p>
+<p><strong>这种默认指向全局对象的方式就是 <code>this</code> 的默认绑定。</strong></p>
+<p>但默认绑定常常会带来更多的问题，任何代码都可能污染全局对象。不应该使用全局变量来保存数据。所以 ES5 引入了<strong>严格模式</strong>。</p>
+<p>严格模式使用 <code>&quot;use strict&quot;;</code> 声明，会取消默认绑定：</p>
+<pre><code class="language-JavaScript">&quot;use strict&quot;;
+
+console.log(this);  // undefined
+</code></pre>
+<h2 id="隐式绑定">隐式绑定</h2>
+<p>隐式绑定很简单，<strong>当函数作为一个对象的属性时，该函数的 <code>this</code> 指向该对象。</strong></p>
+<pre><code class="language-JavaScript">var hello = {
+  str: 'world',
+  print: function() {
+    console.log('hello', this.str);
+  }
+}
+hello.print();  // hello world
+</code></pre>
+<p>默认绑定或许也可以看成全局函数默认作为全局对象的一个属性，从而使得全局函数的 <code>this</code> 指向全局对象。</p>
+<h2 id="显式绑定">显式绑定</h2>
+<p>在 <code>React</code> 中常常会看到类似的代码：</p>
+<pre><code class="language-JavaScript">class Test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.testBtnClick = this.testBtnClick.bind(this);
+  }
+  
+  testBtnClick() {
+    console.log('click');
+  }
+  
+  render() {
+    return (
+      &lt;div&gt; 
+        &lt;button onClick={this.testBtnClick}&gt;test button&lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+
+ReactDOM.render(
+  &lt;Test/&gt;,
+  document.getElementById('example')
+);
+</code></pre>
+<p>其中的第四行 <code>this.testBtnClick = this.testBtnClick.bind(this);</code> 显式地绑定了 <code>testBtnClick</code> 这个函数的 <code>this</code>。</p>
+<p>在 <code>Function.prototype</code> 中有三个方法 <code>call</code>，<code>apply</code>，<code>bind</code> 都是用于显式绑定的。</p>
+<p><strong>显式绑定是将 <code>this</code> 显式地绑定到一个上下文中。</strong> 这样能避免代码中的错误绑定和丢失绑定问题，同时也更便于执行重构和实现一些设计模式。</p>
+<p><code>call</code> 和 <code>apply</code> 的作用都一样，使用指定的上下文对象运行方法，不同的只是传参方式。</p>
+<p>考虑下面的代码：</p>
+<pre><code class="language-JavaScript">var test1 = {
+  name: '',
+  init: function() {
+    this.name = 'aaa';
+  },
+  print: function() {
+    console.log(&quot;hello1&quot;, this.name);
+  }
+}
+
+var test2 = {
+  name: '',
+  init: function() {
+    this.name = 'bbb';
+  },
+  print: function() {
+    console.log(&quot;hello2&quot;, this.name);
+  }
+}
+
+test1.init();
+test1.print();  // hello1 aaa
+
+test2.init();
+test2.print();  // hello2 bbb
+
+test2.print.call(test1);    // hello2 aaa
+</code></pre>
+<p>在最后一行，通过 <code>call</code> 使用 <code>test1</code> 的上下文执行 <code>test2</code> 的 <code>print</code>，此时在 <code>print</code> 里取到的 <code>this</code> 就是 <code>test1</code>。</p>
+<p>假设调用的方法有参数，通过下面的方式传递参，这也是 <code>call</code> 和 <code>apply</code> 唯一的区别：</p>
+<pre><code class="language-JavaScript">test2.print.call(test1, param1, param2);
+test2.print.apply(test1, [param1, param2]);
+</code></pre>
+<p>而 <code>bind</code> 的作用是返回一个绑定指定上下文对象的新方法</p>
+<p>修改改改的例子：</p>
+<pre><code class="language-JavaScript">var test1 = {
+  name: '',
+  init: function() {
+    this.name = 'aaa';
+  },
+  print: function() {
+    console.log(&quot;hello1&quot;, this.name);
+  }
+}
+
+var test2 = {
+  name: '',
+  init: function() {
+    this.name = 'bbb';
+  },
+  print: function() {
+    console.log(&quot;hello2&quot;, this.name);
+  }
+}
+
+test1.init();
+test2.init();
+
+var newPrint = test2.print.bind(test1);
+newPrint(); // hello2 aaa
+
+// 或者直接赋值回去
+test2.print = test2.print.bind(test1);
+test2.print();  // hello2 aaa
+</code></pre>
+<p>在实际中会有一个常见的问题，在控件的事件回调方法里传入我们的函数，函数中通过 <code>this</code> 调用当前对象的某些属性或方法。</p>
+<p>而当回调执行时，是在浏览器中运行的，上下文被改变。此时函数里的 <code>this</code> 丢失绑定指向 <code>window</code>，就会出现错误。这也正是 <code>React</code> 常在 <code>constructor</code> 中使用 <code>bind</code> 显式绑定函数的 <code>this</code> 的原因。</p>
+<h2 id="new-绑定">new 绑定</h2>
+<p>在 ES6 前，通常用这种原型链方式创建一个对象：</p>
+<pre><code class="language-JavaScript">function Hello(name) {
+  this.name = name || 'world';
+}
+Hello.prototype.print = function() {
+  console.log('hello', this.name);
+};
+
+var h = new Hello();
+h.print();  // hello world
+</code></pre>
+<p>构造函数默认返回 <code>this</code>，并且该 <code>this</code> 绑定指向新创建的对象。</p>
+<p>所以通过 <code>new</code> 创建的对象，<code>this</code> 绑定在这个新创建的对象上。</p>
+<h2 id="箭头函数">箭头函数</h2>
+<p>在各种事件和 HTTP 请求的回调中可能会用到 <code>this</code>，但就会发生前面讲的丢失绑定问题。</p>
+<p>但箭头函数就可以解决该问题，箭头函数的 <code>this</code> 总是指向词法作用域，即其宿主。</p>
+<p>例如以下代码：</p>
+<pre><code class="language-JavaScript">var Hello1 = {
+  str: 'world',
+  print: function() {
+    var p = function() {
+      console.log('hello', this.str);
+    }
+    return p();
+  }
+}
+
+var Hello2 = {
+  str: 'world',
+  print: function() {
+    var p = () =&gt; {
+      console.log('hello', this.str);
+    }
+    return p();
+  }
+}
+
+Hello1.print(); // hello undefined
+Hello2.print(); // hello world
+</code></pre>
+<h2 id="总结">总结</h2>
+<ol>
+<li>默认绑定会指向全局对象，带来不可控的影响。避免默认绑定或使用严格模式</li>
+<li>隐式绑定和 <code>new</code> 绑定都可以确保 <code>this</code> 能得到应有的指向</li>
+<li>在某些情况下，也需要显式绑定来修改和确保 <code>this</code> 的指向为我们所想</li>
+</ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[分布式系统 BASE 理论]]></title>
+        <id>https://xqinger.com/post/base-mean/</id>
+        <link href="https://xqinger.com/post/base-mean/">
+        </link>
+        <updated>2019-06-02T13:03:11.000Z</updated>
+        <summary type="html"><![CDATA[<p>BASE 理论是对 CAP 理论进行权衡后得出的选择，是 ebay 架构师于2008年提出的，通过牺牲一部分一致性、来大幅度提升可用性。是目前绝大多数分布式系统的选择。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>BASE 理论是对 CAP 理论进行权衡后得出的选择，是 ebay 架构师于2008年提出的，通过牺牲一部分一致性、来大幅度提升可用性。是目前绝大多数分布式系统的选择。</p>
+<!-- more -->
+<h1 id="1-base-理论">1. BASE 理论</h1>
+<p>BASE 理论是指：</p>
+<ul>
+<li><strong>Basically Available 基本可用</strong></li>
+<li><strong>Soft State 软状态</strong></li>
+<li><strong>Eventual Consistency 最终一致性</strong></li>
+</ul>
+<h2 id="11-basically-available-基本可用">1.1 Basically Available 基本可用</h2>
+<p>基本可用指的是当系统出现故障时，允许损失部分可用性（功能、响应时间等），但核心功能仍然可用。</p>
+<h2 id="12-soft-state-软状态">1.2 Soft State 软状态</h2>
+<p>软状态是允许系统中的数据存在中间状态而不影响系统整体可用性。</p>
+<p>通俗点说：除非刷新，否则信息（状态）会过期或被系统丢失，但系统仍然能正常运行。</p>
+<p>相反地，当系统拥有强一致性时，数据所处的状态就是<strong>硬状态（Hard State）</strong>。</p>
+<p>软状态的定义比较模糊，想有更详细的了解可以浏览以下资料：</p>
+<blockquote>
+<p><a href="https://stackoverflow.com/questions/4851242/what-does-soft-state-in-base-mean">What does 'soft-state' in BASE mean? - Stack Overflow</a><br>
+<a href="http://mercury.lcs.mit.edu/~jnc/tech/hard_soft.html">&quot;Soft&quot; and &quot;Hard&quot; State - MIT</a></p>
+</blockquote>
+<h2 id="13-eventual-consistency-最终一致性">1.3 Eventual Consistency 最终一致性</h2>
+<p>最终一致性也称为乐观复制，是弱一致性的特殊形式，指的是能保证数据在更新前，返回最新值。</p>
+<p>而一致性一般又分为五种：</p>
+<h3 id="131-causal-consistency-因果一致性">1.3.1 Causal Consistency 因果一致性</h3>
+<p>因果一致性指的是：如果节点A在更新完某个数据后通知了节点B，那么节点B之后对该数据的访问和修改都是基于A更新后的值。于此同时，和节点A无因果关系的节点C的数据访问则没有这样的限制。</p>
+<h3 id="132-read-your-writes-读己之所写">1.3.2 Read your Writes 读己之所写</h3>
+<p>读己之所写指的是：节点A更新一个数据后，它自身总是能访问到自身更新过的最新值，而不会看到旧值。其实也算一种因果一致性。</p>
+<h3 id="133-session-consistency-会话一致性">1.3.3 Session Consistency 会话一致性</h3>
+<p>会话一致性将对系统数据的访问过程框定在了一个会话当中：系统能保证在同一个有效的会话中实现 “读己之所写” 的一致性，也就是说，执行更新操作之后，客户端能够在同一个会话中始终读取到该数据项的最新值。</p>
+<h3 id="134-monotonic-read-consistency-单调读一致性">1.3.4 Monotonic Read Consistency 单调读一致性</h3>
+<p>单调读一致性指的是：如果一个节点从系统中读取出一个数据项的某个值后，那么系统对于该节点后续的任何数据访问都不应该返回更旧的值。</p>
+<h3 id="135-monotonic-write-consistency-单调写一致性">1.3.5 Monotonic Write Consistency 单调写一致性</h3>
+<p>单调写一致性指的是：一个系统要能够保证来自同一个节点的写操作被顺序的执行。</p>
+<h1 id="2-acid-与-base">2. ACID 与 BASE</h1>
+<p>在传统的关系型数据库中，常常会要求拥有 ACID 性质（如事务），ACID 表示：</p>
+<ul>
+<li><strong>Atomicity 原子性</strong> （事务操作要么全部执行，要么全不执行）</li>
+<li><strong>Consistency 一致性</strong> （数据之间保持一致性约束）</li>
+<li><strong>Isolation 独立性</strong> （每个事务之间不会互相干扰）</li>
+<li><strong>Durability 持久性</strong> （事务对数据库的影响永远不会丢失）</li>
+</ul>
+<p>ACID 和 BASE 可以说是两种截然相反的设计方向，ACID 要求了强一致性， BASE 放弃一部分一致性以提高系统伸缩性和性能。但在具体系统设计中，由于场景和对系统的要求不同，常常会结合使用。就连关系型数据库也有部分功能采用 BASE 设计。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[分布式系统 CAP 理论]]></title>
+        <id>https://xqinger.com/post/cap-theorem/</id>
+        <link href="https://xqinger.com/post/cap-theorem/">
+        </link>
+        <updated>2019-05-28T05:12:54.000Z</updated>
+        <summary type="html"><![CDATA[<p>CAP 理论是分布式系统的基本定理，也是我们理解分布式系统的起点。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>CAP 理论是分布式系统的基本定理，也是我们理解分布式系统的起点。</p>
+<!-- more -->
+<h1 id="1-cap-理论">1. CAP 理论</h1>
+<p>1998 年，加州大学的计算机科学家 <em>Eric Brewer</em> 提出，分布式系统有三个指标：</p>
+<ul>
+<li><strong>Consistency 一致性</strong></li>
+<li><strong>Availability 可用性</strong></li>
+<li><strong>Partition tolerance 分区容错性</strong></li>
+</ul>
+<p>并且在分布式系统中，三者不可兼得。这就是 CAP 定理</p>
+<figure data-type="image" tabindex="1"><img src="https://xqinger.com/post-images/1559031332586.jpg" alt="CAP理论" loading="lazy"></figure>
+<h2 id="11-consistency-一致性">1.1 Consistency 一致性</h2>
+<p>一致性指的是在分布式系统中，是否<strong>所有</strong>节点都拥有数据的最新版本。</p>
+<p>当其中一个节点的数据被更新时，如果其它节点的数据没有得到更新，用户再读取到的可能就是其它节点的旧数据，此时就出现了数据不一致的情况。</p>
+<p>如果能保证当某一节点更新时，所有用户都能读取到数据的最新版本，就能说该分布式系统拥有<strong>强一致性</strong>。</p>
+<p>从 CAP理论 我们可以得知三者无法兼得，但选择 AP 并不意味着完全放弃 C，只是无法实现强一致性。一致性是分为多个级别的：</p>
+<ul>
+<li><strong>强一致性</strong>：保证所有节点都拥有数据的最新版本，用户读取的永远是最新值</li>
+<li><strong>弱一致性</strong>：无法保证立刻能取得最新值，但在一定时间后或许能实现一致</li>
+<li><strong>最终一致性</strong>：弱一致性的特殊形式，指的是能保证数据在更新前，返回最新值。最终一致性是目前在工业界在大型分布式系统上广泛使用的一种一致性模型</li>
+</ul>
+<h2 id="12-availability-可用性">1.2 Availability 可用性</h2>
+<p>可用性指的是在分布式系统中，系统提供的服务必须一直处于可用的状态，对用户的所有请求都必须能在有限时间内响应。</p>
+<p>其中，<strong>有限时间</strong>指的是在系统设计之初就就设定好的指标。<strong>响应</strong>指的是系统在处理完后应该返回一个明确的结果而不该令用户感到困惑。</p>
+<p>和一致性一样，这里的可用性指的是<strong>极致可用性</strong>。可用性的值域可以定义成0到100%的连续区间。</p>
+<h2 id="13-partition-tolerance-分区容错性">1.3 Partition tolerance 分区容错性</h2>
+<p>在分布式系统中，一般节点在各个网络中应该是连通的，然而由于网络或其它原因，节点之间的通信可能会失败，网络就给划分成了若干区域，这些区域就是分区。</p>
+<p>假设当某项数据只存储在系统的一个节点中，当出现分区时，这个数据就可能无法被访问；或者用户的某些操作在系统中涉及多个节点，但由于分区使得操作无法进行，这些都是难以接受的。所以分区容错性就是在网络出现分区时，系统依然能够正常运行，或者说依然能保证一致性或可用性。</p>
+<p>准确的定义是：</p>
+<blockquote>
+<p>In order to model partition tolerance, the network will be allowed to losearbitrarily many messages sent from one node to another.</p>
+</blockquote>
+<p><strong>系统能够容忍节点间通信时丢失任意多的消息</strong></p>
+<h1 id="2-矛盾与选择">2. 矛盾与选择</h1>
+<p>CAP 理论告诉我们，一致性、可用性和分区容错性无法兼得，为什么三者无法同时成立呢？我们先来考虑能选择的三种情况。</p>
+<h2 id="21-ca">2.1 CA</h2>
+<p>放弃分区容错性，强一致性和极致可用性是可以保证的，但这意味着不允许系统中存在分区。实际上这在分布式系统中几乎是不可能的，由于各种天灾人祸，分区无法避免。所以 CA 系统基本就是传统的单机系统。或者说，分布式系统无法舍弃 P ，我们也默认 P 是必须实现的。</p>
+<h2 id="22-cp">2.2 CP</h2>
+<p>降低对可用性的要求，追求强一致性和分区容错性。相当于对数据的任何操作都需要在节点间同步，而分区问题可能导致同步时间无限延长，可用性便降低了。</p>
+<h2 id="23-ap">2.3 AP</h2>
+<p>追求可用性并允许分区，则当分区发生时，为了能够保持可用性，每个节点只能用本地的可能是过时的数据来提供服务，这就放弃了强一致性。AP 还是目前大多数分布式系统的选择。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[微服务架构概念与基础知识]]></title>
+        <id>https://xqinger.com/post/microservice-concept/</id>
+        <link href="https://xqinger.com/post/microservice-concept/">
+        </link>
+        <updated>2019-05-23T11:55:41.000Z</updated>
+        <summary type="html"><![CDATA[<p>“容器和微服务是计算的未来” ——Eric Brewer</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>“容器和微服务是计算的未来” ——Eric Brewer</p>
+<!-- more -->
+<p>mark</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[P、NP 和 NPC 问题]]></title>
+        <id>https://xqinger.com/post/p-np-npc-problem/</id>
+        <link href="https://xqinger.com/post/p-np-npc-problem/">
+        </link>
+        <updated>2019-04-26T15:22:05.000Z</updated>
+        <summary type="html"><![CDATA[<p>理论计算机科学中最经典的问题</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>理论计算机科学中最经典的问题</p>
+<!-- more -->
+<h1 id="1-定义">1. 定义</h1>
+<h3 id="11-多项式时间">1.1 多项式时间:</h3>
+<p>在计算复杂度理论中，如果指的是一个问题的计算时间 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>m</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">m(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">m</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> 不大于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>n</mi></mrow><annotation encoding="application/x-tex">n</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.43056em;vertical-align:0em;"></span><span class="mord mathdefault">n</span></span></span></span> 的多项式倍数。也就是说：</p>
+<p class='katex-block'><span class="katex-display"><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>m</mi><mo>(</mo><mi>n</mi><mo>)</mo><mo>=</mo><mi>O</mi><mo>(</mo><msup><mi>n</mi><mi>k</mi></msup><mo>)</mo></mrow><annotation encoding="application/x-tex">m(n) = O(n^k)
+</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault">m</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:1.149108em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathdefault">n</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8991079999999999em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathdefault mtight" style="margin-right:0.03148em;">k</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>（此处 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>k</mi></mrow><annotation encoding="application/x-tex">k</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.03148em;">k</span></span></span></span> 为常量）。则该时间就为多项式时间。</p>
+<h3 id="12-p-问题">1.2 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题：</h3>
+<ul>
+<li>能够在<strong>多项式时间内解决</strong>的问题</li>
+</ul>
+<p>例如求一序列最大值，很显然时间复杂度为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>O</mi><mo>(</mo><mi>n</mi><mo>)</mo></mrow><annotation encoding="application/x-tex">O(n)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathdefault" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathdefault">n</span><span class="mclose">)</span></span></span></span> 。这种问题就是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题。</p>
+<h3 id="13-np-问题">1.3 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题:</h3>
+<ul>
+<li>能够在<strong>多项式时间内验证</strong>的问题</li>
+</ul>
+<h1 id="2-p-np">2. <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mi>N</mi><mi>P</mi><mo>?</mo></mrow><annotation encoding="application/x-tex">P = NP?</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mclose">?</span></span></span></span></h1>
+<p>很显然，所有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题都是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题，因为能在多项式时间内求解，必然也能验证，只需要和正解比较一下即可。</p>
+<p>但是不是所有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题都是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题呢？</p>
+<p>我们把这些问题看做集合，所有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题都是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题的子集。假设 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题也都是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题，那也就是说 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">P=NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span>。现在所有对于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题的研究都集中于该问题上，即是否有 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mo>=</mo><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">N=NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> ？</p>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mi>N</mi><mi>P</mi><mo>?</mo></mrow><annotation encoding="application/x-tex">P=NP?</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.69444em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mclose">?</span></span></span></span> 这是目前理论计算机科学领域的一大难题。不过主流学术界均认为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> <strong>≠</strong> <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span>。</p>
+<h3 id="21-假如-p-np">2.1 假如 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">P = NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span></h3>
+<p>假设 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi><mo>=</mo><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">P = NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 被证明，不仅仅是计算机科学，各个科学领域都会迎来翻天覆地的变化。</p>
+<p><code>MD5</code> 算法不再有效，判定一个串的 <code>MD5</code> 是否等于给定值与寻找一个 <code>MD5</code> 等于给定值的串一样轻松。</p>
+<p><code>RSA</code> 加密算法也失去意义，寻找一个质因子和判断整除性也变得一样简单。现有密码学体系彻底崩溃，依赖于伪随机数的算法都不安全。</p>
+<p>数学证明可以完全交给计算机来处理。寻找一个反例和验证一个反例变得同样简单。</p>
+<p>所有可被形式化的科学都将受到不同程度的影响...</p>
+<h1 id="3-npc-问题">3. <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题</h1>
+<h2 id="31-背景">3.1 背景</h2>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题也叫 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span>-完全 问题，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>C</mi></mrow><annotation encoding="application/x-tex">C</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 是完全的第一个单词。</p>
+<p>为了引入 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题。我们先引入一个概念——约化（Reducibility，也叫归约）</p>
+<p>简单地说，一个问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span></span></span></span> 可以约化为问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span> 的含义即是，可以用问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span> 的解法解决问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span></span></span></span>，或者说，问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span></span></span></span> 可以“变成”问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span>。</p>
+<p>「问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span></span></span></span> 可约化为问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span>」有一个重要的直观意义：<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span> 的时间复杂度高于或者等于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span></span></span></span> 的时间复杂度。也就是说，问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>A</mi></mrow><annotation encoding="application/x-tex">A</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault">A</span></span></span></span> 不比问题 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>B</mi></mrow><annotation encoding="application/x-tex">B</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.05017em;">B</span></span></span></span> 难。</p>
+<h2 id="32-npc">3.2 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span></h2>
+<p>则是否可以找到一个时间复杂度最高，并且能「通吃」所有的  <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span>问题的这样一个超级 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题？答案居然是肯定的。</p>
+<p>也就是说，存在这样一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题，所有的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题都可以约化成它。换句话说，只要解决了这个问题，那么所有的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题都解决了。这种问题的存在难以置信，并且更加不可思议的是，这种问题不只一个，它有很多个，它是一类问题。这一类问题就是传说中的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题，也就是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span>-完全 问题。</p>
+<p>人们想表达一个问题不存在多项式的高效算法时应该说它 「属于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题」。</p>
+<h2 id="32-定义">3.2 定义</h2>
+<p><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题的定义非常简单。同时满足下面两个条件的问题就是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题。</p>
+<ol>
+<li>首先，它得是一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题；</li>
+<li>然后，所有的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题都可以约化到它。</li>
+</ol>
+<p>证明一个问题是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题也很简单。</p>
+<ol>
+<li>先证明它至少是一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题。</li>
+<li>再证明其中一个已知的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题能约化到它（由约化的传递性，则 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题定义的第二条也得以满足；至于第一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题是怎么来的，下文将介绍），这样就可以说它是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题了。</li>
+</ol>
+<p>既然所有的NP问题都能约化成 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题，那么只要任意一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题找到了一个多项式的算法，那么所有的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题都能用这个算法解决了，<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 也就等于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 了。因此，给 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 找一个多项式算法太不可思议了。</p>
+<p>因此，前文才说，「正是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题的存在，使人们相信 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>P</mi></mrow><annotation encoding="application/x-tex">P</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> <strong>≠</strong> <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span>」。我们可以就此直观地理解，<strong><span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题目前没有多项式的有效算法，只能用指数级甚至阶乘级复杂度的搜索。</strong></p>
+<h2 id="33-逻辑电路问题">3.3 逻辑电路问题</h2>
+<p>逻辑电路问题是指的这样一个问题：给定一个逻辑电路，问是否存在一种输入使输出为 <code>True</code>。</p>
+<p>逻辑电路是第一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题。其它的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题都是由这个问题约化而来的。因此，逻辑电路问题是 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 类问题的“鼻祖”。</p>
+<p>逻辑电路问题属于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi><mi>C</mi></mrow><annotation encoding="application/x-tex">NPC</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span></span></span></span> 问题。这是有严格证明的。它显然属于 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题，并且可以直接证明所有的 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题都可以约化到它（不要以为 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题有无穷多个将给证明造成不可逾越的困难）。证明过程相当复杂，其大概意思是说任意一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题的输入和输出都可以转换成逻辑电路的输入和输出（想想计算机内部也不过是一些 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>0</mn></mrow><annotation encoding="application/x-tex">0</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">0</span></span></span></span> 和 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mn>1</mn></mrow><annotation encoding="application/x-tex">1</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.64444em;vertical-align:0em;"></span><span class="mord">1</span></span></span></span> 的运算），因此对于一个 <span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>N</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">NP</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span><span class="mord mathdefault" style="margin-right:0.13889em;">P</span></span></span></span> 问题来说，问题转化为了求出满足结果为 <code>True</code> 的一个输入（即一个可行解）。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[使用 TensorFlow Lite 将 TensorFlow 模型部署到移动端（Android）]]></title>
+        <id>https://xqinger.com/post/android-tensorflowlite/</id>
+        <link href="https://xqinger.com/post/android-tensorflowlite/">
+        </link>
+        <updated>2019-04-23T05:18:37.000Z</updated>
+        <summary type="html"><![CDATA[<p>在工作中需要将深度学习模型部署到移动端上运行，感觉官方文档和网上的资料也不是很好，就自己记录一下</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>在工作中需要将深度学习模型部署到移动端上运行，感觉官方文档和网上的资料也不是很好，就自己记录一下</p>
+<!-- more -->
+<p>准备写这个的时候又去翻了遍官方文档，发现已经更新的很齐全了，就暂时不想写了...先mark着吧</p>
+<blockquote>
+<p><a href="https://tensorflow.google.cn/lite/guide">TensorFlow Lite Guide</a></p>
+</blockquote>
+]]></content>
+    </entry>
+</feed>

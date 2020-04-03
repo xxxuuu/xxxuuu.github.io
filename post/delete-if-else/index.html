@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>删掉你那一堆if else——表驱动法 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1585931592340">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="优雅地重构 if else
+
+要优雅
+假设要写一个将国家名转换为简写的函数，会很自然地想到以下的方法：
+fun countryAbbreviate(countryName: String): String {
+    if(countryN..." />
+    <meta name="keywords" content="设计模式" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1585931592340" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css">
+ | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">删掉你那一堆if else——表驱动法</h2>
+            <div class="post-date">2018-04-14</div>
+            
+            <div class="post-content" v-pre>
+              <p>优雅地重构 <code>if else</code></p>
+<!-- more -->
+<h2 id="要优雅">要优雅</h2>
+<p>假设要写一个将国家名转换为简写的函数，会很自然地想到以下的方法：</p>
+<pre><code class="language-Kotlin">fun countryAbbreviate(countryName: String): String {
+    if(countryName == &quot;China&quot;) {
+        return &quot;CHN&quot;
+    }
+    else if(countryName == &quot;America&quot;) {
+        return &quot;USA&quot;
+    }
+    else if(countryName == &quot;Japan&quot;) {
+        return &quot;JPN&quot;
+    }
+    else {
+        return &quot;Other&quot;
+    }
+}
+</code></pre>
+<p>用<code>if...else if</code>来根据全名返回对应的缩写。当数据量小，只需要几次判断的时候完全没问题，但是一旦数据量大起来，就是无止境的<code>if...else if</code>，代码就变得非常恶心了。必须得重构，稍微好一点的方法是用<code>switch</code>类的条件判断，特别是对于<code>Kotlin</code>这种有语法糖的语言来说，代码一下缩短了一半，可读性也大大增加了。</p>
+<pre><code class="language-Kotlin">fun countryAbbreviate(countryName: String): String {
+    when(countryName) {
+        &quot;China&quot;   -&gt; return &quot;CHN&quot;
+        &quot;America&quot; -&gt; return &quot;USA&quot;
+        &quot;Japan&quot;   -&gt; return &quot;JPN&quot;
+        else      -&gt; return &quot;Other&quot;
+    }
+}
+</code></pre>
+<p>但这还不够好，每次要增加一个国家，还是得多一条语句。只是将代码紧凑化了，并没有实质性的改变。接下来就要介绍本文的主角了——<strong>表驱动法</strong>。</p>
+<h2 id="表驱动法">表驱动法</h2>
+<p>表驱动法即是根据查表的方式获取值，方法改成表驱动法后的样子：</p>
+<pre><code class="language-Kotlin">fun countryAbbreviate(countryName: String): String {
+
+    val countryMap = mapOf(
+            &quot;China&quot;   to &quot;CHN&quot;,
+            &quot;America&quot; to &quot;USA&quot;,
+            &quot;Japan&quot;   to &quot;JPN&quot;
+    )
+
+    if(countryName in countryMap)   return countryMap[countryName]!!
+    else                            return &quot;Other&quot;
+</code></pre>
+<p>代码中使用了<code>Map</code>这个键值对数据结构来存储数据，然后只需判断国家名是否在数据中，是就直接返回对应键的值。这样无论数据有多少条，逻辑代码都只用这两行<code>if...else</code>，非常优雅。</p>
+<p>但表驱动法的意义可不仅仅只是节省一堆代码，更重要的意义在于：<strong>将逻辑，数据分离</strong></p>
+<p>相较于直接修改逻辑代码，修改数据要简单，安全得多。</p>
+<p>如果是一开始的方式，那每添加一个国家，就要多一条<code>else if</code>，相当于多了一条逻辑。使用了表驱动法，就只用在<code>Map</code>里增加一条数据，数据的来源也非常灵活，比如可以像上面一样来自代码，可以来自配置文件，可以来自API，可以来自数据库...</p>
+<p>而且当程序使用者是非专业人员时，想修改数据也非常容易。而逻辑写死在代码里，修改只能是开发人员来，然后经过一系列的部署流程，成本非常高。</p>
+<h2 id="总结">总结</h2>
+<p>表驱动法能够<strong>简化代码</strong>，将<strong>逻辑、数据分离</strong>。<strong>提高程序的扩展性，动态性和可读性</strong>。</p>
+<p>当然，所有事情都是有性价比的，如果是像上面例子一样的简单程序，直接用<code>if...else</code>和<code>switch</code>来的更快些。</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xqinger.com/tag/XjU8xdvkS/" class="tag">
+                    设计模式
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xqinger.com/post/android-drag-demo/">
+                  <h3 class="post-title">
+                    Android 中 View 拖拽的简单实现
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
