@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-04-06T04:08:38.681Z</updated>
+    <updated>2020-04-06T07:43:56.427Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -10,18 +10,6 @@
     <logo>https://xqinger.com/images/avatar.png</logo>
     <icon>https://xqinger.com/favicon.ico</icon>
     <rights>All rights reserved 2020, 某不科學の技術博客</rights>
-    <entry>
-        <title type="html"><![CDATA[云上两地三中心分布式容灾架构设计与实现]]></title>
-        <id>https://xqinger.com/post/three-center-in-two-places/</id>
-        <link href="https://xqinger.com/post/three-center-in-two-places/">
-        </link>
-        <updated>2020-03-21T16:16:35.000Z</updated>
-        <summary type="html"><![CDATA[<p>最近给忽悠去了华为的鲲鹏创新大赛，要求设计一个分布式的在线教学管理系统，于是乎顺便开个坑</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>最近给忽悠去了华为的鲲鹏创新大赛，要求设计一个分布式的在线教学管理系统，于是乎顺便开个坑</p>
-<!-- more -->
-]]></content>
-    </entry>
     <entry>
         <title type="html"><![CDATA[蒟蒻的2019年度总结]]></title>
         <id>https://xqinger.com/post/2019summary/</id>
@@ -887,6 +875,56 @@ Hello2.print(); // hello world
 <blockquote>
 <p><a href="https://tensorflow.google.cn/lite/guide">TensorFlow Lite Guide</a></p>
 </blockquote>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Docker 容器的迁移]]></title>
+        <id>https://xqinger.com/post/docker-container-move/</id>
+        <link href="https://xqinger.com/post/docker-container-move/">
+        </link>
+        <updated>2019-04-03T15:13:24.000Z</updated>
+        <summary type="html"><![CDATA[<p>最近需要将一台服务器上的应用和数据迁移到另一台服务器上，由于全部使用了 <code>Docker</code> 部署，所以水篇文章</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>最近需要将一台服务器上的应用和数据迁移到另一台服务器上，由于全部使用了 <code>Docker</code> 部署，所以水篇文章</p>
+<!-- more -->
+<h2 id="1-通过云端仓库迁移">1. 通过云端仓库迁移</h2>
+<h3 id="11-备份容器">1.1 备份容器</h3>
+<p>首先将容器进行备份，创建一个新的镜像（commit 会将对容器的变更保存下来，生成新的镜像）:</p>
+<pre><code>docker commit 容器ID 备份后的镜像名:标签
+</code></pre>
+<h3 id="12-将容器推送到云端仓库">1.2 将容器推送到云端仓库</h3>
+<p>登录 docker 仓库（阿里云有免费的）</p>
+<pre><code>docker login 地址
+</code></pre>
+<p>标记镜像到仓库（重命名）</p>
+<pre><code>docker tag 镜像ID 仓库/名称:标签
+</code></pre>
+<p>推送镜像</p>
+<pre><code>docker push 仓库/名称:标签
+</code></pre>
+<h3 id="13-拉取镜像并部署">1.3 拉取镜像并部署</h3>
+<p>从云端仓库拉取镜像</p>
+<pre><code>docker pull 仓库/名称:标签
+</code></pre>
+<p>从镜像启动容器</p>
+<pre><code>docker run 仓库/名称:标签
+</code></pre>
+<h2 id="2-通过镜像文件迁移">2. 通过镜像文件迁移</h2>
+<h3 id="21-备份容器">2.1 备份容器</h3>
+<p>首先将容器进行备份，创建一个新的镜像:</p>
+<pre><code>docker commit 容器ID 备份后的镜像名:标签
+</code></pre>
+<h3 id="22-导出为文件">2.2 导出为文件</h3>
+<p>将镜像打包为 tar 文件</p>
+<pre><code>docker save -o 目录 镜像
+</code></pre>
+<h3 id="23-导入镜像">2.3 导入镜像</h3>
+<p>将 tar 传输到另一台服务器后，导入 tar 包</p>
+<pre><code>docker load -i tar文件
+</code></pre>
+<p>然后启动镜像即可</p>
+<pre><code>docker run 镜像
+</code></pre>
 ]]></content>
     </entry>
 </feed>
