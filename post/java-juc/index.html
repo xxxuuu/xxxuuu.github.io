@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Java JUC并发包 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1587961997926">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="复习一下基础~
+
+概念
+悲观锁
+悲观锁认为被它保护的数据是极其不安全的，每时每刻都有可能变动，一个线程拿到悲观锁后，不允许任何线程对其进行获取，需要阻塞等待解锁
+乐观锁
+乐观锁认为数据变动不会太频繁，读取时不会上锁，但在写入时会进行判断数据..." />
+    <meta name="keywords" content="Java" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1587961997926" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css"> | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Java JUC并发包</h2>
+            <div class="post-date">2020-04-27</div>
+            
+            <div class="post-content" v-pre>
+              <p>复习一下基础~</p>
+<!-- more -->
+<h1 id="概念">概念</h1>
+<h2 id="悲观锁">悲观锁</h2>
+<p>悲观锁认为被它保护的数据是极其不安全的，每时每刻都有可能变动，一个线程拿到悲观锁后，不允许任何线程对其进行获取，需要阻塞等待解锁</p>
+<h2 id="乐观锁">乐观锁</h2>
+<p>乐观锁认为数据变动不会太频繁，读取时不会上锁，但在写入时会进行判断数据是否最新。例如通过版本号实现，读取时一并读取版本号，写入时对比版本号。不一致则拒绝写入</p>
+<h2 id="cas-无锁算法">CAS 无锁算法</h2>
+<p>Compare and Swap（比较并交换），CAS是一种无锁算法（不用锁实现线程同步，也叫非阻塞同步）。JUC就是建立在CAS之上的。</p>
+<p>假设内存原数据V，旧预期值A，需要修改的新值B，则CAS的语义是“我认为V的值应该为A，如果是，那么将V的值更新为B，否则不修改并告诉V的值实际为多少”。有以下操作：</p>
+<ol>
+<li>比较A与V是否相等（比较）</li>
+<li>相等则将B写入V（交换）</li>
+<li>返回结果（是否成功写入）</li>
+</ol>
+<p>多个线程操作只有一个能成功，可见CAS是一个乐观锁</p>
+<h1 id="juc并发包">JUC并发包</h1>
+<p>从JDK1.5开始，引入了一个高级的处理并发的java.util.concurrent包，简称JUC。它提供了大量更高级的并发功能，能大大简化多线程程序的编写。</p>
+<h2 id="reentranlock-可重入锁">ReentranLock 可重入锁</h2>
+<p>和<code>synchronized</code>一样。<code>ReentrantLock</code> 是一个可重用的互斥锁，又称独占锁。性能与 <code>synchronized</code> 相近，但功能更加丰富</p>
+<pre><code class="language-Java">public class Counter {
+    private int count;
+
+    public synchronized void add(int n) {
+        count += n;
+    }
+}
+// 等价于
+public class Counter {
+    private final Lock lock = new ReentrantLock();
+    private int count;
+
+    public void add(int n) {
+        lock.lock();
+        try {
+            count += n;
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+</code></pre>
+<p>因为<code>synchronized</code>是Java语言层面提供的语法，即使抛出异常也能释放锁，而<code>ReentranLock</code>是JUC中用Java实现的，所以要在<code>finally</code>中释放。</p>
+<p><code>ReentranLock</code>可以尝试获取锁：</p>
+<pre><code class="language-Java">// 1秒内没取到锁返回false
+if (lock.tryLock(1, TimeUnit.SECONDS)) {    
+    try {
+        ...
+    } finally {
+        lock.unlock();
+    }
+}
+</code></pre>
+<h2 id="condition-线程协作">Condition 线程协作</h2>
+<p><code>synchronized</code>可以使用<code>wait</code>和<code>notify</code>进行线程间的协作，但<code>ReentrantLock</code>不能直接使用<code>wait</code>和<code>notify</code>。</p>
+<p>于是有了<code>Condition</code>，以之前的<code>TaskQueue</code>为例：</p>
+<pre><code class="language-Java">class TaskQueue {
+    private final Lock lock = new ReentrantLock();
+    private final Condition condition = lock.newCondition();
+    private Queue&lt;String&gt; queue = new LinkedList&lt;&gt;();
+
+    public void addTask(String s) {
+        lock.lock();
+        try {
+            queue.add(s);
+            condition.signalAll();
+        } finally {
+            lock.unlock();
+        }
+    }
+
+    public String getTask() {
+        lock.lock();
+        try {
+            while (queue.isEmpty()) {
+                condition.await();
+            }
+            return queue.remove();
+        } finally {
+            lock.unlock();
+        }
+    }
+}
+</code></pre>
+<p><code>Condition</code>对象必须从<code>Lock</code>实例的<code>newCondition()</code>返回，这样才能获得一个绑定了<code>Lock</code>实例的<code>Condition</code>实例</p>
+<p><code>Condition</code>提供的<code>await()</code>、<code>signal()</code>、<code>signalAll()</code>相当于<code>synchronized</code>锁对象的<code>wait()</code>、<code>notify()</code>、<code>notifyAll()</code></p>
+<p>和<code>tryLock()</code>类似，<code>await()</code>可以在等待指定时间后，如果还没有被其他线程通过<code>signal()</code>或<code>signalAll()</code>唤醒，可以自己醒来：</p>
+<pre><code class="language-Java">if (condition.await(1, TimeUnit.SECOND)) {
+    // 被其他线程唤醒
+} else {
+    // 指定时间内没有被其他线程唤醒
+}
+</code></pre>
+<h2 id="readwritelock-悲观读写锁">ReadWriteLock 悲观读写锁</h2>
+<p>无论是<code>synchronized</code>还是<code>ReentranLock</code>，都只允许一个线程在临界区内执行代码。但很多时候我们需要更灵活地控制，例如IO操作时：读取不会影响数据，我们希望能多个线程同时读，而写入时不允许其它任何线程读取和写入。</p>
+<p>使用<code>ReadWriteLock</code>可以解决这个问题：</p>
+<ul>
+<li>只允许一个线程写入（其他线程既不能写入也不能读取）；</li>
+<li>没有写入时，多个线程允许同时读（提高性能）。</li>
+</ul>
+<p>例：</p>
+<pre><code>public class FileIO {
+    private final ReadWriteLock rwlock = new ReentrantReadWriteLock();
+    private final Lock rlock = rwlock.readLock();
+    private final Lock wlock = rwlock.writeLock();
+
+    public void write(char[] data) {
+        wlock.lock();       // 加写锁
+        try {
+            // 写入
+        } finally {
+            wlock.unlock(); // 释放写锁
+        }
+    }
+
+    public char[] read() {
+        rlock.lock();       // 加读锁
+        try {
+            // 读取
+        } finally {
+            rlock.unlock(); // 释放读锁
+        }
+    }
+}
+</code></pre>
+<h2 id="stampedlock-乐观读写锁">StampedLock 乐观读写锁</h2>
+<p><code>StampedLock</code>是JDK8新引入的读写锁，和<code>ReadWriteLock</code>的区别在于。后者如果有线程在读，写入线程需要等读取线程释放后才能写入。读的过程不能写，这是一种悲观的读锁。</p>
+<p>而<code>StampedLock</code>支持在读取的过程中写入，但这样数据就可能不一致，需要一些额外的判断。这是一种乐观锁</p>
+<p>我们将上面<code>ReadWriteLock</code>的例子修改为<code>StampedLock</code>的版本：</p>
+<pre><code class="language-Java">public class FileIO {
+    private final StampedLock stampedLock = new StampedLock();
+
+    public void write(char[] data) {
+        long stamp = stampedLock.writeLock();   // 获取写锁
+        try {
+            // 写入
+        } finally {
+            stampedLock.unlockWrite(stamp);     // 释放写锁
+        }
+    }
+
+    public char[] read() {
+        long stamp = stampedLock.tryOptimisticRead();   // 获取乐观读锁
+        
+        // 读取...
+        // 读取的中途可能有写入 导致数据不一致
+        
+        if（!stampedLock.validate(stamp)) {     // 检查是否有其他写锁发生
+            stamp = stampedLock.readLock();     // 获取悲观读锁
+            try {
+                // 读取...
+            } finally {
+                stampedLock.unlockRead(stamp);  // 释放悲观读锁
+            }
+        }
+    }
+}
+</code></pre>
+<p>和<code>ReadWriteLock</code>相比，写入是一样的，不同的是读取：</p>
+<ol>
+<li>先获取一个乐观读锁，并返回版本号。</li>
+<li>如果读取过程中没有写入，版本号不变，则顺利执行。</li>
+<li>若版本号变化，说明发生写入，需要获取一个悲观读锁再次读取</li>
+</ol>
+<p>需要注意的是<code>StampedLock</code>是不可重入锁，不能在一个线程中反复获取同一个锁。</p>
+<p><code>StampedLock</code>还提供了更复杂的将悲观读锁升级为写锁的功能，它主要使用在if-then-update的场景：即先读，如果读的数据满足条件，就返回，如果读的数据不满足条件，再尝试写。</p>
+<h2 id="concurrent-线程安全集合">Concurrent 线程安全集合</h2>
+<p>我们之前尝试设计了一个线程安全的阻塞任务队列<code>TaskQueue</code>，实际上JUC早已提供此类线程安全的集合类：</p>
+<table>
+<thead>
+<tr>
+<th>接口</th>
+<th>非线程安全</th>
+<th>线程安全</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>List</td>
+<td>ArrayList</td>
+<td>CopyOnWriteArrayList</td>
+</tr>
+<tr>
+<td>Map</td>
+<td>HashMap</td>
+<td>ConcurrentHashMap</td>
+</tr>
+<tr>
+<td>Set</td>
+<td>HashSet / TreeSet</td>
+<td>CopyOnWriteArraySet</td>
+</tr>
+<tr>
+<td>Queue</td>
+<td>ArrayDeque / LinkedList</td>
+<td>ArrayBlockingQueue / LinkedBlockingQueue</td>
+</tr>
+<tr>
+<td>Deque</td>
+<td>ArrayDeque / LinkedList</td>
+<td>LinkedBlockingDeque</td>
+</tr>
+</tbody>
+</table>
+<p>因为实现的是一样的接口，所以用法和非线程安全的集合类完全相同。</p>
+<p><code>java.util.Collections</code>工具类还提供了一个旧的线程安全集合转换器，例如将<code>HashMap</code>转换为线程安全的：<code>Collections.synchronizedMap(map);</code></p>
+<p>但是它实际上是通过包装类包装后对所有读写方法都用<code>synchronized</code>加锁，这样获得的线程安全集合的性能比<code>java.util.concurrent</code>集合要低很多，所以不推荐使用。</p>
+<h2 id="atomic-原子类">Atomic 原子类</h2>
+<p>JUC在<code>java.util.concurrent.atomic</code>包中提供了一组原子操作的封装类，是通过CAS实现的</p>
+<p>例如<code>AtomicInteger</code>，主要方法有：</p>
+<ul>
+<li>增加指定值并返回：<code>int addAndGet(int delta)</code></li>
+<li>自增并返回：<code>int incrementAndGet()</code></li>
+<li>获取当前值：<code>int get()</code></li>
+<li>用CAS方式设置(如果当前值为expect，则更新为update)：<code>boolean compareAndSet(int expect, int update)</code></li>
+</ul>
+<p>如果自己通过CAS实现<code>incrementAndSet()</code>，大概是这样：</p>
+<pre><code class="language-Java">public int incrementAndGet() {
+    int prev, next;
+    do {
+        prev = this.get();
+        next = prev + 1;
+    } while (!this.compareAndSet(prev, next));
+    return next;
+}
+</code></pre>
+<p>我们利用<code>AtomicLong</code>可以编写一个多线程安全的全局唯一ID生成器：</p>
+<pre><code class="language-Java">class IdGenerator {
+    AtomicLong id = new AtomicLong(0);
+
+    public long getNextId() {
+        return id.incrementAndGet();
+    }
+}
+</code></pre>
+<p>JDK8中还添加了<code>LongAdder</code>和<code>LongAccumulato</code>等原子类</p>
+<h2 id="executorservice-线程池">ExecutorService 线程池</h2>
+<p>线程的创建、销毁都是非常消耗时间的，而通过线程池，我们可以复用一组线程，</p>
+<p><code>Exeutor</code>是线程池里的顶级接口，<code>ExecutorService</code>是继承了前者提供服务的接口，典型用法如下：</p>
+<pre><code class="language-Java">// 创建固定大小的线程池:
+ExecutorService executor = Executors.newFixedThreadPool(3);
+// 提交任务:
+executor.submit(runnable);
+// 关闭线程池
+executor.shutdown();
+</code></pre>
+<p>JUC提供了几个<code>ExcutorService</code>的常用实现，可以通过<code>Executors</code>的<code>newXXX()</code>系列静态工厂方法来创建：</p>
+<ul>
+<li><code>FixedThreadPool</code>：固定线程数的线程池，每次提交任务都会新增线程直到数量限制。有线程异常会新建线程替换</li>
+<li><code>CachedThreadPool</code>：可缓存的线程池，会重复利用线程，无线程可用则新建，会回收60秒未使用的线程</li>
+<li><code>SingleThreadExecuor</code>：单线程的线程池，有线程异常会新建线程替换</li>
+<li><code>ScheduledThreadPool</code>：支持定时任务和周期运行的线程池</li>
+</ul>
+<h3 id="scheduledthreadpool-周期线程池">ScheduledThreadPool 周期线程池</h3>
+<p><code>ScheduledThreadPool</code>支持线程的周期运行，一个定时任务代表线程池的一个线程：</p>
+<pre><code class="language-Java">ScheduledExecutorService ses = Executors.newScheduledThreadPool(4);
+// 1秒后执行一次性任务
+ses.schedule(runnable, 1, TimeUnit.SECONDS);
+// 2秒后开始执行定时任务，每3秒执行:
+ses.scheduleAtFixedRate(runnable, 2, 3, TimeUnit.SECONDS);
+// 2秒后开始执行定时任务，以3秒为间隔执行（上一个任务执行结束后开始算）
+ses.scheduleWithFixedDelay(runnable, 2, 3, TimeUnit.SECONDS);
+</code></pre>
+<p>推荐使用<code>ScheduledExecutorService</code>替代<code>Timer</code>，<code>ScheduledExecutorService</code>功能更强大也更安全。</p>
+<ul>
+<li>需要注意的是，在<code>FixedRate</code>模型下，当运行时间大于<code>period</code>间隔时间时，例如每三秒执行一次，但每个任务执行五秒，这时候后面的任务会等前面的执行完再运行</li>
+<li>抛出异常后，任务后续不会继续执行，并且没有报错，要注意异常捕获</li>
+</ul>
+<h3 id="threadpoolexecutor-自定义线程池">ThreadPoolExecutor 自定义线程池</h3>
+<p><code>ThreadPoolExecutor</code>是线程池的真正实现，上面的工厂方法也是对其设置参数的封装。</p>
+<p>在《阿里巴巴Java开发手册》中也规定要使用其来创建线程池：</p>
+<blockquote>
+<p>【强制】线程池不允许使用 <code>Executors</code> 去创建，而是通过 <code>ThreadPoolExecutor</code> 的方式，这样 的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。 说明：<code>Executors</code> 返回的线程池对象的弊端如下：</p>
+</blockquote>
+<ul>
+<li>
+<blockquote>
+<p>1）<code>FixedThreadPool</code> 和 <code>SingleThreadPool</code>: 允许的请求队列长度为 <code>Integer.MAX_VALUE</code>，可能会堆积大量的请求，从而导致 OOM。</p>
+</blockquote>
+</li>
+<li>
+<blockquote>
+<p>2）<code>CachedThreadPool</code> 和 <code>ScheduledThreadPool</code>: 允许的创建线程数量为 <code>Integer.MAX_VALUE</code>，可能会创建大量的线程，从而导致 OOM</p>
+</blockquote>
+</li>
+</ul>
+<p>看来下它的完整参数构造方法：</p>
+<pre><code class="language-Java">public ThreadPoolExecutor(int corePoolSize,
+                          int maximumPoolSize,
+                          long keepAliveTime,
+                          TimeUnit unit,
+                          BlockingQueue&lt;Runnable&gt; workQueue,
+                          ThreadFactory threadFactory,
+                          RejectedExecutionHandler handler)
+</code></pre>
+<ul>
+<li><code>int corePoolSize</code>：核心线程数量。即使在空闲状态也会被保留，除非设置了<code>allowCoreThreadTimeOut</code>为<code>true</code>。</li>
+<li><code>int maximumPoolSize</code>：允许的最大线程数量，不允许小于<code>corePoolSize</code>。</li>
+<li><code>long keepAliveTime</code>： 当线程数大于核心线程数时，非核心线程的闲置超时时间。</li>
+<li><code>TimeUnit unit</code>：<code>keepAliveTime</code>参数的时间单位，例<code>TimeUnit.SECONDS</code>为秒。</li>
+<li><code>BlockingQueue&lt;Runnable&gt; workQueue</code>：任务队列，常见有三种队列：<code>SynchronousQueue</code>，<code>LinkedBlockingDeque</code>和<code>ArrayBlockingQueue</code>。</li>
+<li><code>ThreadFactory threadFactory</code>：线程工厂，提供创建新线程的功能。《阿里巴巴Java开发手册》规定要使用带有这个参数的构造方法，来方便地管理线程。</li>
+<li><code>RejectedExecutionHandler handler</code>：当到达线程池资源上限时，添加新线程会调用<code>RejectedExecutionHandler</code>接口的<code>rejectedExecution</code>方法</li>
+</ul>
+<h4 id="任务队列规则">任务队列规则</h4>
+<p>线程添加的规则和<code>workQueue</code>的类型有很大关系，当一个线程任务添加到线程池时：</p>
+<ul>
+<li>
+<p>如果线程池中的线程数量 &lt;= <code>corePoolSize</code>，则新建线程，不放入队列</p>
+</li>
+<li>
+<p>如果线程池中的线程数量 &gt; <code>corePoolSize</code>，&lt;= <code>maximumPoolSize</code>时。</p>
+<ul>
+<li>队列为<code>LinkedBlockingDeque</code>，则放入队列排队。如果队列已满，则直接新建线程执行任务</li>
+<li>队列为<code>SynchronousQueue</code>，则直接新建线程处理该任务</li>
+<li>非核心线程闲置时间超过<code>keepAliveTime</code>后就会被销毁。</li>
+</ul>
+</li>
+<li>
+<p>如果线程池中的线程数量 &gt; <code>corePoolSize</code>和<code>maximumPoolSize</code>。</p>
+<ul>
+<li>队列为<code>LinkedBlockingDeque</code>，如果队列没有大小限制，会将任务放进队列。如果队列有大小限制，则交给<code>handler</code>拒绝任务。</li>
+<li>队列为<code>SynchronousQueue</code>，会使用<code>handler</code>拒绝任务。</li>
+</ul>
+</li>
+</ul>
+<h2 id="future-异步返回机制">Future 异步返回机制</h2>
+<p><code>Runnable</code>没有返回值比较不方便，JUC提供了个<code>Callable</code>泛型接口，和前者相比，多了一个返回值，并且可以通过泛型指定返回结果。</p>
+<p>前面提到的线程<code>ExecutorService</code>的<code>submit()</code>返回了一个<code>Future</code>，一个Future类型的实例代表一个未来能获取结果的对象：</p>
+<pre><code class="language-Java">ExecutorService e = Executors.newSingleThreadExecutor();
+Future&lt;String&gt; future = e.submit(new Callable&lt;String&gt;() {
+    @Override
+    public String call() throws Exception {
+        return &quot;task result&quot;;
+    }
+});
+// 返回结果 任务未完成则阻塞等待
+try {
+    future.get();
+} catch (ExecutionException ex) {
+    ex.printStackTrace();
+}
+</code></pre>
+<p><code>Future</code>还有以下方法：</p>
+<ul>
+<li><code>get()</code>：获取结果（可能会等待）</li>
+<li><code>get(long timeout, TimeUnit unit)</code>：获取结果，但只等待指定的时间；</li>
+<li><code>cancel(boolean mayInterruptIfRunning)</code>：取消当前任务；</li>
+<li><code>isDone()</code>：判断任务是否已完成。</li>
+</ul>
+<h2 id="semaphore-信号量">Semaphore 信号量</h2>
+<p><code>Semaphore</code> 本质上是一个共享锁，线程获取到许可时才能执行：</p>
+<pre><code class="language-Java">ExecutorService executor = Executors.newCachedThreadPool();
+// 最多同时发放3个许可
+Semaphore s = new Semaphore(3);
+for(int i = 0; i &lt; 10; i++) {
+    executor.execute(() -&gt; {
+        try {
+            // 获取许可
+            s.acquire();
+            // 执行操作
+            Thread.sleep(3000);
+            // 释放
+            s.release();
+        } catch(Exception e) {
+            
+        }
+    }
+}
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xqinger.com/tag/5S8q_OVUH/" class="tag">
+                    Java
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xqinger.com/post/2019summary/">
+                  <h3 class="post-title">
+                    蒟蒻的2019年度总结
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
