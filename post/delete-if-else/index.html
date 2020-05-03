@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1588489525212">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1588489560625">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -39,7 +39,7 @@ fun countryAbbreviate(countryName: String): String {
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1588489525212" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1588489560625" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -154,6 +154,7 @@ fun countryAbbreviate(countryName: String): String {
 
     if(countryName in countryMap)   return countryMap[countryName]!!
     else                            return &quot;Other&quot;
+}
 </code></pre>
 <p>代码中使用了<code>Map</code>这个键值对数据结构来存储数据，然后只需判断国家名是否在数据中，是就直接返回对应键的值。这样无论数据有多少条，逻辑代码都只用这两行<code>if...else</code>，非常优雅。</p>
 <p>但表驱动法的意义可不仅仅只是节省一堆代码，更重要的意义在于：<strong>将逻辑，数据分离</strong></p>
