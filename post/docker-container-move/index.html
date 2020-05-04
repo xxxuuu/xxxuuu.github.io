@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1588489860629">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1588601406355">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -26,9 +26,8 @@
 
     <meta name="description" content="最近需要将一台服务器上的应用和数据迁移到另一台服务器上，由于全部使用了 Docker 部署，所以水篇文章
 
-1. 通过云端仓库迁移
-1.1 备份容器
-首先将容器进行备份，创建一个新的镜像（commit 会将对容器的变更保存下来，生成新的镜像..." />
+
+作者写这篇文章的时候对Docker的认知和学习还不够深入。实际上，不应该用 commit 来而应该用 dockerfile 定制镜..." />
     <meta name="keywords" content="Docker,运维" />
   </head>
   <body>
@@ -38,7 +37,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1588489860629" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1588601406355" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -116,6 +115,9 @@
             <div class="post-content" v-pre>
               <p>最近需要将一台服务器上的应用和数据迁移到另一台服务器上，由于全部使用了 <code>Docker</code> 部署，所以水篇文章</p>
 <!-- more -->
+<blockquote>
+<p>作者写这篇文章的时候对Docker的认知和学习还不够深入。实际上，不应该用 <code>commit</code> 来而应该用 <code>dockerfile</code> 定制镜像。<code>commit</code> 的应用大多数在保存入侵现场等场景上。而docker容器本身应该是无状态的，通过数据卷存储所有数据，迁移只需要在另一台服务器上通过一样的镜像启动容器，迁移数据卷即可</p>
+</blockquote>
 <h2 id="1-通过云端仓库迁移">1. 通过云端仓库迁移</h2>
 <h3 id="11-备份容器">1.1 备份容器</h3>
 <p>首先将容器进行备份，创建一个新的镜像（commit 会将对容器的变更保存下来，生成新的镜像）:</p>
