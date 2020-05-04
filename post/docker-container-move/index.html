@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1588603071466">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1588607893189">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -39,7 +39,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1588603071466" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1588607893189" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -120,7 +120,7 @@
 <hr>
 <p>注：作者写这篇文章的时候对Docker的认知和学习还不够深入，这篇文章是有一定问题的：</p>
 <blockquote>
-<p>实际上，不应该用 <code>commit</code> 来而应该用 <code>dockerfile</code> 定制镜像。<code>commit</code> 的应用大多数在保存入侵现场等场景上。而Docker容器本身应该是无状态的，通过数据卷存储所有数据，迁移只需要在另一台服务器上通过一样的镜像启动容器，迁移数据卷即可</p>
+<p>实际上，不应该用 <code>commit</code> 来而应该用 <code>Dockerfile</code> 定制镜像。<code>commit</code> 的应用大多数在保存入侵现场等场景上。而Docker容器本身应该是无状态的，通过数据卷存储所有数据，迁移只需要在另一台服务器上通过一样的镜像启动容器，迁移数据卷即可</p>
 </blockquote>
 <blockquote>
 <p>大多数情况下也不建议使用 <code>commit</code>，<code>commit</code> 会在原有镜像上叠加修改后的容器存储层构建成新的镜像，了解Docker分层存储概念的就会知道，这样造成的问题就是日后的每一次修改都会添加一层，而且就算把之前层的操作、产生的文件删除、复原了，也无法删除这一层，会像滚雪球一样致镜像极度臃肿，而且由于命令的执行，实际上有大量无关内容被添加进来，进一步加剧这个问题。此外，通过 <code>commit</code> 构建的镜像到底执行过什么操作，无从得知，成为一个黑箱镜像。这种镜像难以维护</p>
