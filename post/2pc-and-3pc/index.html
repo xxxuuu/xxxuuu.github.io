@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1589796047117">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1589798075586">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -37,7 +37,7 @@ Two-Phase Commit (2PC)
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1589796047117" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1589798075586" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -166,7 +166,7 @@ end
 <p>虽然 3PC 可以处理 coordinator 和 participant 的 fail-stop，但无法处理在分布式情况中更常见的 <strong>fail-recover（宕机一段时间后恢复）</strong> 的情况。假设 coordinator 在收到 pre commit 前宕机，此时 participant 选举出新 coordinator 并进行 commit，而旧 coordinator 恢复并且因为没有收到 pre commit 而进行 callback。便导致了数据不一致</p>
 <p>还有另一个更简单的场景，当网络出现分区，participant 被分成两个区域，一个区域的收到了 pre commit，一个区域的没有。这时候它们各自重新选举 coordinator，执行了不同的操作，也导致了数据不一致</p>
 <h2 id="总结">总结</h2>
-<p>无论 2PC 还是 3PC 都无法彻底解决分布式系统中的一致性问题，下一篇文章会介绍 Paxos 算法，Paxos 是公认的晦涩难懂，但也几乎是分布式一致性协议的代名词</p>
+<p>无论 2PC 还是 3PC 都无法彻底解决分布式系统中的一致性问题，下一篇文章会介绍 Paxos 算法，Paxos 是公认的晦涩难懂，但也几乎是分布式一致性算法的代名词</p>
 
             </div>
             
