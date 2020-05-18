@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>分布式系统 2PC &amp; 3PC 协议 | 某不科學の技術博客</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1589796047117">
+<link rel="stylesheet" href="https://xqinger.com/styles/main.css">
+
+
+  
+    <link rel="stylesheet" href="https://unpkg.com/gitalk/dist/gitalk.css" />
+  
+
+  
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="大多数数据库事务都具有 ACID 性质，在单机系统中可以帮助我们轻松地进行并发编程，但分布式的全局事务不具有 ACID 性质。而 2PC 和 3PC 就是实现分布式事务的两种协议
+
+Two-Phase Commit (2PC)
+「Two-P..." />
+    <meta name="keywords" content="数据结构与算法,分布式" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://xqinger.com">
+        <img src="https://xqinger.com/images/avatar.png?v=1589796047117" class="site-logo">
+        <h1 class="site-title">某不科學の技術博客</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            🏠首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            📃归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            🏷标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            👤关于
+          </a>
+        
+      
+        
+          <a href="/post/friend-links/" class="site-nav">
+            👬友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      🗒随便写点东西的地方
+    </div>
+    <div class="site-footer">
+      Powered by <a href="https://github.com/getgridea/gridea" target="_blank">Gridea</a>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.10.0/katex.min.css"> | <a class="rss" href="https://xqinger.com/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">分布式系统 2PC &amp; 3PC 协议</h2>
+            <div class="post-date">2020-05-16</div>
+            
+            <div class="post-content" v-pre>
+              <p>大多数数据库事务都具有 ACID 性质，在单机系统中可以帮助我们轻松地进行并发编程，但分布式的全局事务不具有 ACID 性质。而 2PC 和 3PC 就是实现分布式事务的两种协议</p>
+<!-- more -->
+<h2 id="two-phase-commit-2pc">Two-Phase Commit (2PC)</h2>
+<p>「Two-Phase Commit」称为二阶段提交，即事务的提交分为两个阶段： <strong>准备阶段（prepare phase）</strong> 和 <strong>提交阶段（commit phase）</strong> 。其中有 <strong>协调者（coordinator）</strong> 和 <strong>参与者（participant）</strong> 两个角色，coordinator 负责调度多个 participant 的行为，并决定 participant 是否进行事务提交。</p>
+<p>2PC 的过程可以类比投票，且所有人都有一票否决权，全员通过时才可以进行事务提交。</p>
+<h3 id="prepare-phase">prepare phase</h3>
+<ol>
+<li>coordinator 向所有 participant 发送一个消息询问是否可以提交，并等待所有 participant 回复</li>
+<li>participant 执行事务，直到被要求提交。并将 undo 和 redo 写入事务日志</li>
+<li>如果 participant 执行成功，则向 coordinator 发送 agreement message（同意提交），否则发送 abort message（否决提交）</li>
+</ol>
+<h3 id="commit-phase">commit phase</h3>
+<p>在 commit 阶段，有成功和失败两种情况：</p>
+<h4 id="成功">成功：</h4>
+<p>如果 coordinator 接收到所有 participant 的 agreement message，就会提交事务</p>
+<ol>
+<li>coordinator 向所有 participant 发送提交信息</li>
+<li>participant 完成操作，并释放事务期间的锁和其它资源</li>
+<li>所有 coordinator 向 participant 发送确认（acknowledgement，ACK）消息，确认完成</li>
+<li>coordinator 在收到所有 participant 的 ACK 消息后，完成事务</li>
+</ol>
+<h4 id="失败">失败：</h4>
+<p>如果有任何一个 participant 发送了 abort message（否决）或者 coordinator 响应超时，事务就会中断</p>
+<ol>
+<li>coordinator 向所有 participant 发送回滚消息</li>
+<li>所有 participant 根据 undo 日志来撤销事务，并释放事务期间的锁和其它资源</li>
+<li>所有 coordinator 向 participant 发送 ACK 消息，确认撤销完成</li>
+<li>coordinator 在收到所有 participant 的 ACK 消息后撤销事务</li>
+</ol>
+<pre><code>Coordinator                                          Participant
+                             QUERY TO COMMIT
+                 --------------------------------&gt;
+                             VOTE YES/NO             prepare*/abort*
+                 &lt;-------------------------------
+commit*/abort*               COMMIT/ROLLBACK
+                 --------------------------------&gt;
+                             ACKNOWLEDGMENT          commit*/abort*
+                 &lt;--------------------------------  
+end
+</code></pre>
+<h3 id="2pc-的缺点">2PC 的缺点</h3>
+<p>2PC 最大的问题是它是阻塞的，当等待回复过程中另一方宕机时，就会陷入长时间等待，同时 coordinator 只有一个，存在单点故障问题（可靠性低），而且在 commit phase 中由于故障可能导致部分消息发送/接收失败从而丢失一致性（无法保证一致性）。</p>
+<h2 id="three-phase-commit3pc">Three-Phase Commit（3PC）</h2>
+<p>3PC 是 2PC 的改进算法， 3PC 是非阻塞的。通过拆分 commit phases 引入 <strong>prepared commit phase（预提交阶段）</strong> ，重复确认是否提交，解决了 2PC 的部分问题。</p>
+<p>考虑一个情况：</p>
+<ol>
+<li>coordinator 在 perpare phase 收到一个 agreement，一个 abort</li>
+<li>coordinator 向所有 participant 发送回滚消息</li>
+<li>在向第一台 participant 发送回滚消息后，这台 participant 和 coordinator 同时宕机</li>
+</ol>
+<p>如果是 <strong>fail-stop（持续性宕机）</strong> 的情况。在 2PC 中，participant 不知道 coordinator 已经宕机，会长时间阻塞等待。同时就算选举出了新的 coordinator，也无法得知先前的决定是 commit 还是 callback。</p>
+<p>而在 3PC 中，在 pre commmit phase 发生这个问题时，剩下 participant 可以重新选举 coordinator 重新协调过程或直接回滚。当通过 pre commit phase 到达 commit phase 时出现这个问题，因为已经 prepared commit 了，重新选举 coordinator 后就可以直接 commit。</p>
+<h3 id="3pc-的缺点">3PC 的缺点</h3>
+<p>虽然 3PC 可以处理 coordinator 和 participant 的 fail-stop，但无法处理在分布式情况中更常见的 <strong>fail-recover（宕机一段时间后恢复）</strong> 的情况。假设 coordinator 在收到 pre commit 前宕机，此时 participant 选举出新 coordinator 并进行 commit，而旧 coordinator 恢复并且因为没有收到 pre commit 而进行 callback。便导致了数据不一致</p>
+<p>还有另一个更简单的场景，当网络出现分区，participant 被分成两个区域，一个区域的收到了 pre commit，一个区域的没有。这时候它们各自重新选举 coordinator，执行了不同的操作，也导致了数据不一致</p>
+<h2 id="总结">总结</h2>
+<p>无论 2PC 还是 3PC 都无法彻底解决分布式系统中的一致性问题，下一篇文章会介绍 Paxos 算法，Paxos 是公认的晦涩难懂，但也几乎是分布式一致性协议的代名词</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xqinger.com/tag/jbJAPOonJ/" class="tag">
+                    数据结构与算法
+                  </a>
+                
+                  <a href="https://xqinger.com/tag/pYvZx8dA5/" class="tag">
+                    分布式
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xqinger.com/post/microservice-concept/">
+                  <h3 class="post-title">
+                    微服务架构概念与基础知识
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+              
+                <div id="gitalk-container" data-aos="fade-in"></div>
+              
+
+              
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcss.com/highlight.js/9.12.0/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+  
+    <script src="https://unpkg.com/gitalk/dist/gitalk.min.js"></script>
+    <script>
+
+      var gitalk = new Gitalk({
+        clientID: '4d00b89eee19e9df2c38',
+        clientSecret: 'f301c74975e847c0ced30a8bfc1aa6c8b4cb6a87',
+        repo: 'xxxuuu.github.io',
+        owner: 'xxxuuu',
+        admin: ['xxxuuu'],
+        id: (location.pathname).substring(0, 49),      // Ensure uniqueness and length less than 50
+        distractionFreeMode: false  // Facebook-like distraction free mode
+      })
+
+      gitalk.render('gitalk-container')
+
+    </script>
+  
+
+  
+
+
+
+
+  </body>
+</html>
