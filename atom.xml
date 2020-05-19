@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-05-18T10:34:38.272Z</updated>
+    <updated>2020-05-19T02:27:41.913Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -61,7 +61,7 @@ end
 <h3 id="2pc-的缺点">2PC 的缺点</h3>
 <p>2PC 最大的问题是它是阻塞的，当等待回复过程中另一方宕机时，就会陷入长时间等待，同时 coordinator 只有一个，存在单点故障问题（可靠性低），而且在 commit phase 中由于故障可能导致部分消息发送/接收失败从而丢失一致性（无法保证一致性）。</p>
 <h2 id="three-phase-commit3pc">Three-Phase Commit（3PC）</h2>
-<p>3PC 是 2PC 的改进算法， 3PC 是非阻塞的。通过拆分 commit phases 引入 <strong>prepared commit phase（预提交阶段）</strong> ，重复确认是否提交，解决了 2PC 的部分问题。</p>
+<p>3PC 是 2PC 的改进算法， 3PC 是非阻塞的。通过拆分 commit phases 引入 <strong>prepared commit phase（预提交阶段）</strong>，重复确认是否提交，解决了 2PC 的部分问题。</p>
 <p>考虑一个情况：</p>
 <ol>
 <li>coordinator 在 perpare phase 收到一个 agreement，一个 abort</li>

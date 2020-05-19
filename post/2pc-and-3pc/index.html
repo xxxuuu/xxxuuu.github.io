@@ -8,7 +8,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 
 <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1589798075586">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1589855259460">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -37,7 +37,7 @@ Two-Phase Commit (2PC)
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1589798075586" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1589855259460" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -153,7 +153,7 @@ end
 <h3 id="2pc-的缺点">2PC 的缺点</h3>
 <p>2PC 最大的问题是它是阻塞的，当等待回复过程中另一方宕机时，就会陷入长时间等待，同时 coordinator 只有一个，存在单点故障问题（可靠性低），而且在 commit phase 中由于故障可能导致部分消息发送/接收失败从而丢失一致性（无法保证一致性）。</p>
 <h2 id="three-phase-commit3pc">Three-Phase Commit（3PC）</h2>
-<p>3PC 是 2PC 的改进算法， 3PC 是非阻塞的。通过拆分 commit phases 引入 <strong>prepared commit phase（预提交阶段）</strong> ，重复确认是否提交，解决了 2PC 的部分问题。</p>
+<p>3PC 是 2PC 的改进算法， 3PC 是非阻塞的。通过拆分 commit phases 引入 <strong>prepared commit phase（预提交阶段）</strong>，重复确认是否提交，解决了 2PC 的部分问题。</p>
 <p>考虑一个情况：</p>
 <ol>
 <li>coordinator 在 perpare phase 收到一个 agreement，一个 abort</li>
