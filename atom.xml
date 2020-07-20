@@ -2,11 +2,11 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-07-20T11:04:20.353Z</updated>
+    <updated>2020-07-20T12:11:28.452Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
-    <subtitle>🗒随便写点东西的地方</subtitle>
+    <subtitle>🗒 随便写点东西的地方</subtitle>
     <logo>https://xqinger.com/images/avatar.png</logo>
     <icon>https://xqinger.com/favicon.ico</icon>
     <rights>All rights reserved 2020, 某不科學の技術博客</rights>
