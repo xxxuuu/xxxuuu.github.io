@@ -2842,6 +2842,16 @@ body {
   font-weight: 200;
   text-align: justify;
 }
+.post-item .left .post-date-tag {
+  display: flex;
+  font-size: 16px;
+}
+.post-item .left .post-date-tag .tag-container {
+  margin-left: 20px;
+}
+.post-item .left .post-date-tag .tag-container .tag {
+  opacity: 0.8;
+}
 .post-item .left .post-date,
 .post-detail .post-date {
   font-weight: 100;
