@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="https://xqinger.com/media/styles/fontawesome.min.css">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1598251027134">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1598770802013">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -40,7 +40,7 @@ this 的动态指向性
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1598251027134" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1598770802013" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -109,7 +109,7 @@ this 的动态指向性
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
             <h2 class="post-title">JavaScript 中的 this 之探讨</h2>
-            <div class="post-date">2019-10-22</div>
+            <div class="post-date">2019-10-22&emsp;&emsp;1308 字 &emsp;阅读时间 6 分钟</div>
             
             <div class="post-content" v-pre>
               <p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
@@ -320,9 +320,28 @@ Hello2.print(); // hello world
             
 
           </div>
-
         </div>
       </div>
+
+      <div class="post-toc">
+        <span>目录</span>
+        <div class="divider"></div>
+        <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#this-%E7%9A%84%E5%8A%A8%E6%80%81%E6%8C%87%E5%90%91%E6%80%A7">this 的动态指向性</a></li>
+<li><a href="#%E9%BB%98%E8%AE%A4%E7%BB%91%E5%AE%9A">默认绑定</a></li>
+<li><a href="#%E9%9A%90%E5%BC%8F%E7%BB%91%E5%AE%9A">隐式绑定</a></li>
+<li><a href="#%E6%98%BE%E5%BC%8F%E7%BB%91%E5%AE%9A">显式绑定</a></li>
+<li><a href="#new-%E7%BB%91%E5%AE%9A">new 绑定</a></li>
+<li><a href="#%E7%AE%AD%E5%A4%B4%E5%87%BD%E6%95%B0">箭头函数</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+      </div>
+
     </div>
 
     <script src="https://cdn.bootcdn.net/ajax/libs/aos/3.0.0-beta.6/aos.js"></script>

@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="https://xqinger.com/media/styles/fontawesome.min.css">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1598251027134">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1598770802013">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -40,7 +40,7 @@ Two-Phase Commit (2PC)
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1598251027134" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1598770802013" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -109,7 +109,7 @@ Two-Phase Commit (2PC)
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
             <h2 class="post-title">分布式系统 2PC &amp; 3PC 协议</h2>
-            <div class="post-date">2020-05-16</div>
+            <div class="post-date">2020-05-16&emsp;&emsp;1045 字 &emsp;阅读时间 4 分钟</div>
             
             <div class="post-content" v-pre>
               <p>大多数数据库事务都具有 ACID 性质，在单机系统中可以帮助我们轻松地进行并发编程，但分布式的全局事务不具有 ACID 性质。而 2PC 和 3PC 就是实现分布式事务的两种协议</p>
@@ -204,9 +204,39 @@ end
             
 
           </div>
-
         </div>
       </div>
+
+      <div class="post-toc">
+        <span>目录</span>
+        <div class="divider"></div>
+        <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#two-phase-commit-2pc">Two-Phase Commit (2PC)</a>
+<ul>
+<li><a href="#prepare-phase">prepare phase</a></li>
+<li><a href="#commit-phase">commit phase</a>
+<ul>
+<li><a href="#%E6%88%90%E5%8A%9F">成功：</a></li>
+<li><a href="#%E5%A4%B1%E8%B4%A5">失败：</a></li>
+</ul>
+</li>
+<li><a href="#2pc-%E7%9A%84%E7%BC%BA%E7%82%B9">2PC 的缺点</a></li>
+</ul>
+</li>
+<li><a href="#three-phase-commit3pc">Three-Phase Commit（3PC）</a>
+<ul>
+<li><a href="#3pc-%E7%9A%84%E7%BC%BA%E7%82%B9">3PC 的缺点</a></li>
+</ul>
+</li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+      </div>
+
     </div>
 
     <script src="https://cdn.bootcdn.net/ajax/libs/aos/3.0.0-beta.6/aos.js"></script>

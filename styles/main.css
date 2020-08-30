@@ -2817,6 +2817,12 @@ body {
   color: #E79C00 !important;
   border-bottom: 1px dashed #E79C00 !important;
 }
+.post-toc {
+  position: fixed;
+  width: 200px;
+  top: 48px;
+  right: 200px;
+}
 .pagination-container {
   display: block;
   margin-bottom: 50px;

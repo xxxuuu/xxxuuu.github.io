@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="https://xqinger.com/media/styles/fontawesome.min.css">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1598251027134">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1598770802013">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -40,7 +40,7 @@
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1598251027134" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1598770802013" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -109,7 +109,7 @@
         <div class="content-container" data-aos="fade-up">
           <div class="post-detail">
             <h2 class="post-title">Kotlin 初体验</h2>
-            <div class="post-date">2018-03-21</div>
+            <div class="post-date">2018-03-21&emsp;&emsp;3953 字 &emsp;阅读时间 17 分钟</div>
             
               <div class="feature-container" style="background-image: url('https://xqinger.com/post-images/hello-kotlin.png')">
               </div>
@@ -613,9 +613,68 @@ fun main(args : Array&lt;String&gt;) {
             
 
           </div>
-
         </div>
       </div>
+
+      <div class="post-toc">
+        <span>目录</span>
+        <div class="divider"></div>
+        <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E5%87%86%E5%A4%87%E5%B7%A5%E4%BD%9C">准备工作</a></li>
+<li><a href="#hello-world">Hello World</a></li>
+<li><a href="#%E5%9F%BA%E6%9C%AC%E8%AF%AD%E6%B3%95">基本语法</a>
+<ul>
+<li><a href="#%E5%8F%98%E9%87%8F">变量</a></li>
+<li><a href="#%E6%95%B0%E7%BB%84%E4%B8%8E%E9%9B%86%E5%90%88">数组与集合</a></li>
+<li><a href="#%E5%BE%AA%E7%8E%AF%E5%92%8C%E6%9D%A1%E4%BB%B6">循环和条件</a>
+<ul>
+<li><a href="#in">in</a></li>
+<li><a href="#if%E7%9A%84%E5%85%B6%E4%BB%96%E5%BD%A2%E5%BC%8F">if的其他形式</a></li>
+<li><a href="#when">when</a></li>
+<li><a href="#%E6%A0%87%E7%AD%BE">标签</a></li>
+</ul>
+</li>
+<li><a href="#%E5%87%BD%E6%95%B0">函数</a>
+<ul>
+<li><a href="#%E5%8F%82%E6%95%B0%E9%BB%98%E8%AE%A4%E5%80%BC">参数默认值</a></li>
+<li><a href="#%E5%8F%AF%E5%8F%98%E5%8F%82%E6%95%B0">可变参数</a></li>
+<li><a href="#%E5%91%BD%E5%90%8D%E5%8F%82%E6%95%B0">命名参数</a></li>
+<li><a href="#%E5%B1%80%E9%83%A8%E5%87%BD%E6%95%B0">局部函数</a></li>
+</ul>
+</li>
+<li><a href="#%E7%B1%BB">类</a>
+<ul>
+<li><a href="#%E8%B0%83%E7%94%A8%E6%96%B9%E5%BC%8F">调用方式</a></li>
+<li><a href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0">构造函数</a></li>
+<li><a href="#%E5%B1%9E%E6%80%A7">属性</a></li>
+<li><a href="#%E9%9D%99%E6%80%81%E6%96%B9%E6%B3%95">静态方法</a></li>
+<li><a href="#%E7%BB%A7%E6%89%BF">继承</a></li>
+<li><a href="#%E9%87%8D%E5%86%99%E6%96%B9%E6%B3%95%E4%B8%8E%E5%B1%9E%E6%80%A7">重写方法与属性</a></li>
+<li><a href="#%E8%A6%86%E7%9B%96%E8%A7%84%E5%88%99">覆盖规则</a></li>
+</ul>
+</li>
+<li><a href="#%E5%85%B6%E4%BB%96">其他</a>
+<ul>
+<li><a href="#%E5%8F%AF%E7%A9%BA%E5%80%BC%E4%B8%8E%E7%A9%BA%E5%80%BC%E6%A3%80%E6%B5%8B">可空值与空值检测</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a href="#kotlin%E4%B8%8Ejava%E4%BA%92%E6%93%8D%E4%BD%9C">Kotlin与Java互操作</a>
+<ul>
+<li><a href="#%E7%9B%B4%E6%8E%A5%E8%BD%AC%E6%8D%A2">直接转换</a></li>
+<li><a href="#kotlin%E4%B8%8Ejava%E4%BA%92%E7%9B%B8%E8%B0%83%E7%94%A8">Kotlin与Java互相调用</a></li>
+</ul>
+</li>
+<li><a href="#%E5%AE%98%E6%96%B9%E6%96%87%E6%A1%A3">官方文档</a></li>
+</ul>
+</li>
+</ul>
+
+      </div>
+
     </div>
 
     <script src="https://cdn.bootcdn.net/ajax/libs/aos/3.0.0-beta.6/aos.js"></script>
