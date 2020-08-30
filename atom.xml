@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-08-30T07:40:05.659Z</updated>
+    <updated>2020-08-30T08:00:53.560Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -146,16 +146,16 @@ int main() {
 </ol>
 <h3 id="commit-phase">commit phase</h3>
 <p>在 commit 阶段，有成功和失败两种情况：</p>
-<h4 id="成功">成功：</h4>
-<p>如果 coordinator 接收到所有 participant 的 agreement message，就会提交事务</p>
+<p><strong>成功：</strong><br>
+如果 coordinator 接收到所有 participant 的 agreement message，就会提交事务</p>
 <ol>
 <li>coordinator 向所有 participant 发送提交信息</li>
 <li>participant 完成操作，并释放事务期间的锁和其它资源</li>
 <li>所有 coordinator 向 participant 发送确认（acknowledgement，ACK）消息，确认完成</li>
 <li>coordinator 在收到所有 participant 的 ACK 消息后，完成事务</li>
 </ol>
-<h4 id="失败">失败：</h4>
-<p>如果有任何一个 participant 发送了 abort message（否决）或者 coordinator 响应超时，事务就会中断</p>
+<p><strong>失败：</strong><br>
+如果有任何一个 participant 发送了 abort message（否决）或者 coordinator 响应超时，事务就会中断</p>
 <ol>
 <li>coordinator 向所有 participant 发送回滚消息</li>
 <li>所有 participant 根据 undo 日志来撤销事务，并释放事务期间的锁和其它资源</li>

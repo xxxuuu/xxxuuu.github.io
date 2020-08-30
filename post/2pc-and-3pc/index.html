@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="https://xqinger.com/media/styles/fontawesome.min.css">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1598770802013">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1598773913106">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -40,7 +40,7 @@ Two-Phase Commit (2PC)
   <div class="top-container" data-aos="fade-right">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1598770802013" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1598773913106" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -125,16 +125,16 @@ Two-Phase Commit (2PC)
 </ol>
 <h3 id="commit-phase">commit phase</h3>
 <p>在 commit 阶段，有成功和失败两种情况：</p>
-<h4 id="成功">成功：</h4>
-<p>如果 coordinator 接收到所有 participant 的 agreement message，就会提交事务</p>
+<p><strong>成功：</strong><br>
+如果 coordinator 接收到所有 participant 的 agreement message，就会提交事务</p>
 <ol>
 <li>coordinator 向所有 participant 发送提交信息</li>
 <li>participant 完成操作，并释放事务期间的锁和其它资源</li>
 <li>所有 coordinator 向 participant 发送确认（acknowledgement，ACK）消息，确认完成</li>
 <li>coordinator 在收到所有 participant 的 ACK 消息后，完成事务</li>
 </ol>
-<h4 id="失败">失败：</h4>
-<p>如果有任何一个 participant 发送了 abort message（否决）或者 coordinator 响应超时，事务就会中断</p>
+<p><strong>失败：</strong><br>
+如果有任何一个 participant 发送了 abort message（否决）或者 coordinator 响应超时，事务就会中断</p>
 <ol>
 <li>coordinator 向所有 participant 发送回滚消息</li>
 <li>所有 participant 根据 undo 日志来撤销事务，并释放事务期间的锁和其它资源</li>
@@ -207,21 +207,17 @@ end
         </div>
       </div>
 
-      <div class="post-toc">
-        <span>目录</span>
-        <div class="divider"></div>
-        <ul class="markdownIt-TOC">
+      
+        <div class="post-toc" data-aos="fade-up">
+          <span>目录</span>
+          <div class="divider"></div>
+          <ul class="markdownIt-TOC">
 <li>
 <ul>
 <li><a href="#two-phase-commit-2pc">Two-Phase Commit (2PC)</a>
 <ul>
 <li><a href="#prepare-phase">prepare phase</a></li>
-<li><a href="#commit-phase">commit phase</a>
-<ul>
-<li><a href="#%E6%88%90%E5%8A%9F">成功：</a></li>
-<li><a href="#%E5%A4%B1%E8%B4%A5">失败：</a></li>
-</ul>
-</li>
+<li><a href="#commit-phase">commit phase</a></li>
 <li><a href="#2pc-%E7%9A%84%E7%BC%BA%E7%82%B9">2PC 的缺点</a></li>
 </ul>
 </li>
@@ -235,7 +231,8 @@ end
 </li>
 </ul>
 
-      </div>
+        </div>
+      
 
     </div>
 

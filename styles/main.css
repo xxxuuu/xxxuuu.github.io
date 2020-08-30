@@ -2821,7 +2821,31 @@ body {
   position: fixed;
   width: 200px;
   top: 48px;
-  right: 200px;
+  right: 80px;
+  user-select: none;
+}
+.post-toc > .divider {
+  height: 1px;
+  width: 100%;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 10px 0 10px 0;
+}
+.post-toc > span {
+  font-weight: bold;
+}
+.post-toc .markdownIt-TOC {
+  list-style: none;
+}
+.post-toc .markdownIt-TOC > li > ul > li,
+.post-toc .markdownIt-TOC > li {
+  margin-left: 0px;
+}
+.post-toc li {
+  margin: 8px 0 8px 22px;
+  list-style: none;
+}
+.post-toc li > a {
+  color: rgba(0, 0, 0, 0.6);
 }
 .pagination-container {
   display: block;
@@ -2994,6 +3018,11 @@ hr {
     padding-bottom: 20px;
     margin-bottom: 40px;
     border-bottom: 1px dashed #F3F4F3;
+  }
+}
+@media (max-width: 1600px) {
+  .post-toc {
+    display: none;
   }
 }
 .img_info {
