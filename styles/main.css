@@ -2567,6 +2567,7 @@ a {
   max-width: 80px;
   min-width: 80px;
   margin: 0 16px 0 0 !important;
+  border-radius: 12px 0 0 12px !important;
 }
 .friend-links .friend-info {
   display: flex;
