@@ -18,8 +18,13 @@
   
 
 
-<link href="https://cdn.bootcdn.net/ajax/libs/aos/3.0.0-beta.6/aos.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+<link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.0/animate.min.css" rel="stylesheet">
+<style>
+:root {
+  --animate-duration: 800ms;
+}
+</style>
+<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.9/vue.min.js"></script>
 
 
 
@@ -37,7 +42,7 @@
     <div id="app" class="main">
 
       <div class="sidebar" :class="{ 'full-height': menuVisible }">
-  <div class="top-container" data-aos="fade-right">
+  <div class="top-container animate__animated animate__fadeInLeft">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
         <img src="https://xqinger.com/images/avatar.png?v=1598900396186" class="site-logo">
@@ -81,7 +86,7 @@
       
     </div>
   </div>
-  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+  <div class="bottom-container animate__animated animate__flipInX">
     <div class="social-container">
       
         
@@ -106,7 +111,7 @@
 
 
       <div class="main-container">
-        <div class="content-container" data-aos="fade-up">
+        <div class="content-container animate__animated animate__fadeInUp">
           <div class="post-detail">
             <h2 class="post-title">Kotlin 初体验</h2>
             <div class="post-date">2018-03-21&emsp;&emsp;3953 字 &emsp;阅读时间 17 分钟</div>
@@ -606,7 +611,7 @@ fun main(args : Array&lt;String&gt;) {
 
             
               
-                <div id="gitalk-container" data-aos="fade-in"></div>
+                <div id="gitalk-container" class="animate__animated animate__fadeIn"></div>
               
 
               
@@ -617,7 +622,7 @@ fun main(args : Array&lt;String&gt;) {
       </div>
 
       
-        <div class="post-toc" data-aos="fade-up">
+        <div class="post-toc animate__animated animate__fadeInUp">
           <span>目录</span>
           <div class="divider"></div>
           <ul class="markdownIt-TOC">
@@ -679,10 +684,7 @@ fun main(args : Array&lt;String&gt;) {
 
     </div>
 
-    <script src="https://cdn.bootcdn.net/ajax/libs/aos/3.0.0-beta.6/aos.js"></script>
-<script type="application/javascript">
-
-AOS.init();
+    <script type="application/javascript">
 
 var app = new Vue({
   el: '#app',
