@@ -2540,6 +2540,49 @@ a {
 .archives-container .post .post-title:hover {
   color: #212529;
 }
+.friend-links {
+  display: flex;
+  height: 80px;
+  width: auto;
+  background: rgba(54, 86, 60, 0.02);
+  box-shadow: 0 20px 40px 0 rgba(55, 86, 60, 0.1);
+  border-radius: 12px;
+}
+.friend-links:not(:first-child) {
+  margin-top: 50px;
+}
+.friend-links:last-child {
+  margin-bottom: 50px;
+}
+.friend-links .link {
+  display: flex;
+  width: 100%;
+}
+.friend-links .link:after {
+  content: "" !important;
+}
+.friend-links .firend-head,
+.friend-links .firend-head > img {
+  max-height: 80px;
+  max-width: 80px;
+  min-width: 80px;
+  margin: 0 16px 0 0 !important;
+}
+.friend-links .friend-info {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 0 10px 0;
+}
+.friend-info .title {
+  color: rgba(0, 0, 0, 0.6) !important;
+  font-size: 20px !important;
+  margin: 0 !important;
+}
+.friend-info .url {
+  color: rgba(0, 0, 0, 0.2) !important;
+  font-size: 16px !important;
+  margin: 0 0 0 0 !important;
+}
 @media (max-width: 800px) {
   .sidebar {
     position: relative;
