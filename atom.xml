@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-09-04T06:55:39.088Z</updated>
+    <updated>2020-09-06T08:57:02.638Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -16,9 +16,9 @@
         <link href="https://xqinger.com/post/golang-advantage/">
         </link>
         <updated>2020-08-21T20:32:54.000Z</updated>
-        <summary type="html"><![CDATA[<p>最近对 Golang 比较感兴趣，学习了一番。但也总能听到 “Go 是 互联网时代的 C”、“Go 天生高并发” 之类的论调。why ？Go 对于 Java 等语言真正的优势在哪里？ 所谓的天生高并发又从而何来？ 于是乎我陷入了沉思</p>
+        <summary type="html"><![CDATA[<p>最近对 Golang 比较感兴趣，学习了一番。但也总能听到 「Go 是 互联网时代的 C」、「Go 天生高并发」 之类的论调。那么 Go 对于 Java 等语言真正的优势在哪里，所谓的天生高并发又从而何来？ 于是乎我陷入了沉思</p>
 ]]></summary>
-        <content type="html"><![CDATA[<p>最近对 Golang 比较感兴趣，学习了一番。但也总能听到 “Go 是 互联网时代的 C”、“Go 天生高并发” 之类的论调。why ？Go 对于 Java 等语言真正的优势在哪里？ 所谓的天生高并发又从而何来？ 于是乎我陷入了沉思</p>
+        <content type="html"><![CDATA[<p>最近对 Golang 比较感兴趣，学习了一番。但也总能听到 「Go 是 互联网时代的 C」、「Go 天生高并发」 之类的论调。那么 Go 对于 Java 等语言真正的优势在哪里，所谓的天生高并发又从而何来？ 于是乎我陷入了沉思</p>
 <!-- more -->
 <hr>
 <h2 id="goroutine-channel-线程和协程"><code>goroutine</code>、<code>channel</code>、线程和协程</h2>
