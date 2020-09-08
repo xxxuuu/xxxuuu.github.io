@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-09-08T14:46:29.570Z</updated>
+    <updated>2020-09-08T15:52:36.164Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -610,6 +610,27 @@ try {
     ex.printStackTrace();
 }
 </code></pre>
+<h2 id="completablefuture-回调的future">CompletableFuture 回调的Future</h2>
+<p><code>Future</code> 获取结果时也需要阻塞等待， <code>CompletableFuture</code> 则提供了一个回调接口，任务完成时自动调用回调方法</p>
+<pre><code class="language-Java">CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; {
+    try {
+        TimeUnit.SECONDS.sleep(3);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
+    }
+    return &quot;result&quot;;
+});
+
+// 成功执行
+future.thenAccept((result) -&gt; {
+    System.out.println(&quot;回调 &quot; + result);
+});
+// 出现异常
+future.exceptionally((e) -&gt; {
+    e.printStackTrace();
+    return null;
+});
+</code></pre>
 <h2 id="semaphore-信号量">Semaphore 信号量</h2>
 <p><code>Semaphore</code> 本质上是一个共享锁，线程获取到许可时才能执行：</p>
 <pre><code class="language-Java">ExecutorService executor = Executors.newCachedThreadPool();
@@ -672,6 +693,49 @@ for(int i = 1; i &lt;= 4; i++) {
 
         System.out.println(Thread.currentThread().getName() + &quot;开始开会&quot;);
     }).start();
+}
+</code></pre>
+<h2 id="forkjoin-任务拆分">ForkJoin 任务拆分</h2>
+<p><code>ForkJoin</code> 可以将一个任务拆分成多个子任务并发执行，然后将子任务的结果合并起来，大数据量下能有效提升效率。以下是使用 <code>ForkJoin</code> 计算 1 加到 n 的样例：</p>
+<pre><code class="language-Java">class SumTask extends RecursiveTask&lt;Long&gt; {
+    private Long start;
+    private Long end;
+    private Long check = 10000L;
+
+    public SumTask(Long start, Long end) {
+        this.start = start;
+        this.end = end;
+    }
+
+    @Override
+    protected Long compute() {
+        // 任务太大就拆分
+        if(end - start &gt;= check) {
+            long mid = (start + end) / 2;
+            SumTask task1 = new SumTask(start, mid);
+            SumTask task2 = new SumTask(mid + 1, end);
+            // 并行运行子任务
+            invokeAll(task1, task2);
+            // 获取结果
+            Long subResult1 = task1.join();
+            Long subResult2 = task2.join();
+            return subResult1 + subResult2;
+        }
+        // 直接计算
+        long sum = 0L;
+        for(Long i = start; i &lt;= end; i++) {
+            sum += i;
+        }
+
+        return sum;
+    }
+}
+
+public static void main(String[] args){
+    // 求 1 到 100000000 的和
+    ForkJoinTask&lt;Long&gt; task = new SumTask(0L, 100000000L);
+    Long result = ForkJoinPool.commonPool().invoke(task);
+    System.out.println(result);
 }
 </code></pre>
 ]]></content>
