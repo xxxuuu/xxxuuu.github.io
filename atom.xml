@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-09-06T08:57:02.638Z</updated>
+    <updated>2020-09-08T01:07:19.988Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -538,7 +538,7 @@ ses.scheduleWithFixedDelay(runnable, 2, 3, TimeUnit.SECONDS);
 <li><code>TimeUnit unit</code>：<code>keepAliveTime</code>参数的时间单位，例<code>TimeUnit.SECONDS</code>为秒。</li>
 <li><code>BlockingQueue&lt;Runnable&gt; workQueue</code>：任务队列，常见有三种队列：<code>SynchronousQueue</code>，<code>LinkedBlockingDeque</code>和<code>ArrayBlockingQueue</code>。</li>
 <li><code>ThreadFactory threadFactory</code>：线程工厂，提供创建新线程的功能。《阿里巴巴Java开发手册》规定要使用带有这个参数的构造方法，来方便地管理线程。</li>
-<li><code>RejectedExecutionHandler handler</code>：当到达线程池资源上限时，添加新线程会调用<code>RejectedExecutionHandler</code>接口的<code>rejectedExecution</code>方法</li>
+<li><code>RejectedExecutionHandler handler</code>：拒绝策略，当到达线程池资源上限时，添加新线程会调用<code>RejectedExecutionHandler</code>接口的<code>rejectedExecution</code>方法</li>
 </ul>
 <h4 id="任务队列规则">任务队列规则</h4>
 <p>线程添加的规则和<code>workQueue</code>的类型有很大关系，当一个线程任务添加到线程池时：</p>
@@ -586,24 +586,84 @@ try {
 <li><code>cancel(boolean mayInterruptIfRunning)</code>：取消当前任务；</li>
 <li><code>isDone()</code>：判断任务是否已完成。</li>
 </ul>
+<p>想要在 <code>Thread</code> 中使用可以用 <code>FutureTask</code> ：</p>
+<pre><code class="language-Java">FutureTask&lt;String&gt; futureTask = new FutureTask&lt;&gt;(new Callable&lt;String&gt;() {
+    @Override
+    public String call() throws Exception {
+        return &quot;task result&quot;;
+    }
+});
+
+new Thread(futureTask).run();
+
+try {
+    futureTask.get();
+} catch (InterruptedException | ExecutionException ex) {
+    ex.printStackTrace();
+}
+</code></pre>
 <h2 id="semaphore-信号量">Semaphore 信号量</h2>
 <p><code>Semaphore</code> 本质上是一个共享锁，线程获取到许可时才能执行：</p>
 <pre><code class="language-Java">ExecutorService executor = Executors.newCachedThreadPool();
 // 最多同时发放3个许可
 Semaphore s = new Semaphore(3);
 for(int i = 0; i &lt; 10; i++) {
-    executor.execute(() -&gt; {
+    executor.submit(() -&gt; {
         try {
             // 获取许可
             s.acquire();
             // 执行操作
+            System.out.println(Thread.currentThread().getName() + &quot;执行耗时操作&quot;);
             Thread.sleep(3000);
+            System.out.println(Thread.currentThread().getName() + &quot;执行操作结束&quot;);
             // 释放
             s.release();
         } catch(Exception e) {
-            
+
         }
+    });
+}
+</code></pre>
+<h2 id="countdownlatch-计数器">CountDownLatch 计数器</h2>
+<p><code>CountDownLatch</code> 类似计数器，可以用于多个线程执行完毕的同步</p>
+<pre><code class="language-Java">CountDownLatch latch = new CountDownLatch(2);	// 初始为2
+
+Runnable runnable = () -&gt; {
+    try {
+        Thread.sleep(2000);
+    } catch (InterruptedException e) {
+        e.printStackTrace();
     }
+    latch.countDown();  // 执行完就 -1
+};
+
+new Thread(runnable).start();
+new Thread(runnable).start();
+
+latch.await();      // 阻塞等待直到为0
+System.out.println(&quot;finish&quot;);
+</code></pre>
+<h2 id="cyclicbarrier-循环栅栏">CyclicBarrier 循环栅栏</h2>
+<p><code>CyclicBarrier</code> 直译是循环栅栏，意为可循环使用的屏障，可以让指定数量的线程都到达屏障后后才执行下一步动作</p>
+<pre><code class="language-Java">CyclicBarrier cyclicBarrier = new CyclicBarrier(4, () -&gt; {
+    // 每n个的线程到达屏障后执行的操作
+    System.out.println(&quot;人到齐 开会&quot;);
+});
+
+for(int i = 1; i &lt;= 4; i++) {
+    new Thread(() -&gt; {
+        System.out.println(Thread.currentThread().getName() + &quot;到了&quot;);
+
+        try {
+            cyclicBarrier.await();  // 到达屏障
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (BrokenBarrierException e) {
+            e.printStackTrace();
+        }
+
+        System.out.println(Thread.currentThread().getName() + &quot;开始开会&quot;);
+    }).start();
 }
 </code></pre>
 ]]></content>
