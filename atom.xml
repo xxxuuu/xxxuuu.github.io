@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-09-08T01:07:19.988Z</updated>
+    <updated>2020-09-08T14:46:29.570Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -561,6 +561,14 @@ ses.scheduleWithFixedDelay(runnable, 2, 3, TimeUnit.SECONDS);
 <li>队列为<code>SynchronousQueue</code>，会使用<code>handler</code>拒绝任务。</li>
 </ul>
 </li>
+</ul>
+<h4 id="拒绝策略">拒绝策略</h4>
+<p><code>ThreadPoolExecutor</code> 构造方法的最后一个参数是 <code>RejectedExecutionHandler</code> 接口，即拒绝策略。JUC 实现了四种拒绝策略：</p>
+<ul>
+<li><code>AbortPolicy</code> ：会抛出 <code>RejectedExecutionException</code> 异常，当 <code>ThreadPoolExecutor</code> 构造方法不指定拒绝策略时，默认使用该策略</li>
+<li><code>CallerRunsPolicy</code> ：如果线程池没被关闭，其会直接执 <code>Runnable</code> 的 <code>run()</code> 而不放进线程池，不会开启新线程。也就是说如果在主线程中启动的线程池，那么该 <code>Runable</code> 也会直接在主线程中执行</li>
+<li><code>DiscardOldestPolicy</code> ：如果线程池没被关闭，其会将任务队列中的第一个任务丢弃，然后将当前任务放入线程池（即加到队列末尾）</li>
+<li><code>DiscardPolicy</code> ：静默丢弃，实际上其对接口就是空实现</li>
 </ul>
 <h2 id="future-异步返回机制">Future 异步返回机制</h2>
 <p><code>Runnable</code>没有返回值比较不方便，JUC提供了个<code>Callable</code>泛型接口，和前者相比，多了一个返回值，并且可以通过泛型指定返回结果。</p>

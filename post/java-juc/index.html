@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="https://xqinger.com/media/styles/fontawesome.min.css">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1599483697032">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1599576387730">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -48,7 +48,7 @@
   <div class="top-container animate__animated animate__fadeInLeft">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1599483697032" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1599576387730" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -117,7 +117,7 @@
         <div class="content-container animate__animated animate__fadeInUp">
           <div class="post-detail">
             <h2 class="post-title">Java JUC并发包</h2>
-            <div class="post-date">2020-04-27&emsp;&emsp;3311 字 &emsp;阅读时间 14 分钟</div>
+            <div class="post-date">2020-04-27&emsp;&emsp;3500 字 &emsp;阅读时间 14 分钟</div>
             
             <div class="post-content" v-pre>
               <p>复习一下基础~</p>
@@ -446,6 +446,14 @@ ses.scheduleWithFixedDelay(runnable, 2, 3, TimeUnit.SECONDS);
 </ul>
 </li>
 </ul>
+<h4 id="拒绝策略">拒绝策略</h4>
+<p><code>ThreadPoolExecutor</code> 构造方法的最后一个参数是 <code>RejectedExecutionHandler</code> 接口，即拒绝策略。JUC 实现了四种拒绝策略：</p>
+<ul>
+<li><code>AbortPolicy</code> ：会抛出 <code>RejectedExecutionException</code> 异常，当 <code>ThreadPoolExecutor</code> 构造方法不指定拒绝策略时，默认使用该策略</li>
+<li><code>CallerRunsPolicy</code> ：如果线程池没被关闭，其会直接执 <code>Runnable</code> 的 <code>run()</code> 而不放进线程池，不会开启新线程。也就是说如果在主线程中启动的线程池，那么该 <code>Runable</code> 也会直接在主线程中执行</li>
+<li><code>DiscardOldestPolicy</code> ：如果线程池没被关闭，其会将任务队列中的第一个任务丢弃，然后将当前任务放入线程池（即加到队列末尾）</li>
+<li><code>DiscardPolicy</code> ：静默丢弃，实际上其对接口就是空实现</li>
+</ul>
 <h2 id="future-异步返回机制">Future 异步返回机制</h2>
 <p><code>Runnable</code>没有返回值比较不方便，JUC提供了个<code>Callable</code>泛型接口，和前者相比，多了一个返回值，并且可以通过泛型指定返回结果。</p>
 <p>前面提到的线程<code>ExecutorService</code>的<code>submit()</code>返回了一个<code>Future</code>，一个Future类型的实例代表一个未来能获取结果的对象：</p>
@@ -610,6 +618,7 @@ for(int i = 1; i &lt;= 4; i++) {
 <li><a href="#threadpoolexecutor-%E8%87%AA%E5%AE%9A%E4%B9%89%E7%BA%BF%E7%A8%8B%E6%B1%A0">ThreadPoolExecutor 自定义线程池</a>
 <ul>
 <li><a href="#%E4%BB%BB%E5%8A%A1%E9%98%9F%E5%88%97%E8%A7%84%E5%88%99">任务队列规则</a></li>
+<li><a href="#%E6%8B%92%E7%BB%9D%E7%AD%96%E7%95%A5">拒绝策略</a></li>
 </ul>
 </li>
 </ul>
