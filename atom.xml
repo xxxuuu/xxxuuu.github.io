@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-09-08T16:02:30.322Z</updated>
+    <updated>2020-09-09T09:32:42.504Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -738,6 +738,21 @@ public static void main(String[] args){
     System.out.println(result);
 }
 </code></pre>
+<h2 id="threadlocal-线程局部状态">ThreadLocal 线程局部状态</h2>
+<p>在线程中横跨多个方法进行状态或变量的传递比较不方便，而 <code>ThreadLocal</code> 提供了类似上下文的机制用于在线程内传递状态。</p>
+<p><code>ThreadLocal</code> 一般总是以静态变量的形式初始化</p>
+<pre><code class="language-Java">private static ThreadLocal&lt;T&gt; local = new ThreadLocal&lt;&gt;();
+// 初始化同时设定默认值
+private static ThreadLocal&lt;Long&gt; local = ThreadLocal.withInitial(() -&gt; 0L);
+</code></pre>
+<p>主要方法：</p>
+<ul>
+<li><code>T get()</code> ：获取值，当值为空时，调用 <code>initialValue()</code></li>
+<li><code>void set(T t)</code> ：设置值</li>
+<li><code>void remove()</code> ：移除值，当不需要时务必 <code>remove()</code>。否则当在线程池等场景时当线程被复用可能就会 <code>get()</code> 到之前的值造成污染和潜在的问题</li>
+</ul>
+<p><code>ThreadLocal</code> 相当一个哈希表，不同的线程调用 <code>ThreadLocal</code> 时，都是以自身作为 key，获取到不同到存储空间再对数据进行操作。所以 <code>ThreadLocal</code> 一般是静态的，不同线程对其操作也不会造成干扰和线程安全问题。所以经常通过 <code>ThreadLocal</code> 来转化一些同步问题和进行一些计算的调度。</p>
+<p>例如 <code>Mybatis</code> 利用 <code>ThreadLocal</code> 实现 <code>SqlSessionManager</code> 来让同一个线程始终分配同一个连接以实现资源一致性（一个事务在多个连接（线程）中执行可能导致不一致性）</p>
 ]]></content>
     </entry>
     <entry>
