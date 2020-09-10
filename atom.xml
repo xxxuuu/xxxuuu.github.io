@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-09-09T09:32:42.504Z</updated>
+    <updated>2020-09-10T07:11:33.176Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -337,7 +337,7 @@ if (lock.tryLock(1, TimeUnit.SECONDS)) {
 <li>没有写入时，多个线程允许同时读（提高性能）。</li>
 </ul>
 <p>例：</p>
-<pre><code>public class FileIO {
+<pre><code class="language-Java">public class FileIO {
     private final ReadWriteLock rwlock = new ReentrantReadWriteLock();
     private final Lock rlock = rwlock.readLock();
     private final Lock wlock = rwlock.writeLock();
@@ -610,7 +610,7 @@ try {
     ex.printStackTrace();
 }
 </code></pre>
-<h2 id="completablefuture-回调的future">CompletableFuture 回调的Future</h2>
+<h3 id="completablefuture-回调的future">CompletableFuture 回调的Future</h3>
 <p><code>Future</code> 获取结果时也需要阻塞等待， <code>CompletableFuture</code> 则提供了一个回调接口，任务完成时自动调用回调方法</p>
 <pre><code class="language-Java">CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; {
     try {

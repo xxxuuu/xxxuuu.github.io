@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="https://xqinger.com/media/styles/fontawesome.min.css">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1599643941763">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1599721865259">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -48,7 +48,7 @@
   <div class="top-container animate__animated animate__fadeInLeft">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1599643941763" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1599721865259" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -221,7 +221,7 @@ if (lock.tryLock(1, TimeUnit.SECONDS)) {
 <li>没有写入时，多个线程允许同时读（提高性能）。</li>
 </ul>
 <p>例：</p>
-<pre><code>public class FileIO {
+<pre><code class="language-Java">public class FileIO {
     private final ReadWriteLock rwlock = new ReentrantReadWriteLock();
     private final Lock rlock = rwlock.readLock();
     private final Lock wlock = rwlock.writeLock();
@@ -494,7 +494,7 @@ try {
     ex.printStackTrace();
 }
 </code></pre>
-<h2 id="completablefuture-回调的future">CompletableFuture 回调的Future</h2>
+<h3 id="completablefuture-回调的future">CompletableFuture 回调的Future</h3>
 <p><code>Future</code> 获取结果时也需要阻塞等待， <code>CompletableFuture</code> 则提供了一个回调接口，任务完成时自动调用回调方法</p>
 <pre><code class="language-Java">CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; {
     try {
@@ -702,8 +702,11 @@ private static ThreadLocal&lt;Long&gt; local = ThreadLocal.withInitial(() -&gt; 
 </li>
 </ul>
 </li>
-<li><a href="#future-%E5%BC%82%E6%AD%A5%E8%BF%94%E5%9B%9E%E6%9C%BA%E5%88%B6">Future 异步返回机制</a></li>
+<li><a href="#future-%E5%BC%82%E6%AD%A5%E8%BF%94%E5%9B%9E%E6%9C%BA%E5%88%B6">Future 异步返回机制</a>
+<ul>
 <li><a href="#completablefuture-%E5%9B%9E%E8%B0%83%E7%9A%84future">CompletableFuture 回调的Future</a></li>
+</ul>
+</li>
 <li><a href="#semaphore-%E4%BF%A1%E5%8F%B7%E9%87%8F">Semaphore 信号量</a></li>
 <li><a href="#countdownlatch-%E8%AE%A1%E6%95%B0%E5%99%A8">CountDownLatch 计数器</a></li>
 <li><a href="#cyclicbarrier-%E5%BE%AA%E7%8E%AF%E6%A0%85%E6%A0%8F">CyclicBarrier 循环栅栏</a></li>
