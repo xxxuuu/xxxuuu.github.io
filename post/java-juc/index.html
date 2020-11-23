@@ -7,7 +7,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="https://xqinger.com/media/styles/fontawesome.min.css">
-<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1605610949379">
+<link rel="shortcut icon" href="https://xqinger.com/favicon.ico?v=1606103970325">
 <link rel="stylesheet" href="https://xqinger.com/styles/main.css">
 
 
@@ -48,7 +48,7 @@
   <div class="top-container animate__animated animate__fadeInLeft">
     <div class="top-header-container">
       <a class="site-title-container" href="https://xqinger.com">
-        <img src="https://xqinger.com/images/avatar.png?v=1605610949379" class="site-logo">
+        <img src="https://xqinger.com/images/avatar.png?v=1606103970325" class="site-logo">
         <h1 class="site-title">某不科學の技術博客</h1>
       </a>
       <div class="menu-btn" @click="menuVisible = !menuVisible">
@@ -117,7 +117,7 @@
         <div class="content-container animate__animated animate__fadeInUp">
           <div class="post-detail">
             <h2 class="post-title">Java JUC并发包</h2>
-            <div class="post-date">2020-04-27&emsp;&emsp;4127 字 &emsp;阅读时间 17 分钟</div>
+            <div class="post-date">2020-04-27&emsp;&emsp;4126 字 &emsp;阅读时间 17 分钟</div>
             
             <div class="post-content" v-pre>
               <p>复习一下基础~</p>
@@ -622,7 +622,7 @@ public static void main(String[] args){
     System.out.println(result);
 }
 </code></pre>
-<h2 id="threadlocal-线程局部状态">ThreadLocal 线程局部状态</h2>
+<h2 id="threadlocal-线程上下文">ThreadLocal 线程上下文</h2>
 <p>在线程中横跨多个方法进行状态或变量的传递比较不方便，而 <code>ThreadLocal</code> 提供了类似上下文的机制用于在线程内传递状态。</p>
 <p><code>ThreadLocal</code> 一般总是以静态变量的形式初始化</p>
 <pre><code class="language-Java">private static ThreadLocal&lt;T&gt; local = new ThreadLocal&lt;&gt;();
@@ -711,7 +711,7 @@ private static ThreadLocal&lt;Long&gt; local = ThreadLocal.withInitial(() -&gt; 
 <li><a href="#countdownlatch-%E8%AE%A1%E6%95%B0%E5%99%A8">CountDownLatch 计数器</a></li>
 <li><a href="#cyclicbarrier-%E5%BE%AA%E7%8E%AF%E6%A0%85%E6%A0%8F">CyclicBarrier 循环栅栏</a></li>
 <li><a href="#forkjoin-%E4%BB%BB%E5%8A%A1%E6%8B%86%E5%88%86">ForkJoin 任务拆分</a></li>
-<li><a href="#threadlocal-%E7%BA%BF%E7%A8%8B%E5%B1%80%E9%83%A8%E7%8A%B6%E6%80%81">ThreadLocal 线程局部状态</a></li>
+<li><a href="#threadlocal-%E7%BA%BF%E7%A8%8B%E4%B8%8A%E4%B8%8B%E6%96%87">ThreadLocal 线程上下文</a></li>
 </ul>
 </li>
 </ul>
