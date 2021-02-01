@@ -2,14 +2,51 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2020-11-25T08:52:33.406Z</updated>
+    <updated>2021-02-01T11:42:53.743Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
     <subtitle>🗒 随便写点东西的地方</subtitle>
     <logo>https://xqinger.com/images/avatar.png</logo>
     <icon>https://xqinger.com/favicon.ico</icon>
-    <rights>All rights reserved 2020, 某不科學の技術博客</rights>
+    <rights>All rights reserved 2021, 某不科學の技術博客</rights>
+    <entry>
+        <title type="html"><![CDATA[蒟蒻的2020年度总结]]></title>
+        <id>https://xqinger.com/post/2020summary/</id>
+        <link href="https://xqinger.com/post/2020summary/">
+        </link>
+        <updated>2021-01-10T04:34:38.000Z</updated>
+        <summary type="html"><![CDATA[<p>转眼三年已经过去，我也即将迎来毕业</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>转眼三年已经过去，我也即将迎来毕业</p>
+<!-- more -->
+<h2 id="0x00-算法竞赛">0x00 算法&amp;竞赛</h2>
+<p>虽然去年说不打 ACM 了，但上半年的时候在胡神的洗脑+区域赛牌子诱惑下，还是又回来继续<s>训练</s>划水准备冲区域赛牌子了，今年由于疫情，区域赛也基本都改成了线上举办。虽然少了点味道，但对我们来说也方便了些，毕竟不用再操心路费之类的问题</p>
+<p>前两场打的是 CCPC 威海和 ICPC 上海，具体就不说了，我自闭五小时，全程基本 0 贡献，在题目翻译上还背了点锅。原本的铜牌目标也没达到，还以为我的 ACM 生涯会就此铁牌收场。没想到 ICPC 南京给我了个大大的惊喜，一开始我们手速够快过掉了三题，我也想出了第四道数学签到题。最后四题收场感觉铜牌稳了，没想到罚时少居然拿了个银尾，远超出预期，也算退役无憾了<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20210201171000.png" alt="ICPC南京排名" loading="lazy"><br>
+而且这个银牌也是国内带专第一个拿到的银牌，还记得大一开学前胡神忽悠我打 ACM 时，我就说希望能创造历史，现在看来也算是创造了历史吧。</p>
+<p>PS：今年的总结这么晚发主要就是为了等南航那边发正式的获奖证书下来，结果它们一直咕咕咕，估计开学前都不会发了，所以就只能等后面发了再贴上来了</p>
+<p>今年还参加了些别的比赛，蓝桥天梯技能大赛之类的，不过在 ACM 面前就没啥好提的了</p>
+<p>之后计划插完本后挑战一些更工程向的竞赛，比如阿里云的云&amp;中间件大赛之类的，不过也得等把操作系统和分布式计算学完后再说了<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20210201174500.png" alt="阿里云云&amp;中间件大赛" loading="lazy"></p>
+<h2 id="0x01-技术与工程">0x01 技术与工程</h2>
+<p>记得去年的时候说尝试构建自己的开发工作流，现在也算初步成型了，包括一套 DevOps，测试，运维的体系。这些「软件工程」的掌控力和一些架构设计的算不上经验的经验之谈基本就是今年最主要的进步了，hold 住一个小技术团队也完全没问题了</p>
+<p>很早之前就想写个 OJ，但一直给我咕咕咕，前两个月趁着课程设计写了下，评测机也是自己实现的。等有空再完善下应该就会开源出来（咕咕咕警告⚠️）<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/JOOJ-1.png" alt="JOOJ-1" loading="lazy"><br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/JOOJ-2.png" alt="JOOJ-2" loading="lazy"><br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/JOOJ-3.png" alt="JOOJ-3" loading="lazy"></p>
+<p>大一开学前 <s>（怎么我大一开学前戏这么多）</s> 还想着毕业后能拿 7-8k 就不错了，现在觉得 13k 以下勿扰。不过感觉离大厂还是有些差距，这也是插本的原因之一吧，给自己两年时间打磨一下，专心学习。到那个时候再去大厂应该问题不大了。之前也说过想去大厂是因为想解决更复杂的问题，而不只是拿更高的薪水（但能给应届生 3、40w 的年薪还是很有诱惑力的</p>
+<h2 id="0x02-理论基础">0x02 理论基础</h2>
+<p>之前说希望能写自己的操作系统和编译器，不过因为种种原因进展一直比想象中要慢。所以就刚好趁着毕业设计来推进下</p>
+<p>具体的话打算设计一门简单的编程语言，因为之前学习了函数范式，很感兴趣；所以这门语言应该还是要支持函数式编程的。名字已经想好了，就叫鸟语 Birdlang（逃</p>
+<p>然后去实现这门语言的编译器前端，因为操作系统这块学习还不够深入，后端实现上可能会有困难。考虑到事关毕业所以只有前端了（太菜了我）。后端就直接基于 JVM，为什么不是 LLVM？因为 JVM 最熟悉。不过 JVM 毕竟还是以 OOP 设计的，实现函数式语言的话可能会在语法制导翻译和字节码生成这里遇到一些挑战</p>
+<p>去年立的毕业前写 OS 的 flag 看来是难以完成了，等插完本后有时间了就要马上把欠的 MIT6.828 和 6.824 补回来❗️❗️❗️</p>
+<h2 id="0x03-插本">0x03 插本</h2>
+<p>今年华师也允许软件报考了，一直很纠结要不要报华师（华南师大），但觉得华师课程比较满、而且都是师范课，对我这种比较自闭的人很不友好，好处就是这个耀眼的 211 光环是其它插本院校都难以比拟的</p>
+<p>但仔细思考后，暂时还是决定报广师大而不是华师了。最主要的原因还是华师自学时间太少，这样无论对工作还是考研都是比较致命的。加上我还是想走技术路线的，没有时间提升自己可能就算 211 毕业也不能进大厂。广师大虽然是双非，但也有 carry、首铭这样优秀的前辈，我相信这可能会是更好的选择（扯了这么多，我的插本进度还是很落后，到时候落榜了也说不定</p>
+<h2 id="0x04-生活">0x04 生活</h2>
+]]></content>
+    </entry>
     <entry>
         <title type="html"><![CDATA[Nacos 报错 parse data from Nacos error]]></title>
         <id>https://xqinger.com/post/nacos-parse-data-from-nacos-error/</id>
@@ -1292,189 +1329,6 @@ http.createServer((req, res) =&gt; {
 <p>当然我们也可以更进一步直接在本项目中实现这个静态网站服务器，但我认为这类 web 程序和 <code>Nginx</code> 等接近网络层的 HTTP 服务器的应用场景还是有很大差别的，在应用层面去实现这些东西显然不太合适、也不专业，在维护上也是一大麻烦</p>
 <h3 id="27-开源地址">2.7 开源地址</h3>
 <p>使用 <code>Node.js</code> 的项目也上传到了 <a href="https://github.com/xxxuuu/node-github-hooks">Github</a>，有兴趣的同学可以参考一下</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[JavaScript 中的 this 之探讨]]></title>
-        <id>https://xqinger.com/post/javascript-this/</id>
-        <link href="https://xqinger.com/post/javascript-this/">
-        </link>
-        <updated>2019-10-22T09:19:34.000Z</updated>
-        <summary type="html"><![CDATA[<p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
-<!-- more -->
-<h2 id="this-的动态指向性">this 的动态指向性</h2>
-<p>在大多数常见的面向对象的语言中，<code>this</code> 通常指向类的实例，如 <code>Java</code> 的 <code>this</code>, <code>Python</code> 的 <code>self</code>，<code>PHP</code> 的 <code>$this</code>。</p>
-<p>于是乎，大多数人在接触 <code>JavaScript</code> 时也下意识认为 <code>this</code> 是指向类的实例。实际上在 <code>JavaScript</code> 里根本就没有真正意义上的类，也不区分类和实例的概念，是通过 <code>prototype</code> 来实现的面向对象（在 ES6 里已经引入了 <code>class</code> 关键字，但本质上还只是 <code>prototype</code> 的语法糖）。</p>
-<h2 id="默认绑定">默认绑定</h2>
-<p>在浏览器的 <code>Developer Tools</code> 中的 <code>Console</code> 输入 <code>this</code> 并回车，会输出以下信息：</p>
-<pre><code class="language-JSON">Window {parent: Window, postMessage: ƒ, blur: ƒ, focus: ƒ, close: ƒ, …}
-</code></pre>
-<p>当 <code>this</code> 没有在任何其它对象中时，默认指向全局对象（全局作用域）。在浏览器中这个全局对象就是 <code>window</code>。（在 <code>Node.js</code> 环境中没有全局对象，所以会是 <code>undefined</code>）</p>
-<p><strong>这种默认指向全局对象的方式就是 <code>this</code> 的默认绑定。</strong></p>
-<p>但默认绑定常常会带来更多的问题，任何代码都可能污染全局对象。不应该使用全局变量来保存数据。所以 ES5 引入了<strong>严格模式</strong>。</p>
-<p>严格模式使用 <code>&quot;use strict&quot;;</code> 声明，会取消默认绑定：</p>
-<pre><code class="language-JavaScript">&quot;use strict&quot;;
-
-console.log(this);  // undefined
-</code></pre>
-<h2 id="隐式绑定">隐式绑定</h2>
-<p>隐式绑定很简单，<strong>当函数作为一个对象的属性时，该函数的 <code>this</code> 指向该对象。</strong></p>
-<pre><code class="language-JavaScript">var hello = {
-  str: 'world',
-  print: function() {
-    console.log('hello', this.str);
-  }
-}
-hello.print();  // hello world
-</code></pre>
-<p>默认绑定或许也可以看成全局函数默认作为全局对象的一个属性，从而使得全局函数的 <code>this</code> 指向全局对象。</p>
-<h2 id="显式绑定">显式绑定</h2>
-<p>在 <code>React</code> 中常常会看到类似的代码：</p>
-<pre><code class="language-JavaScript">class Test extends React.Component {
-  constructor(props) {
-    super(props);
-    this.testBtnClick = this.testBtnClick.bind(this);
-  }
-  
-  testBtnClick() {
-    console.log('click');
-  }
-  
-  render() {
-    return (
-      &lt;div&gt; 
-        &lt;button onClick={this.testBtnClick}&gt;test button&lt;/button&gt;
-      &lt;/div&gt;
-    );
-  }
-}
-
-ReactDOM.render(
-  &lt;Test/&gt;,
-  document.getElementById('example')
-);
-</code></pre>
-<p>其中的第四行 <code>this.testBtnClick = this.testBtnClick.bind(this);</code> 显式地绑定了 <code>testBtnClick</code> 这个函数的 <code>this</code>。</p>
-<p>在 <code>Function.prototype</code> 中有三个方法 <code>call</code>，<code>apply</code>，<code>bind</code> 都是用于显式绑定的。</p>
-<p><strong>显式绑定是将 <code>this</code> 显式地绑定到一个上下文中。</strong> 这样能避免代码中的错误绑定和丢失绑定问题，同时也更便于执行重构和实现一些设计模式。</p>
-<p><code>call</code> 和 <code>apply</code> 的作用都一样，使用指定的上下文对象运行方法，不同的只是传参方式。</p>
-<p>考虑下面的代码：</p>
-<pre><code class="language-JavaScript">var test1 = {
-  name: '',
-  init: function() {
-    this.name = 'aaa';
-  },
-  print: function() {
-    console.log(&quot;hello1&quot;, this.name);
-  }
-}
-
-var test2 = {
-  name: '',
-  init: function() {
-    this.name = 'bbb';
-  },
-  print: function() {
-    console.log(&quot;hello2&quot;, this.name);
-  }
-}
-
-test1.init();
-test1.print();  // hello1 aaa
-
-test2.init();
-test2.print();  // hello2 bbb
-
-test2.print.call(test1);    // hello2 aaa
-</code></pre>
-<p>在最后一行，通过 <code>call</code> 使用 <code>test1</code> 的上下文执行 <code>test2</code> 的 <code>print</code>，此时在 <code>print</code> 里取到的 <code>this</code> 就是 <code>test1</code>。</p>
-<p>假设调用的方法有参数，通过下面的方式传递参，这也是 <code>call</code> 和 <code>apply</code> 唯一的区别：</p>
-<pre><code class="language-JavaScript">test2.print.call(test1, param1, param2);
-test2.print.apply(test1, [param1, param2]);
-</code></pre>
-<p>而 <code>bind</code> 的作用是返回一个绑定指定上下文对象的新方法</p>
-<p>修改改改的例子：</p>
-<pre><code class="language-JavaScript">var test1 = {
-  name: '',
-  init: function() {
-    this.name = 'aaa';
-  },
-  print: function() {
-    console.log(&quot;hello1&quot;, this.name);
-  }
-}
-
-var test2 = {
-  name: '',
-  init: function() {
-    this.name = 'bbb';
-  },
-  print: function() {
-    console.log(&quot;hello2&quot;, this.name);
-  }
-}
-
-test1.init();
-test2.init();
-
-var newPrint = test2.print.bind(test1);
-newPrint(); // hello2 aaa
-
-// 或者直接赋值回去
-test2.print = test2.print.bind(test1);
-test2.print();  // hello2 aaa
-</code></pre>
-<p>在实际中会有一个常见的问题，在控件的事件回调方法里传入我们的函数，函数中通过 <code>this</code> 调用当前对象的某些属性或方法。</p>
-<p>而当回调执行时，是在浏览器中运行的，上下文被改变。此时函数里的 <code>this</code> 丢失绑定指向 <code>window</code>，就会出现错误。这也正是 <code>React</code> 常在 <code>constructor</code> 中使用 <code>bind</code> 显式绑定函数的 <code>this</code> 的原因。</p>
-<h2 id="new-绑定">new 绑定</h2>
-<p>在 ES6 前，通常用这种原型链方式创建一个对象：</p>
-<pre><code class="language-JavaScript">function Hello(name) {
-  this.name = name || 'world';
-}
-Hello.prototype.print = function() {
-  console.log('hello', this.name);
-};
-
-var h = new Hello();
-h.print();  // hello world
-</code></pre>
-<p>构造函数默认返回 <code>this</code>，并且该 <code>this</code> 绑定指向新创建的对象。</p>
-<p>所以通过 <code>new</code> 创建的对象，<code>this</code> 绑定在这个新创建的对象上。</p>
-<h2 id="箭头函数">箭头函数</h2>
-<p>在各种事件和 HTTP 请求的回调中可能会用到 <code>this</code>，但就会发生前面讲的丢失绑定问题。</p>
-<p>但箭头函数就可以解决该问题，箭头函数的 <code>this</code> 总是指向词法作用域，即其宿主。</p>
-<p>例如以下代码：</p>
-<pre><code class="language-JavaScript">var Hello1 = {
-  str: 'world',
-  print: function() {
-    var p = function() {
-      console.log('hello', this.str);
-    }
-    return p();
-  }
-}
-
-var Hello2 = {
-  str: 'world',
-  print: function() {
-    var p = () =&gt; {
-      console.log('hello', this.str);
-    }
-    return p();
-  }
-}
-
-Hello1.print(); // hello undefined
-Hello2.print(); // hello world
-</code></pre>
-<h2 id="总结">总结</h2>
-<ol>
-<li>默认绑定会指向全局对象，带来不可控的影响。避免默认绑定或使用严格模式</li>
-<li>隐式绑定和 <code>new</code> 绑定都可以确保 <code>this</code> 能得到应有的指向</li>
-<li>在某些情况下，也需要显式绑定来修改和确保 <code>this</code> 的指向为我们所想</li>
-</ol>
 ]]></content>
     </entry>
 </feed>
