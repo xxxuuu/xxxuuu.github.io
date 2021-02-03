@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2021-02-02T06:01:57.727Z</updated>
+    <updated>2021-02-03T15:22:01.791Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -116,8 +116,8 @@ Server: nginx
 <p>几乎所有所谓 “天生高并发” 的说法最终都指向了 <code>goroutine</code> 和 <code>channel</code>，它们是 Golang 中的并发模型。在讨论它们之前，先谈谈线程和协程</p>
 <p>在不少多线程开发中，是需要多个线程操作共享资源和协作的，经常会出现需要线程频繁等待另一线程执行的情况，而大部分操作系统对于线程的调度是抢占式的，这种频繁阻塞等待另一线程的情况加上线程的高消耗上下文切换导致效率不高。</p>
 <p>对于这种应用场景，协程更加合适。协程直接理解就是协作的程序，和线程的抢占式调度不同，协程通常是主动让出 CPU 时间片，加上协程一般是编程语言中的 runtime 和 VM 实现的，就算是有上下文切换的有栈协程，效率也远比操作系统层面的线程上下文切换更高。</p>
-<p>所以很多语言和平台所谓的 I/O 效率高（如 Node.js），本质上是因为对协程的良好支持加上系统的 selector、epoll 等 I/O 多路复用机制。Node.js 和 Python 的协程是全跑在一个线程里的，但一个线程是没法在 CPU 多核执行的，Python 的所谓多线程因为 GIL 也是只跑在一个核心里，这种协程对于 CPU 密集场景不能真正并行，无法有效发挥性能，在碰到阻塞式 I/O 的时候也该阻塞还是会阻塞</p>
-<p>简单地说，协程 + I/O 多路复用适合频繁协作和 I/O 密集场景，线程（多核）适合 CPU 密集场景。</p>
+<p>所以很多语言和平台所谓的性能高（如 Node.js），本质上是因为对协程的良好支持加上系统的 selector、epoll 等 I/O 多路复用和一些异步 I/O 机制。Node.js 和 Python 的协程是全跑在一个线程里的，但一个线程是没法利用 CPU 多核的，Python 的所谓多线程因为 GIL 也是只跑在一个核心里。对于 CPU 密集场景，这种协程不能真正并行，无法有效发挥性能，在碰到阻塞式 I/O 的时候也该阻塞还是会阻塞。不过大部分 Web 服务器正是 I/O 密集场景，所以这些语言在一定程度上也可以称是高性能的。</p>
+<p>简单地说，协程适合频繁协作和 I/O 密集场景，线程适合 CPU 密集场景。</p>
 <p>Go 中的 <code>goroutine</code> 类似运行在线程池里并且带调度的协程。它在实现了真正并行的情况下令性能开销尽可能低，结合了两者的优点。并且只需要一句 <code>go fun()</code> 就可以进行调用，极其方便。而 <code>channel</code> 是 <code>goroutine</code> 的通信机制，类似消息队列。提倡通过通信共享内存而不是通过共享内存而实现通信。这样能够避免很多情况下因为操作共享资源导致的线程安全问题</p>
 <h2 id="java-能做到吗">Java 能做到吗？</h2>
 <p>能！利用 JUC 和 Netty ，自己在 Java 中实现类似 <code>goroutine</code> 的东西并不是什么难事，只需要有一定操作系统知识即可。<code>channel</code> 也可以轻易用阻塞队列实现，性能甚至能更好。并且 Java 也有 loom 等半官方的协程库</p>
