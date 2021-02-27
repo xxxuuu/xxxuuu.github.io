@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2021-02-03T16:02:58.219Z</updated>
+    <updated>2021-02-27T14:33:17.078Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -26,6 +26,8 @@
 <img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20210201171000.png" alt="ICPC南京排名" loading="lazy"><br>
 而且这个银牌也是 ICPC 里带专第一个拿到的银牌，还记得大一开学前胡神忽悠我打 ACM 时，我就说希望能创造历史，现在看来也算是创造了历史吧。</p>
 <p>PS：今年的总结这么晚发主要就是为了等南航那边发正式的获奖证书下来，结果它们一直咕咕咕，估计开学前都不会发了，所以就只能等后面发了再贴上来了</p>
+<p>2021-02-22：证书终于发下来啦<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/icpc-nanjing.png" alt="获奖证书" loading="lazy"></p>
 <p>今年还参加了些别的比赛，蓝桥天梯技能大赛之类的，不过在 ACM 面前就没啥好提的了</p>
 <p>之后计划插完本后挑战一些更工程向的竞赛，比如阿里云的云&amp;中间件大赛之类的，不过也得等把操作系统和分布式计算学完后再说了<br>
 <img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20210201174500.png" alt="阿里云云&amp;中间件大赛" loading="lazy"></p>
