@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-    <id>https://xqinger.com</id>
+    <id>http://localhost:4000</id>
     <title>某不科學の技術博客</title>
-    <updated>2021-03-16T05:20:40.012Z</updated>
+    <updated>2021-03-16T05:36:19.877Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
-    <link rel="alternate" href="https://xqinger.com"/>
-    <link rel="self" href="https://xqinger.com/atom.xml"/>
+    <link rel="alternate" href="http://localhost:4000"/>
+    <link rel="self" href="http://localhost:4000/atom.xml"/>
     <subtitle>🗒 随便写点东西的地方</subtitle>
-    <logo>https://xqinger.com/images/avatar.png</logo>
-    <icon>https://xqinger.com/favicon.ico</icon>
+    <logo>http://localhost:4000/images/avatar.png</logo>
+    <icon>http://localhost:4000/favicon.ico</icon>
     <rights>All rights reserved 2021, 某不科學の技術博客</rights>
     <entry>
         <title type="html"><![CDATA[蒟蒻的2020年度总结]]></title>
-        <id>https://xqinger.com/post/2020summary/</id>
-        <link href="https://xqinger.com/post/2020summary/">
+        <id>http://localhost:4000/post/2020summary/</id>
+        <link href="http://localhost:4000/post/2020summary/">
         </link>
         <updated>2021-01-10T04:34:38.000Z</updated>
         <summary type="html"><![CDATA[<p>转眼三年已经过去，我也迎来了毕业</p>
@@ -52,8 +52,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[关于 Golang 优势之思考]]></title>
-        <id>https://xqinger.com/post/golang-advantage/</id>
-        <link href="https://xqinger.com/post/golang-advantage/">
+        <id>http://localhost:4000/post/golang-advantage/</id>
+        <link href="http://localhost:4000/post/golang-advantage/">
         </link>
         <updated>2020-08-21T20:32:54.000Z</updated>
         <summary type="html"><![CDATA[<p>最近对 Golang 比较感兴趣，学习了一番。但也总能听到 「Go 是 互联网时代的 C」、「Go 天生高并发」 之类的论调。那么 Go 对于 Java 等语言真正的优势在哪里，所谓的天生高并发又从而何来？ 于是乎我陷入了沉思</p>
@@ -77,8 +77,8 @@
     </entry>
     <entry>
         <title type="html"><![CDATA[厦门大学“网宿杯“17届程序设计竞赛决赛 D 财富密码]]></title>
-        <id>https://xqinger.com/post/d-cai-fu-mi-ma/</id>
-        <link href="https://xqinger.com/post/d-cai-fu-mi-ma/">
+        <id>http://localhost:4000/post/d-cai-fu-mi-ma/</id>
+        <link href="http://localhost:4000/post/d-cai-fu-mi-ma/">
         </link>
         <updated>2020-06-03T04:16:23.000Z</updated>
         <summary type="html"><![CDATA[<p>基础数论题，费马小定理+逆元</p>
@@ -167,8 +167,8 @@ int main() {
     </entry>
     <entry>
         <title type="html"><![CDATA[分布式系统 2PC & 3PC 协议]]></title>
-        <id>https://xqinger.com/post/2pc-and-3pc/</id>
-        <link href="https://xqinger.com/post/2pc-and-3pc/">
+        <id>http://localhost:4000/post/2pc-and-3pc/</id>
+        <link href="http://localhost:4000/post/2pc-and-3pc/">
         </link>
         <updated>2020-05-16T03:21:23.000Z</updated>
         <summary type="html"><![CDATA[<p>大多数数据库事务都具有 ACID 性质，在单机系统中可以帮助我们轻松地进行并发编程，但分布式的全局事务不具有 ACID 性质。而 2PC 和 3PC 就是实现分布式事务的两种协议</p>
@@ -234,8 +234,8 @@ end
     </entry>
     <entry>
         <title type="html"><![CDATA[蒟蒻的2019年度总结]]></title>
-        <id>https://xqinger.com/post/2019summary/</id>
-        <link href="https://xqinger.com/post/2019summary/">
+        <id>http://localhost:4000/post/2019summary/</id>
+        <link href="http://localhost:4000/post/2019summary/">
         </link>
         <updated>2020-01-01T15:21:25.000Z</updated>
         <summary type="html"><![CDATA[<p>随着2019年最后一晚的落幕，21世纪的10年代也结束了，今年的我无论是在技术上还是别的方面，都成长了许多。以本文记录我的技术路程，迎接新的一年</p>
@@ -286,8 +286,8 @@ end
     </entry>
     <entry>
         <title type="html"><![CDATA[没有银弹]]></title>
-        <id>https://xqinger.com/post/no-silver-bullet/</id>
-        <link href="https://xqinger.com/post/no-silver-bullet/">
+        <id>http://localhost:4000/post/no-silver-bullet/</id>
+        <link href="http://localhost:4000/post/no-silver-bullet/">
         </link>
         <updated>2019-12-14T13:44:50.000Z</updated>
         <summary type="html"><![CDATA[<blockquote>
@@ -307,8 +307,8 @@ end
     </entry>
     <entry>
         <title type="html"><![CDATA[Blog 之持续部署]]></title>
-        <id>https://xqinger.com/post/blog-cd/</id>
-        <link href="https://xqinger.com/post/blog-cd/">
+        <id>http://localhost:4000/post/blog-cd/</id>
+        <link href="http://localhost:4000/post/blog-cd/">
         </link>
         <updated>2019-10-30T17:08:52.000Z</updated>
         <summary type="html"><![CDATA[<p>原来本 blog 是在 GitHub Pages 上静态托管的，奈何速度过慢，CDN 效果一般（也许是我配置问题？）。又不想在托管在 Coding Pages 上，便计划将其通过 持续部署（Continuous Deployment）部署在阿里云的服务器上。</p>
@@ -720,8 +720,8 @@ http.createServer((req, res) =&gt; {
     </entry>
     <entry>
         <title type="html"><![CDATA[JavaScript 中的 this 之探讨]]></title>
-        <id>https://xqinger.com/post/javascript-this/</id>
-        <link href="https://xqinger.com/post/javascript-this/">
+        <id>http://localhost:4000/post/javascript-this/</id>
+        <link href="http://localhost:4000/post/javascript-this/">
         </link>
         <updated>2019-10-22T09:19:34.000Z</updated>
         <summary type="html"><![CDATA[<p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
@@ -903,8 +903,8 @@ Hello2.print(); // hello world
     </entry>
     <entry>
         <title type="html"><![CDATA[分布式系统 BASE 理论]]></title>
-        <id>https://xqinger.com/post/base-mean/</id>
-        <link href="https://xqinger.com/post/base-mean/">
+        <id>http://localhost:4000/post/base-mean/</id>
+        <link href="http://localhost:4000/post/base-mean/">
         </link>
         <updated>2019-06-02T13:03:11.000Z</updated>
         <summary type="html"><![CDATA[<p>BASE 理论是对 CAP 理论进行权衡后得出的选择，是 ebay 架构师于2008年提出的，通过牺牲一部分一致性、来大幅度提升可用性。是目前绝大多数分布式系统的选择。</p>
@@ -955,8 +955,8 @@ Hello2.print(); // hello world
     </entry>
     <entry>
         <title type="html"><![CDATA[分布式系统 CAP 理论]]></title>
-        <id>https://xqinger.com/post/cap-theorem/</id>
-        <link href="https://xqinger.com/post/cap-theorem/">
+        <id>http://localhost:4000/post/cap-theorem/</id>
+        <link href="http://localhost:4000/post/cap-theorem/">
         </link>
         <updated>2019-05-28T05:12:54.000Z</updated>
         <summary type="html"><![CDATA[<p>CAP 理论是分布式系统的基本定理，也是我们理解分布式系统的起点。</p>
@@ -971,7 +971,7 @@ Hello2.print(); // hello world
 <li><strong>Partition tolerance 分区容错性</strong></li>
 </ul>
 <p>并且在分布式系统中，三者不可兼得。这就是 CAP 定理</p>
-<figure data-type="image" tabindex="1"><img src="https://xqinger.com/post-images/1559031332586.jpg" alt="CAP理论" loading="lazy"></figure>
+<figure data-type="image" tabindex="1"><img src="http://localhost:4000/post-images/1559031332586.jpg" alt="CAP理论" loading="lazy"></figure>
 <h2 id="11-consistency-一致性">1.1 Consistency 一致性</h2>
 <p>一致性指的是在分布式系统中，是否<strong>所有</strong>节点都拥有数据的最新版本。</p>
 <p>当其中一个节点的数据被更新时，如果其它节点的数据没有得到更新，用户再读取到的可能就是其它节点的旧数据，此时就出现了数据不一致的情况。</p>
