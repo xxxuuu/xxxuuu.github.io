@@ -2,7 +2,7 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
     <id>https://xqinger.com</id>
     <title>某不科學の技術博客</title>
-    <updated>2021-03-04T15:20:34.904Z</updated>
+    <updated>2021-03-16T05:20:40.012Z</updated>
     <generator>https://github.com/jpmonette/feed</generator>
     <link rel="alternate" href="https://xqinger.com"/>
     <link rel="self" href="https://xqinger.com/atom.xml"/>
@@ -48,59 +48,6 @@
 <p>在仔细思考后，暂时还是决定报广师大而不是华师了。最主要的原因还是华师自学时间太少，这样无论对工作还是考研都是比较致命的。加上我还是想走技术路线的，没有时间提升自己可能就算 211 毕业也不能进大厂。广师大虽然是双非，但也有 carry、首铭这样优秀的前辈，我相信这可能会是更好的选择（扯了这么多，我的插本进度还是很落后，到时候落榜了也说不定</p>
 <h2 id="0x04-生活">0x04 生活</h2>
 <p>这部分是新增的，因为今年收获了我的宝藏女孩ヽ(･ω･´ﾒ) ，说来也是奇妙，之前一直很向往科研，想着一定要考研读博，陈立杰就是我的偶像之一。但有了女朋友后就想着要早点工作赚钱买房了，也是希望能给彼此一个更好的未来吧~</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Nacos 报错 parse data from Nacos error]]></title>
-        <id>https://xqinger.com/post/nacos-parse-data-from-nacos-error/</id>
-        <link href="https://xqinger.com/post/nacos-parse-data-from-nacos-error/">
-        </link>
-        <updated>2020-10-01T16:35:22.000Z</updated>
-        <summary type="html"><![CDATA[<p>使用 Nacos 中踩的一个小坑</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>使用 Nacos 中踩的一个小坑</p>
-<!-- more -->
-<h2 id="问题背景">问题背景</h2>
-<p>由于现在的大型应用架构都是分布式、微服务云云。平常开发时弱鸡笔记本难以负担大量的服务和集群，于是乎在家里整了个机架服务器，用阿里云的学生机做内网穿透。平常服务就都搭在这个机架服务器上</p>
-<p>今日在服务器上使用 Docker 搭建完 Nacos 后，将应用程序的 Nacos 服务端切换过去时，程序启动失败了，查看日志大致如下：</p>
-<pre><code>2020-10-02 00:40:42.717 ERROR 7171 --- [           main] c.a.c.n.c.NacosPropertySourceBuilder     : parse data from Nacos error,dataId:nacos-test,data:������+-N-�KLO�R0��*q�s�����.��\|����,
-
-org.yaml.snakeyaml.reader.ReaderException: special characters are not allowed
-</code></pre>
-<p>大概就是从 Nacos 中读取到的配置是一串乱码，配置文件解析失败了</p>
-<h2 id="解决过程">解决过程</h2>
-<p>遇到乱码那么第一反应当然是编码问题，尝试切换了下编码后无果，于是在笔记本上重新搭建了一个 Nacos，测试后是可以正常使用的。那么就可能是通过阿里云机子内网穿透时这一步出现了问题，我将两边Nacos 的 HTTP 请求抓了下包，在 Response Header 处发现了端倪</p>
-<pre><code>// 经过阿里云机子内网穿透后的
-Connection: keep-alive
-Content-Encoding: gzip
-Content-Language: zh-CN
-Content-Type: text/html;charset=UTF-8
-Date: Thu, 01 Oct 2020 16:45:00 GMT
-Last-Modified: Tue, 04 Aug 2020 11:26:49 GMT
-Server: nginx
-Transfer-Encoding: chunked
-Vary: Accept-Encoding
-
-// 直接搭在笔记本上的
-Accept-Ranges: bytes
-Content-Language: zh-CN
-Content-Length: 2624
-Content-Type: text/html;charset=UTF-8
-Date: Thu, 01 Oct 2020 16:28:22 GMT
-Last-Modified: Tue, 04 Aug 2020 11:26:49 GMT
-</code></pre>
-<p>可以发现 <code>Accept-Ranges: bytes</code> 和 <code>Content-Length</code> 在出问题的请求中是没有的，<code>Accept-Ranges: bytes</code> 是表示服务端支持分段下载，这样客户端和浏览器（支持的话）就可以断点续传或多线程下载</p>
-<p>而出问题的的响应头有 <code>Content-Encoding: gzip</code> 表示使用了 gzip 压缩，那么问题就很显然了，Nginx 错误配置导致 Nacos 服务端的响应使用了 gzip 压缩，而 Nacos 客户端无法处理 gzip ，于是出现了一坨乱码</p>
-<p>把 Nginx 对应代理的 gzip 关闭后，问题解决（或者可以在代理中设置 <code>Accept-Encoding</code> 标识不支持 gzip ）</p>
-<pre><code>Accept-Ranges: bytes
-Connection: keep-alive
-Content-Language: zh-CN
-Content-Length: 2624
-Content-Type: text/html;charset=UTF-8
-Date: Thu, 01 Oct 2020 16:57:45 GMT
-Last-Modified: Tue, 04 Aug 2020 11:26:49 GMT
-Server: nginx
-</code></pre>
 ]]></content>
     </entry>
     <entry>
@@ -283,569 +230,6 @@ end
 <p>还有另一个更简单的场景，当网络出现分区，participant 被分成两个区域，一个区域的收到了 pre commit，一个区域的没有。这时候它们各自重新选举 coordinator，执行了不同的操作，也导致了数据不一致</p>
 <h2 id="总结">总结</h2>
 <p>无论 2PC 还是 3PC 都无法彻底解决分布式系统中的一致性问题，下一篇文章会介绍 Paxos 算法，Paxos 是公认的晦涩难懂，但也几乎是分布式一致性算法的代名词</p>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[微服务架构概念与基础知识]]></title>
-        <id>https://xqinger.com/post/microservice-concept/</id>
-        <link href="https://xqinger.com/post/microservice-concept/">
-        </link>
-        <updated>2020-05-09T16:41:20.000Z</updated>
-        <summary type="html"><![CDATA[<p>“容器和微服务是计算的未来” ——Eric Brewer</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>“容器和微服务是计算的未来” ——Eric Brewer</p>
-<!-- more -->
-<h2 id="单体应用">单体应用</h2>
-<p>在很长一段时间内，服务端的程序都处于「单体应用（monolithic）」的形态。所谓单体应用，就是应用的所有模块都在一个项目（程序）内，这也是最自然的方式，开发简单、门槛低。</p>
-<p>但随着互联网的发展，用户不断增多，随之而来的是数据量的指数级提升。计算压力越来越大，单机服务器显然难以应对这样情况，那么就需要一个办法来解决应用的性能问题，既然单台服务器性能不足，最简单粗暴的方法就是加服务器。这时候的服务端应用开始逐渐往「分布式系统（distributed system）」发展</p>
-<h2 id="分布式">分布式</h2>
-<p>在初期，大家还是单体应用+分布式/集群的方案。将应用部署在一起或异地的多台服务器上，然后通过负载均衡将请求转发到各个服务器上，平摊了压力，看起来似乎解决了性能问题，但分布式系统却带来了更多棘手问题和新的挑战。</p>
-<p>其中最重要的就是 「CAP 理论」，CAP 理论在我的另一篇文章有说明，大概意思是分布式系统无法同时保持数据一致性、可用性、分区容错性。分区容错性是分布式系统必须的，因为分布式环境下分区问题不可能避免，那么就是说，分布式系统无法同时保证一致性和可用性，无法保证系统对用户绝对可用的同时，各个节点（服务器）的数据一致。</p>
-<p>比如像防止超卖这种问题，在单机应用上大部分关系型数据库都有 ACID 性质，所以可以轻松通过加锁和事务解决。但在分布式系统中，服务器和数据库在物理上是不同的，想要实现分布式锁和分布式事务就相当困难。现在的主流解决方案就是各退一步：保证服务基本可用，允许数据在不影响可用性的情况下存在中间状态，并在最终期限内达成一致性。这即是 「BASE 理论」。</p>
-<p>分布式系统虽然使系统更加复杂，带来了新的挑战，但也在一定程序上解决了性能问题。不过一切似乎都没有这么简单，现在虽然是分布式部署了，但应用仍然是单体结构的。随着产品的发展，业务需求接踵而至。在 deadline 和一次次迭代下，应用变得越来越臃肿，可维护性越来越差。老手不敢改，新人难下手。而且由于过于臃肿，就算是只修改一行代码，也需要忍受长时间的编译和启动，极大降低了开发效率，对于持续部署和自动化测试来说，更是致命。所有模块运行在同一进程，一个严重 bug 和内存泄漏就能拖垮整个应用，仿佛用牙签堆成的高楼大厦，随时会倾塌。用新技术和框架重写也是几乎不可能的，这种应用也被称为「单体地狱」。</p>
-<h2 id="微服务">微服务</h2>
-<p>「微服务（microservice）」在这个时候渐渐走进大家视野，带来了完全崭新的开发方式。微服务将应用按照业务拆分成多个模块（重点：按照业务拆分，而不是按照技术拆分），这些模块就被称为服务。每个服务就像一个单体应用，都是完全隔离且独立的，且有着自己的数据库，能够单独部署。这是和传统模块化开发最重要的区别；服务之间则通过 REST、RPC、消息队列等方式进行同步或异步的远程调用。</p>
-<p>例如一个在线打车应用，可以分为乘客服务、司机服务、订单服务、支付服务、定位服务、通知服务等等。通过微服务，我们就解决了单体地狱的不少问题。微服务分解和解耦了应用，每个服务都是轻量的，可以很方便地进行维护和开发。不同的服务可以由不同团队进行开发，语言和技术栈完全不受限制，只要提供的接口一致即可；这对年代久远的应用无疑是个福音，可以通过迭代更新服务的方式来轻松地更换到全新的技术栈。而独立部署使得其对持续部署和自动化测试相当友好。不同服务处于不同的服务器，就算一个服务的不可用也不会影响整个应用，同时假设某些服务需要执行图像计算，也可以对其进行针对性硬件适配，提高了性能利用率。</p>
-<p>当然没有技术是完美的，就像分布式+单体应用一样，微服务也带来了新的问题。</p>
-<p>首先，服务之间如何通信？每个服务也可以是集群部署的，还可能动态扩容，直接通过 IP 互相访问肯定不现实，这时候需要一个能够感知和管理所有服务的组件，一般称为「注册中心」，这个行为叫「服务发现」和「服务治理」。每个服务启动和注销时都会通知服务中心，调用其他服务时也会通过注册中心（同步通信的情况下），注册中心也可以实现负载均衡，决定具体连接哪台服务器。也有通过消息队列实现的完全解耦的异步通信，各有优劣；一般都会同时使用，根据不同的场景进行配合</p>
-<p>二、分布式+单体应用中每台服务器都是完整的应用，就算一台挂了也影响不大。但微服务中会进行互相调用，一个服务出现问题虽然不会导致整个应用的崩溃，但别的服务对其进行调用时就出现了长时间等待。特别是服务调用链路很长的时候，这个问题是灾难性的。这时候就需要「熔断器」了。当检测到一个服务不可用时，熔断器会直接将其下线一段时间进行隔离（称为「降级」）。别的服务对其调用时可以返回预设的内容（例如空数据）或直接使用本地缓存。再根据这个内容对用户进行友好的提示，这样就解决了可用性的问题</p>
-<p>三、如何定位故障？随着服务越来越多，调用链路也越来越长、越来越复杂，出现问题也难以定位。「服务链路追踪」就可以帮助我们监控服务的依赖和调用关系。其最早来自于 2010 年的 Google Dapper 论文，原理是给每一次调用添加一个标识，通过对标识排序，就可以清晰地看出服务的先后调用关系，再加上调用者的标识和调用与返回的时间戳，就能得到调用的层级关系和调用时间。这样一来就能轻松监控每一次调用的链路，定位问题和优化性能</p>
-<p>四、客户端如何访问各个服务？对于用户来说不管你是不是微服务，这就是单独的一个应用。让客户端直接通过各个服务的地址去访问肯定也不现实，既然服务与服务之间有注册中心统一服务的通信，那么针对客户端也有「API 网关」统一对外接口。客户端就只用像单体应用一样只访问这一个地址即可，API 网关会统一进行授权、校验、流控、路由和转发请求等，进行 API 的统一管理。但 API 网关也可能成为单点故障点或性能瓶颈</p>
-<p>如同 CAP 理论 和 BASE 理论一样，这些问题其实并不能完美地解决，只能做到在一定程度内令人接受，这种妥协在软件系统中也是非常常见的</p>
-<h2 id="总结">总结</h2>
-<p>可以发现，从单体应用到分布式到微服务，系统架构越来越复杂，门槛越来越高，要解决的问题也越来越多。但在如今的发展下，微服务仍然是大型系统服务端架构的主流选择，与 DevOps 和敏捷开发更是相辅相成。Java 系的解决方案也非常成熟，常见的有 SpringCloud 和 Dubbo + Zookeeper 等。但也要明白技术没有绝对的优劣，选型时要注意应用场景，不要盲目跟风。微服务解决了大型系统的维护、扩展和性能问题，在小型系统上盲目使用微服务，这些需要解决的问题既不存在，同时也引入了微服务和分布式系统产生的一系列问题，得不偿失</p>
-<p>要时刻谨记软件工程中「没有银弹」：</p>
-<blockquote>
-<p>“没有任何一种单纯的技术或管理上的进步，能够独立地承诺在十年内大幅度地提高生成率、可靠性和简洁性。”<br>
-—— Fred Brooks</p>
-</blockquote>
-]]></content>
-    </entry>
-    <entry>
-        <title type="html"><![CDATA[Java JUC并发包]]></title>
-        <id>https://xqinger.com/post/java-juc/</id>
-        <link href="https://xqinger.com/post/java-juc/">
-        </link>
-        <updated>2020-04-27T04:21:11.000Z</updated>
-        <summary type="html"><![CDATA[<p>复习一下基础~</p>
-]]></summary>
-        <content type="html"><![CDATA[<p>复习一下基础~</p>
-<!-- more -->
-<h1 id="概念">概念</h1>
-<h2 id="悲观锁">悲观锁</h2>
-<p>悲观锁认为被它保护的数据是极其不安全的，每时每刻都有可能变动，一个线程拿到悲观锁后，不允许任何线程对其进行获取，需要阻塞等待解锁</p>
-<h2 id="乐观锁">乐观锁</h2>
-<p>乐观锁认为数据变动不会太频繁，读取时不会上锁，但在写入时会进行判断数据是否最新。例如通过版本号实现，读取时一并读取版本号，写入时对比版本号。不一致则拒绝写入</p>
-<h2 id="cas-无锁算法">CAS 无锁算法</h2>
-<p>Compare and Swap（比较并交换），CAS是一种无锁算法（不用锁实现线程同步，也叫非阻塞同步）。JUC就是建立在CAS之上的。</p>
-<p>假设内存原数据V，旧预期值A，需要修改的新值B，则CAS的语义是“我认为V的值应该为A，如果是，那么将V的值更新为B，否则不修改并告诉V的值实际为多少”。有以下操作：</p>
-<ol>
-<li>比较A与V是否相等（比较）</li>
-<li>相等则将B写入V（交换）</li>
-<li>返回结果（是否成功写入）</li>
-</ol>
-<p>多个线程操作只有一个能成功，可见CAS是一个乐观锁</p>
-<h1 id="juc并发包">JUC并发包</h1>
-<p>从JDK1.5开始，引入了一个高级的处理并发的java.util.concurrent包，简称JUC。它提供了大量更高级的并发功能，能大大简化多线程程序的编写。</p>
-<h2 id="reentranlock-可重入锁">ReentranLock 可重入锁</h2>
-<p>和<code>synchronized</code>一样。<code>ReentrantLock</code> 是一个可重用的互斥锁，又称独占锁。性能与 <code>synchronized</code> 相近，但功能更加丰富</p>
-<pre><code class="language-Java">public class Counter {
-    private int count;
-
-    public synchronized void add(int n) {
-        count += n;
-    }
-}
-// 等价于
-public class Counter {
-    private final Lock lock = new ReentrantLock();
-    private int count;
-
-    public void add(int n) {
-        lock.lock();
-        try {
-            count += n;
-        } finally {
-            lock.unlock();
-        }
-    }
-}
-</code></pre>
-<p>因为<code>synchronized</code>是Java语言层面提供的语法，即使抛出异常也能释放锁，而<code>ReentranLock</code>是JUC中用Java实现的，所以要在<code>finally</code>中释放。</p>
-<p><code>ReentranLock</code>可以尝试获取锁：</p>
-<pre><code class="language-Java">// 1秒内没取到锁返回false
-if (lock.tryLock(1, TimeUnit.SECONDS)) {    
-    try {
-        ...
-    } finally {
-        lock.unlock();
-    }
-}
-</code></pre>
-<h2 id="condition-线程协作">Condition 线程协作</h2>
-<p><code>synchronized</code>可以使用<code>wait</code>和<code>notify</code>进行线程间的协作，但<code>ReentrantLock</code>不能直接使用<code>wait</code>和<code>notify</code>。</p>
-<p>于是有了<code>Condition</code>，以之前的<code>TaskQueue</code>为例：</p>
-<pre><code class="language-Java">class TaskQueue {
-    private final Lock lock = new ReentrantLock();
-    private final Condition condition = lock.newCondition();
-    private Queue&lt;String&gt; queue = new LinkedList&lt;&gt;();
-
-    public void addTask(String s) {
-        lock.lock();
-        try {
-            queue.add(s);
-            condition.signalAll();
-        } finally {
-            lock.unlock();
-        }
-    }
-
-    public String getTask() {
-        lock.lock();
-        try {
-            while (queue.isEmpty()) {
-                condition.await();
-            }
-            return queue.remove();
-        } finally {
-            lock.unlock();
-        }
-    }
-}
-</code></pre>
-<p><code>Condition</code>对象必须从<code>Lock</code>实例的<code>newCondition()</code>返回，这样才能获得一个绑定了<code>Lock</code>实例的<code>Condition</code>实例</p>
-<p><code>Condition</code>提供的<code>await()</code>、<code>signal()</code>、<code>signalAll()</code>相当于<code>synchronized</code>锁对象的<code>wait()</code>、<code>notify()</code>、<code>notifyAll()</code></p>
-<p>和<code>tryLock()</code>类似，<code>await()</code>可以在等待指定时间后，如果还没有被其他线程通过<code>signal()</code>或<code>signalAll()</code>唤醒，可以自己醒来：</p>
-<pre><code class="language-Java">if (condition.await(1, TimeUnit.SECOND)) {
-    // 被其他线程唤醒
-} else {
-    // 指定时间内没有被其他线程唤醒
-}
-</code></pre>
-<h2 id="readwritelock-悲观读写锁">ReadWriteLock 悲观读写锁</h2>
-<p>无论是<code>synchronized</code>还是<code>ReentranLock</code>，都只允许一个线程在临界区内执行代码。但很多时候我们需要更灵活地控制，例如IO操作时：读取不会影响数据，我们希望能多个线程同时读，而写入时不允许其它任何线程读取和写入。</p>
-<p>使用<code>ReadWriteLock</code>可以解决这个问题：</p>
-<ul>
-<li>只允许一个线程写入（其他线程既不能写入也不能读取）；</li>
-<li>没有写入时，多个线程允许同时读（提高性能）。</li>
-</ul>
-<p>例：</p>
-<pre><code class="language-Java">public class FileIO {
-    private final ReadWriteLock rwlock = new ReentrantReadWriteLock();
-    private final Lock rlock = rwlock.readLock();
-    private final Lock wlock = rwlock.writeLock();
-
-    public void write(char[] data) {
-        wlock.lock();       // 加写锁
-        try {
-            // 写入
-        } finally {
-            wlock.unlock(); // 释放写锁
-        }
-    }
-
-    public char[] read() {
-        rlock.lock();       // 加读锁
-        try {
-            // 读取
-        } finally {
-            rlock.unlock(); // 释放读锁
-        }
-    }
-}
-</code></pre>
-<h2 id="stampedlock-乐观读写锁">StampedLock 乐观读写锁</h2>
-<p><code>StampedLock</code>是JDK8新引入的读写锁，和<code>ReadWriteLock</code>的区别在于。后者如果有线程在读，写入线程需要等读取线程释放后才能写入。读的过程不能写，这是一种悲观的读锁。</p>
-<p>而<code>StampedLock</code>支持在读取的过程中写入，但这样数据就可能不一致，需要一些额外的判断。这是一种乐观锁</p>
-<p>我们将上面<code>ReadWriteLock</code>的例子修改为<code>StampedLock</code>的版本：</p>
-<pre><code class="language-Java">public class FileIO {
-    private final StampedLock stampedLock = new StampedLock();
-
-    public void write(char[] data) {
-        long stamp = stampedLock.writeLock();   // 获取写锁
-        try {
-            // 写入
-        } finally {
-            stampedLock.unlockWrite(stamp);     // 释放写锁
-        }
-    }
-
-    public char[] read() {
-        long stamp = stampedLock.tryOptimisticRead();   // 获取乐观读锁
-        
-        // 读取...
-        // 读取的中途可能有写入 导致数据不一致
-        
-        if（!stampedLock.validate(stamp)) {     // 检查是否有其他写锁发生
-            stamp = stampedLock.readLock();     // 获取悲观读锁
-            try {
-                // 读取...
-            } finally {
-                stampedLock.unlockRead(stamp);  // 释放悲观读锁
-            }
-        }
-    }
-}
-</code></pre>
-<p>和<code>ReadWriteLock</code>相比，写入是一样的，不同的是读取：</p>
-<ol>
-<li>先获取一个乐观读锁，并返回版本号。</li>
-<li>如果读取过程中没有写入，版本号不变，则顺利执行。</li>
-<li>若版本号变化，说明发生写入，需要获取一个悲观读锁再次读取</li>
-</ol>
-<p>需要注意的是<code>StampedLock</code>是不可重入锁，不能在一个线程中反复获取同一个锁。</p>
-<p><code>StampedLock</code>还提供了更复杂的将悲观读锁升级为写锁的功能，它主要使用在if-then-update的场景：即先读，如果读的数据满足条件，就返回，如果读的数据不满足条件，再尝试写。</p>
-<h2 id="concurrent-线程安全集合">Concurrent 线程安全集合</h2>
-<p>我们之前尝试设计了一个线程安全的阻塞任务队列<code>TaskQueue</code>，实际上JUC早已提供此类线程安全的集合类：</p>
-<table>
-<thead>
-<tr>
-<th>接口</th>
-<th>非线程安全</th>
-<th>线程安全</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>List</td>
-<td>ArrayList</td>
-<td>CopyOnWriteArrayList</td>
-</tr>
-<tr>
-<td>Map</td>
-<td>HashMap</td>
-<td>ConcurrentHashMap</td>
-</tr>
-<tr>
-<td>Set</td>
-<td>HashSet / TreeSet</td>
-<td>CopyOnWriteArraySet</td>
-</tr>
-<tr>
-<td>Queue</td>
-<td>ArrayDeque / LinkedList</td>
-<td>ArrayBlockingQueue / LinkedBlockingQueue</td>
-</tr>
-<tr>
-<td>Deque</td>
-<td>ArrayDeque / LinkedList</td>
-<td>LinkedBlockingDeque</td>
-</tr>
-</tbody>
-</table>
-<p>因为实现的是一样的接口，所以用法和非线程安全的集合类完全相同。</p>
-<p><code>java.util.Collections</code>工具类还提供了一个旧的线程安全集合转换器，例如将<code>HashMap</code>转换为线程安全的：<code>Collections.synchronizedMap(map);</code></p>
-<p>但是它实际上是通过包装类包装后对所有读写方法都用<code>synchronized</code>加锁，这样获得的线程安全集合的性能比<code>java.util.concurrent</code>集合要低很多，所以不推荐使用。</p>
-<h2 id="atomic-原子类">Atomic 原子类</h2>
-<p>JUC在<code>java.util.concurrent.atomic</code>包中提供了一组原子操作的封装类，是通过CAS实现的</p>
-<p>例如<code>AtomicInteger</code>，主要方法有：</p>
-<ul>
-<li>增加指定值并返回：<code>int addAndGet(int delta)</code></li>
-<li>自增并返回：<code>int incrementAndGet()</code></li>
-<li>获取当前值：<code>int get()</code></li>
-<li>用CAS方式设置(如果当前值为expect，则更新为update)：<code>boolean compareAndSet(int expect, int update)</code></li>
-</ul>
-<p>如果自己通过CAS实现<code>incrementAndSet()</code>，大概是这样：</p>
-<pre><code class="language-Java">public int incrementAndGet() {
-    int prev, next;
-    do {
-        prev = this.get();
-        next = prev + 1;
-    } while (!this.compareAndSet(prev, next));
-    return next;
-}
-</code></pre>
-<p>我们利用<code>AtomicLong</code>可以编写一个多线程安全的全局唯一ID生成器：</p>
-<pre><code class="language-Java">class IdGenerator {
-    AtomicLong id = new AtomicLong(0);
-
-    public long getNextId() {
-        return id.incrementAndGet();
-    }
-}
-</code></pre>
-<p>JDK8中还添加了<code>LongAdder</code>和<code>LongAccumulato</code>等原子类</p>
-<h2 id="executorservice-线程池">ExecutorService 线程池</h2>
-<p>线程的创建、销毁都是非常消耗时间的，而通过线程池，我们可以复用一组线程，</p>
-<p><code>Exeutor</code>是线程池里的顶级接口，<code>ExecutorService</code>是继承了前者提供服务的接口，典型用法如下：</p>
-<pre><code class="language-Java">// 创建固定大小的线程池:
-ExecutorService executor = Executors.newFixedThreadPool(3);
-// 提交任务:
-executor.submit(runnable);
-// 关闭线程池
-executor.shutdown();
-</code></pre>
-<p>JUC提供了几个<code>ExcutorService</code>的常用实现，可以通过<code>Executors</code>的<code>newXXX()</code>系列静态工厂方法来创建：</p>
-<ul>
-<li><code>FixedThreadPool</code>：固定线程数的线程池，每次提交任务都会新增线程直到数量限制。有线程异常会新建线程替换</li>
-<li><code>CachedThreadPool</code>：可缓存的线程池，会重复利用线程，无线程可用则新建，会回收60秒未使用的线程</li>
-<li><code>SingleThreadExecuor</code>：单线程的线程池，有线程异常会新建线程替换</li>
-<li><code>ScheduledThreadPool</code>：支持定时任务和周期运行的线程池</li>
-</ul>
-<h3 id="scheduledthreadpool-周期线程池">ScheduledThreadPool 周期线程池</h3>
-<p><code>ScheduledThreadPool</code>支持线程的周期运行，一个定时任务代表线程池的一个线程：</p>
-<pre><code class="language-Java">ScheduledExecutorService ses = Executors.newScheduledThreadPool(4);
-// 1秒后执行一次性任务
-ses.schedule(runnable, 1, TimeUnit.SECONDS);
-// 2秒后开始执行定时任务，每3秒执行:
-ses.scheduleAtFixedRate(runnable, 2, 3, TimeUnit.SECONDS);
-// 2秒后开始执行定时任务，以3秒为间隔执行（上一个任务执行结束后开始算）
-ses.scheduleWithFixedDelay(runnable, 2, 3, TimeUnit.SECONDS);
-</code></pre>
-<p>推荐使用<code>ScheduledExecutorService</code>替代<code>Timer</code>，<code>ScheduledExecutorService</code>功能更强大也更安全。</p>
-<ul>
-<li>需要注意的是，在<code>FixedRate</code>模型下，当运行时间大于<code>period</code>间隔时间时，例如每三秒执行一次，但每个任务执行五秒，这时候后面的任务会等前面的执行完再运行</li>
-<li>抛出异常后，任务后续不会继续执行，并且没有报错，要注意异常捕获</li>
-</ul>
-<h3 id="threadpoolexecutor-自定义线程池">ThreadPoolExecutor 自定义线程池</h3>
-<p><code>ThreadPoolExecutor</code>是线程池的真正实现，上面的工厂方法也是对其设置参数的封装。</p>
-<p>在《阿里巴巴Java开发手册》中也规定要使用其来创建线程池：</p>
-<blockquote>
-<p>【强制】线程池不允许使用 <code>Executors</code> 去创建，而是通过 <code>ThreadPoolExecutor</code> 的方式，这样 的处理方式让写的同学更加明确线程池的运行规则，规避资源耗尽的风险。 说明：<code>Executors</code> 返回的线程池对象的弊端如下：</p>
-</blockquote>
-<ul>
-<li>
-<blockquote>
-<p>1）<code>FixedThreadPool</code> 和 <code>SingleThreadPool</code>: 允许的请求队列长度为 <code>Integer.MAX_VALUE</code>，可能会堆积大量的请求，从而导致 OOM。</p>
-</blockquote>
-</li>
-<li>
-<blockquote>
-<p>2）<code>CachedThreadPool</code> 和 <code>ScheduledThreadPool</code>: 允许的创建线程数量为 <code>Integer.MAX_VALUE</code>，可能会创建大量的线程，从而导致 OOM</p>
-</blockquote>
-</li>
-</ul>
-<p>看来下它的完整参数构造方法：</p>
-<pre><code class="language-Java">public ThreadPoolExecutor(int corePoolSize,
-                          int maximumPoolSize,
-                          long keepAliveTime,
-                          TimeUnit unit,
-                          BlockingQueue&lt;Runnable&gt; workQueue,
-                          ThreadFactory threadFactory,
-                          RejectedExecutionHandler handler)
-</code></pre>
-<ul>
-<li><code>int corePoolSize</code>：核心线程数量。即使在空闲状态也会被保留，除非设置了<code>allowCoreThreadTimeOut</code>为<code>true</code>。</li>
-<li><code>int maximumPoolSize</code>：允许的最大线程数量，不允许小于<code>corePoolSize</code>。</li>
-<li><code>long keepAliveTime</code>： 当线程数大于核心线程数时，非核心线程的闲置超时时间。</li>
-<li><code>TimeUnit unit</code>：<code>keepAliveTime</code>参数的时间单位，例<code>TimeUnit.SECONDS</code>为秒。</li>
-<li><code>BlockingQueue&lt;Runnable&gt; workQueue</code>：任务队列，常见有三种队列：<code>SynchronousQueue</code>，<code>LinkedBlockingDeque</code>和<code>ArrayBlockingQueue</code>。</li>
-<li><code>ThreadFactory threadFactory</code>：线程工厂，提供创建新线程的功能。《阿里巴巴Java开发手册》规定要使用带有这个参数的构造方法，来方便地管理线程。</li>
-<li><code>RejectedExecutionHandler handler</code>：拒绝策略，当到达线程池资源上限时，添加新线程会调用<code>RejectedExecutionHandler</code>接口的<code>rejectedExecution</code>方法</li>
-</ul>
-<h4 id="任务队列规则">任务队列规则</h4>
-<p>线程添加的规则和<code>workQueue</code>的类型有很大关系，当一个线程任务添加到线程池时：</p>
-<ul>
-<li>
-<p>如果线程池中的线程数量 &lt;= <code>corePoolSize</code>，则新建线程，不放入队列</p>
-</li>
-<li>
-<p>如果线程池中的线程数量 &gt; <code>corePoolSize</code>，&lt;= <code>maximumPoolSize</code>时。</p>
-<ul>
-<li>队列为<code>LinkedBlockingDeque</code>，则放入队列排队。如果队列已满，则直接新建线程执行任务</li>
-<li>队列为<code>SynchronousQueue</code>，则直接新建线程处理该任务</li>
-<li>非核心线程闲置时间超过<code>keepAliveTime</code>后就会被销毁。</li>
-</ul>
-</li>
-<li>
-<p>如果线程池中的线程数量 &gt; <code>corePoolSize</code>和<code>maximumPoolSize</code>。</p>
-<ul>
-<li>队列为<code>LinkedBlockingDeque</code>，如果队列没有大小限制，会将任务放进队列。如果队列有大小限制，则交给<code>handler</code>拒绝任务。</li>
-<li>队列为<code>SynchronousQueue</code>，会使用<code>handler</code>拒绝任务。</li>
-</ul>
-</li>
-</ul>
-<h4 id="拒绝策略">拒绝策略</h4>
-<p><code>ThreadPoolExecutor</code> 构造方法的最后一个参数是 <code>RejectedExecutionHandler</code> 接口，即拒绝策略。JUC 实现了四种拒绝策略：</p>
-<ul>
-<li><code>AbortPolicy</code> ：会抛出 <code>RejectedExecutionException</code> 异常，当 <code>ThreadPoolExecutor</code> 构造方法不指定拒绝策略时，默认使用该策略</li>
-<li><code>CallerRunsPolicy</code> ：如果线程池没被关闭，其会直接执 <code>Runnable</code> 的 <code>run()</code> 而不放进线程池，不会开启新线程。也就是说如果在主线程中启动的线程池，那么该 <code>Runable</code> 也会直接在主线程中执行</li>
-<li><code>DiscardOldestPolicy</code> ：如果线程池没被关闭，其会将任务队列中的第一个任务丢弃，然后将当前任务放入线程池（即加到队列末尾）</li>
-<li><code>DiscardPolicy</code> ：静默丢弃，实际上其对接口就是空实现</li>
-</ul>
-<h2 id="future-异步返回机制">Future 异步返回机制</h2>
-<p><code>Runnable</code>没有返回值比较不方便，JUC提供了个<code>Callable</code>泛型接口，和前者相比，多了一个返回值，并且可以通过泛型指定返回结果。</p>
-<p>前面提到的线程<code>ExecutorService</code>的<code>submit()</code>返回了一个<code>Future</code>，一个Future类型的实例代表一个未来能获取结果的对象：</p>
-<pre><code class="language-Java">ExecutorService e = Executors.newSingleThreadExecutor();
-Future&lt;String&gt; future = e.submit(new Callable&lt;String&gt;() {
-    @Override
-    public String call() throws Exception {
-        return &quot;task result&quot;;
-    }
-});
-// 返回结果 任务未完成则阻塞等待
-try {
-    future.get();
-} catch (ExecutionException ex) {
-    ex.printStackTrace();
-}
-</code></pre>
-<p><code>Future</code>还有以下方法：</p>
-<ul>
-<li><code>get()</code>：获取结果（可能会等待）</li>
-<li><code>get(long timeout, TimeUnit unit)</code>：获取结果，但只等待指定的时间；</li>
-<li><code>cancel(boolean mayInterruptIfRunning)</code>：取消当前任务；</li>
-<li><code>isDone()</code>：判断任务是否已完成。</li>
-</ul>
-<p>想要在 <code>Thread</code> 中使用可以用 <code>FutureTask</code> ：</p>
-<pre><code class="language-Java">FutureTask&lt;String&gt; futureTask = new FutureTask&lt;&gt;(new Callable&lt;String&gt;() {
-    @Override
-    public String call() throws Exception {
-        return &quot;task result&quot;;
-    }
-});
-
-new Thread(futureTask).start();
-
-try {
-    futureTask.get();
-} catch (InterruptedException | ExecutionException ex) {
-    ex.printStackTrace();
-}
-</code></pre>
-<h3 id="completablefuture-回调的future">CompletableFuture 回调的Future</h3>
-<p><code>Future</code> 获取结果时也需要阻塞等待， <code>CompletableFuture</code> 则提供了一个回调接口，任务完成时自动调用回调方法</p>
-<pre><code class="language-Java">CompletableFuture&lt;String&gt; future = CompletableFuture.supplyAsync(() -&gt; {
-    try {
-        TimeUnit.SECONDS.sleep(3);
-    } catch (InterruptedException e) {
-        e.printStackTrace();
-    }
-    return &quot;result&quot;;
-});
-
-// 成功执行
-future.thenAccept((result) -&gt; {
-    System.out.println(&quot;回调 &quot; + result);
-});
-// 出现异常
-future.exceptionally((e) -&gt; {
-    e.printStackTrace();
-    return null;
-});
-</code></pre>
-<h2 id="semaphore-信号量">Semaphore 信号量</h2>
-<p><code>Semaphore</code> 本质上是一个共享锁，线程获取到许可时才能执行：</p>
-<pre><code class="language-Java">ExecutorService executor = Executors.newCachedThreadPool();
-// 最多同时发放3个许可
-Semaphore s = new Semaphore(3);
-for(int i = 0; i &lt; 10; i++) {
-    executor.submit(() -&gt; {
-        try {
-            // 获取许可
-            s.acquire();
-            // 执行操作
-            System.out.println(Thread.currentThread().getName() + &quot;执行耗时操作&quot;);
-            Thread.sleep(3000);
-            System.out.println(Thread.currentThread().getName() + &quot;执行操作结束&quot;);
-            // 释放
-            s.release();
-        } catch(Exception e) {
-
-        }
-    });
-}
-</code></pre>
-<h2 id="countdownlatch-计数器">CountDownLatch 计数器</h2>
-<p><code>CountDownLatch</code> 类似计数器，可以用于多个线程执行完毕的同步</p>
-<pre><code class="language-Java">CountDownLatch latch = new CountDownLatch(2);	// 初始为2
-
-Runnable runnable = () -&gt; {
-    try {
-        Thread.sleep(2000);
-    } catch (InterruptedException e) {
-        e.printStackTrace();
-    }
-    latch.countDown();  // 执行完就 -1
-};
-
-new Thread(runnable).start();
-new Thread(runnable).start();
-
-latch.await();      // 阻塞等待直到为0
-System.out.println(&quot;finish&quot;);
-</code></pre>
-<h2 id="cyclicbarrier-循环栅栏">CyclicBarrier 循环栅栏</h2>
-<p><code>CyclicBarrier</code> 直译是循环栅栏，意为可循环使用的屏障，可以让指定数量的线程都到达屏障后后才执行下一步动作</p>
-<pre><code class="language-Java">CyclicBarrier cyclicBarrier = new CyclicBarrier(4, () -&gt; {
-    // 每n个的线程到达屏障后执行的操作
-    System.out.println(&quot;人到齐 开会&quot;);
-});
-
-for(int i = 1; i &lt;= 4; i++) {
-    new Thread(() -&gt; {
-        System.out.println(Thread.currentThread().getName() + &quot;到了&quot;);
-
-        try {
-            cyclicBarrier.await();  // 到达屏障
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (BrokenBarrierException e) {
-            e.printStackTrace();
-        }
-
-        System.out.println(Thread.currentThread().getName() + &quot;开始开会&quot;);
-    }).start();
-}
-</code></pre>
-<h2 id="forkjoin-任务拆分">ForkJoin 任务拆分</h2>
-<p><code>ForkJoin</code> 可以将一个任务拆分成多个子任务并发执行，然后将子任务的结果合并起来，大数据量下能有效提升效率。以下是使用 <code>ForkJoin</code> 计算 1 加到 n 的样例：</p>
-<pre><code class="language-Java">class SumTask extends RecursiveTask&lt;Long&gt; {
-    private Long start;
-    private Long end;
-    private Long check = 10000L;
-
-    public SumTask(Long start, Long end) {
-        this.start = start;
-        this.end = end;
-    }
-
-    @Override
-    protected Long compute() {
-        // 任务太大就拆分
-        if(end - start &gt;= check) {
-            long mid = (start + end) / 2;
-            SumTask task1 = new SumTask(start, mid);
-            SumTask task2 = new SumTask(mid + 1, end);
-            // 并行运行子任务
-            invokeAll(task1, task2);
-            // 获取结果
-            Long subResult1 = task1.join();
-            Long subResult2 = task2.join();
-            return subResult1 + subResult2;
-        }
-        // 直接计算
-        long sum = 0L;
-        for(Long i = start; i &lt;= end; i++) {
-            sum += i;
-        }
-
-        return sum;
-    }
-}
-
-public static void main(String[] args){
-    // 求 1 到 100000000 的和
-    ForkJoinTask&lt;Long&gt; task = new SumTask(0L, 100000000L);
-    Long result = ForkJoinPool.commonPool().invoke(task);
-    System.out.println(result);
-}
-</code></pre>
-<h2 id="threadlocal-线程上下文">ThreadLocal 线程上下文</h2>
-<p>在线程中横跨多个方法进行状态或变量的传递比较不方便，而 <code>ThreadLocal</code> 提供了类似上下文的机制用于在线程内传递状态。</p>
-<p><code>ThreadLocal</code> 一般总是以静态变量的形式初始化</p>
-<pre><code class="language-Java">private static ThreadLocal&lt;T&gt; local = new ThreadLocal&lt;&gt;();
-// 初始化同时设定默认值
-private static ThreadLocal&lt;Long&gt; local = ThreadLocal.withInitial(() -&gt; 0L);
-</code></pre>
-<p>主要方法：</p>
-<ul>
-<li><code>T get()</code> ：获取值，当值为空时，调用 <code>initialValue()</code></li>
-<li><code>void set(T t)</code> ：设置值</li>
-<li><code>void remove()</code> ：移除值，当不需要时务必 <code>remove()</code>。否则当在线程池等场景时当线程被复用可能就会 <code>get()</code> 到之前的值造成污染和潜在的问题</li>
-</ul>
-<p><code>ThreadLocal</code> 相当一个哈希表，不同的线程调用 <code>ThreadLocal</code> 时，都是以自身作为 key，获取到不同到存储空间再对数据进行操作。所以 <code>ThreadLocal</code> 一般是静态的，不同线程对其操作也不会造成干扰和线程安全问题。所以经常通过 <code>ThreadLocal</code> 来转化一些同步问题和进行一些计算的调度。</p>
-<p>例如 <code>Mybatis</code> 利用 <code>ThreadLocal</code> 实现 <code>SqlSessionManager</code> 来让同一个线程始终分配同一个连接以实现资源一致性（一个事务在多个连接（线程）中执行可能导致不一致性）</p>
 ]]></content>
     </entry>
     <entry>
@@ -1332,6 +716,292 @@ http.createServer((req, res) =&gt; {
 <p>当然我们也可以更进一步直接在本项目中实现这个静态网站服务器，但我认为这类 web 程序和 <code>Nginx</code> 等接近网络层的 HTTP 服务器的应用场景还是有很大差别的，在应用层面去实现这些东西显然不太合适、也不专业，在维护上也是一大麻烦</p>
 <h3 id="27-开源地址">2.7 开源地址</h3>
 <p>使用 <code>Node.js</code> 的项目也上传到了 <a href="https://github.com/xxxuuu/node-github-hooks">Github</a>，有兴趣的同学可以参考一下</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[JavaScript 中的 this 之探讨]]></title>
+        <id>https://xqinger.com/post/javascript-this/</id>
+        <link href="https://xqinger.com/post/javascript-this/">
+        </link>
+        <updated>2019-10-22T09:19:34.000Z</updated>
+        <summary type="html"><![CDATA[<p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>对于 <code>JavaScript</code>，其实一直没有系统性的学习过。都是有需要再去查相关语法和 API，自然在使用过程中也存在很多困惑。这次就来探讨下 <code>JavaScript</code> 中的 <code>this</code>。</p>
+<!-- more -->
+<h2 id="this-的动态指向性">this 的动态指向性</h2>
+<p>在大多数常见的面向对象的语言中，<code>this</code> 通常指向类的实例，如 <code>Java</code> 的 <code>this</code>, <code>Python</code> 的 <code>self</code>，<code>PHP</code> 的 <code>$this</code>。</p>
+<p>于是乎，大多数人在接触 <code>JavaScript</code> 时也下意识认为 <code>this</code> 是指向类的实例。实际上在 <code>JavaScript</code> 里根本就没有真正意义上的类，也不区分类和实例的概念，是通过 <code>prototype</code> 来实现的面向对象（在 ES6 里已经引入了 <code>class</code> 关键字，但本质上还只是 <code>prototype</code> 的语法糖）。</p>
+<h2 id="默认绑定">默认绑定</h2>
+<p>在浏览器的 <code>Developer Tools</code> 中的 <code>Console</code> 输入 <code>this</code> 并回车，会输出以下信息：</p>
+<pre><code class="language-JSON">Window {parent: Window, postMessage: ƒ, blur: ƒ, focus: ƒ, close: ƒ, …}
+</code></pre>
+<p>当 <code>this</code> 没有在任何其它对象中时，默认指向全局对象（全局作用域）。在浏览器中这个全局对象就是 <code>window</code>。（在 <code>Node.js</code> 环境中没有全局对象，所以会是 <code>undefined</code>）</p>
+<p><strong>这种默认指向全局对象的方式就是 <code>this</code> 的默认绑定。</strong></p>
+<p>但默认绑定常常会带来更多的问题，任何代码都可能污染全局对象。不应该使用全局变量来保存数据。所以 ES5 引入了<strong>严格模式</strong>。</p>
+<p>严格模式使用 <code>&quot;use strict&quot;;</code> 声明，会取消默认绑定：</p>
+<pre><code class="language-JavaScript">&quot;use strict&quot;;
+
+console.log(this);  // undefined
+</code></pre>
+<h2 id="隐式绑定">隐式绑定</h2>
+<p>隐式绑定很简单，<strong>当函数作为一个对象的属性时，该函数的 <code>this</code> 指向该对象。</strong></p>
+<pre><code class="language-JavaScript">var hello = {
+  str: 'world',
+  print: function() {
+    console.log('hello', this.str);
+  }
+}
+hello.print();  // hello world
+</code></pre>
+<p>默认绑定或许也可以看成全局函数默认作为全局对象的一个属性，从而使得全局函数的 <code>this</code> 指向全局对象。</p>
+<h2 id="显式绑定">显式绑定</h2>
+<p>在 <code>React</code> 中常常会看到类似的代码：</p>
+<pre><code class="language-JavaScript">class Test extends React.Component {
+  constructor(props) {
+    super(props);
+    this.testBtnClick = this.testBtnClick.bind(this);
+  }
+  
+  testBtnClick() {
+    console.log('click');
+  }
+  
+  render() {
+    return (
+      &lt;div&gt; 
+        &lt;button onClick={this.testBtnClick}&gt;test button&lt;/button&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+
+ReactDOM.render(
+  &lt;Test/&gt;,
+  document.getElementById('example')
+);
+</code></pre>
+<p>其中的第四行 <code>this.testBtnClick = this.testBtnClick.bind(this);</code> 显式地绑定了 <code>testBtnClick</code> 这个函数的 <code>this</code>。</p>
+<p>在 <code>Function.prototype</code> 中有三个方法 <code>call</code>，<code>apply</code>，<code>bind</code> 都是用于显式绑定的。</p>
+<p><strong>显式绑定是将 <code>this</code> 显式地绑定到一个上下文中。</strong> 这样能避免代码中的错误绑定和丢失绑定问题，同时也更便于执行重构和实现一些设计模式。</p>
+<p><code>call</code> 和 <code>apply</code> 的作用都一样，使用指定的上下文对象运行方法，不同的只是传参方式。</p>
+<p>考虑下面的代码：</p>
+<pre><code class="language-JavaScript">var test1 = {
+  name: '',
+  init: function() {
+    this.name = 'aaa';
+  },
+  print: function() {
+    console.log(&quot;hello1&quot;, this.name);
+  }
+}
+
+var test2 = {
+  name: '',
+  init: function() {
+    this.name = 'bbb';
+  },
+  print: function() {
+    console.log(&quot;hello2&quot;, this.name);
+  }
+}
+
+test1.init();
+test1.print();  // hello1 aaa
+
+test2.init();
+test2.print();  // hello2 bbb
+
+test2.print.call(test1);    // hello2 aaa
+</code></pre>
+<p>在最后一行，通过 <code>call</code> 使用 <code>test1</code> 的上下文执行 <code>test2</code> 的 <code>print</code>，此时在 <code>print</code> 里取到的 <code>this</code> 就是 <code>test1</code>。</p>
+<p>假设调用的方法有参数，通过下面的方式传递参，这也是 <code>call</code> 和 <code>apply</code> 唯一的区别：</p>
+<pre><code class="language-JavaScript">test2.print.call(test1, param1, param2);
+test2.print.apply(test1, [param1, param2]);
+</code></pre>
+<p>而 <code>bind</code> 的作用是返回一个绑定指定上下文对象的新方法</p>
+<p>修改改改的例子：</p>
+<pre><code class="language-JavaScript">var test1 = {
+  name: '',
+  init: function() {
+    this.name = 'aaa';
+  },
+  print: function() {
+    console.log(&quot;hello1&quot;, this.name);
+  }
+}
+
+var test2 = {
+  name: '',
+  init: function() {
+    this.name = 'bbb';
+  },
+  print: function() {
+    console.log(&quot;hello2&quot;, this.name);
+  }
+}
+
+test1.init();
+test2.init();
+
+var newPrint = test2.print.bind(test1);
+newPrint(); // hello2 aaa
+
+// 或者直接赋值回去
+test2.print = test2.print.bind(test1);
+test2.print();  // hello2 aaa
+</code></pre>
+<p>在实际中会有一个常见的问题，在控件的事件回调方法里传入我们的函数，函数中通过 <code>this</code> 调用当前对象的某些属性或方法。</p>
+<p>而当回调执行时，是在浏览器中运行的，上下文被改变。此时函数里的 <code>this</code> 丢失绑定指向 <code>window</code>，就会出现错误。这也正是 <code>React</code> 常在 <code>constructor</code> 中使用 <code>bind</code> 显式绑定函数的 <code>this</code> 的原因。</p>
+<h2 id="new-绑定">new 绑定</h2>
+<p>在 ES6 前，通常用这种原型链方式创建一个对象：</p>
+<pre><code class="language-JavaScript">function Hello(name) {
+  this.name = name || 'world';
+}
+Hello.prototype.print = function() {
+  console.log('hello', this.name);
+};
+
+var h = new Hello();
+h.print();  // hello world
+</code></pre>
+<p>构造函数默认返回 <code>this</code>，并且该 <code>this</code> 绑定指向新创建的对象。</p>
+<p>所以通过 <code>new</code> 创建的对象，<code>this</code> 绑定在这个新创建的对象上。</p>
+<h2 id="箭头函数">箭头函数</h2>
+<p>在各种事件和 HTTP 请求的回调中可能会用到 <code>this</code>，但就会发生前面讲的丢失绑定问题。</p>
+<p>但箭头函数就可以解决该问题，箭头函数的 <code>this</code> 总是指向词法作用域，即其宿主。</p>
+<p>例如以下代码：</p>
+<pre><code class="language-JavaScript">var Hello1 = {
+  str: 'world',
+  print: function() {
+    var p = function() {
+      console.log('hello', this.str);
+    }
+    return p();
+  }
+}
+
+var Hello2 = {
+  str: 'world',
+  print: function() {
+    var p = () =&gt; {
+      console.log('hello', this.str);
+    }
+    return p();
+  }
+}
+
+Hello1.print(); // hello undefined
+Hello2.print(); // hello world
+</code></pre>
+<h2 id="总结">总结</h2>
+<ol>
+<li>默认绑定会指向全局对象，带来不可控的影响。避免默认绑定或使用严格模式</li>
+<li>隐式绑定和 <code>new</code> 绑定都可以确保 <code>this</code> 能得到应有的指向</li>
+<li>在某些情况下，也需要显式绑定来修改和确保 <code>this</code> 的指向为我们所想</li>
+</ol>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[分布式系统 BASE 理论]]></title>
+        <id>https://xqinger.com/post/base-mean/</id>
+        <link href="https://xqinger.com/post/base-mean/">
+        </link>
+        <updated>2019-06-02T13:03:11.000Z</updated>
+        <summary type="html"><![CDATA[<p>BASE 理论是对 CAP 理论进行权衡后得出的选择，是 ebay 架构师于2008年提出的，通过牺牲一部分一致性、来大幅度提升可用性。是目前绝大多数分布式系统的选择。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>BASE 理论是对 CAP 理论进行权衡后得出的选择，是 ebay 架构师于2008年提出的，通过牺牲一部分一致性、来大幅度提升可用性。是目前绝大多数分布式系统的选择。</p>
+<!-- more -->
+<h1 id="1-base-理论">1. BASE 理论</h1>
+<p>BASE 理论是指：</p>
+<ul>
+<li><strong>Basically Available 基本可用</strong></li>
+<li><strong>Soft State 软状态</strong></li>
+<li><strong>Eventual Consistency 最终一致性</strong></li>
+</ul>
+<h2 id="11-basically-available-基本可用">1.1 Basically Available 基本可用</h2>
+<p>基本可用指的是当系统出现故障时，允许损失部分可用性（功能、响应时间等），但核心功能仍然可用。</p>
+<h2 id="12-soft-state-软状态">1.2 Soft State 软状态</h2>
+<p>软状态是允许系统中的数据存在中间状态而不影响系统整体可用性。</p>
+<p>通俗点说：除非刷新，否则信息（状态）会过期或被系统丢失，但系统仍然能正常运行。</p>
+<p>相反地，当系统拥有强一致性时，数据所处的状态就是<strong>硬状态（Hard State）</strong>。</p>
+<p>软状态的定义比较模糊，想有更详细的了解可以浏览以下资料：</p>
+<blockquote>
+<p><a href="https://stackoverflow.com/questions/4851242/what-does-soft-state-in-base-mean">What does 'soft-state' in BASE mean? - Stack Overflow</a><br>
+<a href="http://mercury.lcs.mit.edu/~jnc/tech/hard_soft.html">&quot;Soft&quot; and &quot;Hard&quot; State - MIT</a></p>
+</blockquote>
+<h2 id="13-eventual-consistency-最终一致性">1.3 Eventual Consistency 最终一致性</h2>
+<p>最终一致性也称为乐观复制，是弱一致性的特殊形式，指的是能保证数据在更新前，返回最新值。</p>
+<p>而一致性一般又分为五种：</p>
+<h3 id="131-causal-consistency-因果一致性">1.3.1 Causal Consistency 因果一致性</h3>
+<p>因果一致性指的是：如果节点A在更新完某个数据后通知了节点B，那么节点B之后对该数据的访问和修改都是基于A更新后的值。于此同时，和节点A无因果关系的节点C的数据访问则没有这样的限制。</p>
+<h3 id="132-read-your-writes-读己之所写">1.3.2 Read your Writes 读己之所写</h3>
+<p>读己之所写指的是：节点A更新一个数据后，它自身总是能访问到自身更新过的最新值，而不会看到旧值。其实也算一种因果一致性。</p>
+<h3 id="133-session-consistency-会话一致性">1.3.3 Session Consistency 会话一致性</h3>
+<p>会话一致性将对系统数据的访问过程框定在了一个会话当中：系统能保证在同一个有效的会话中实现 “读己之所写” 的一致性，也就是说，执行更新操作之后，客户端能够在同一个会话中始终读取到该数据项的最新值。</p>
+<h3 id="134-monotonic-read-consistency-单调读一致性">1.3.4 Monotonic Read Consistency 单调读一致性</h3>
+<p>单调读一致性指的是：如果一个节点从系统中读取出一个数据项的某个值后，那么系统对于该节点后续的任何数据访问都不应该返回更旧的值。</p>
+<h3 id="135-monotonic-write-consistency-单调写一致性">1.3.5 Monotonic Write Consistency 单调写一致性</h3>
+<p>单调写一致性指的是：一个系统要能够保证来自同一个节点的写操作被顺序的执行。</p>
+<h1 id="2-acid-与-base">2. ACID 与 BASE</h1>
+<p>在传统的关系型数据库中，常常会要求拥有 ACID 性质（如事务），ACID 表示：</p>
+<ul>
+<li><strong>Atomicity 原子性</strong> （事务操作要么全部执行，要么全不执行）</li>
+<li><strong>Consistency 一致性</strong> （数据之间保持一致性约束）</li>
+<li><strong>Isolation 独立性</strong> （每个事务之间不会互相干扰）</li>
+<li><strong>Durability 持久性</strong> （事务对数据库的影响永远不会丢失）</li>
+</ul>
+<p>ACID 和 BASE 可以说是两种截然相反的设计方向，ACID 要求了强一致性， BASE 放弃一部分一致性以提高系统伸缩性和性能。但在具体系统设计中，由于场景和对系统的要求不同，常常会结合使用。就连关系型数据库也有部分功能采用 BASE 设计。</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[分布式系统 CAP 理论]]></title>
+        <id>https://xqinger.com/post/cap-theorem/</id>
+        <link href="https://xqinger.com/post/cap-theorem/">
+        </link>
+        <updated>2019-05-28T05:12:54.000Z</updated>
+        <summary type="html"><![CDATA[<p>CAP 理论是分布式系统的基本定理，也是我们理解分布式系统的起点。</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>CAP 理论是分布式系统的基本定理，也是我们理解分布式系统的起点。</p>
+<!-- more -->
+<h1 id="1-cap-理论">1. CAP 理论</h1>
+<p>1998 年，加州大学的计算机科学家 <em>Eric Brewer</em> 提出，分布式系统有三个指标：</p>
+<ul>
+<li><strong>Consistency 一致性</strong></li>
+<li><strong>Availability 可用性</strong></li>
+<li><strong>Partition tolerance 分区容错性</strong></li>
+</ul>
+<p>并且在分布式系统中，三者不可兼得。这就是 CAP 定理</p>
+<figure data-type="image" tabindex="1"><img src="https://xqinger.com/post-images/1559031332586.jpg" alt="CAP理论" loading="lazy"></figure>
+<h2 id="11-consistency-一致性">1.1 Consistency 一致性</h2>
+<p>一致性指的是在分布式系统中，是否<strong>所有</strong>节点都拥有数据的最新版本。</p>
+<p>当其中一个节点的数据被更新时，如果其它节点的数据没有得到更新，用户再读取到的可能就是其它节点的旧数据，此时就出现了数据不一致的情况。</p>
+<p>如果能保证当某一节点更新时，所有用户都能读取到数据的最新版本，就能说该分布式系统拥有<strong>强一致性</strong>。</p>
+<p>从 CAP理论 我们可以得知三者无法兼得，但选择 AP 并不意味着完全放弃 C，只是无法实现强一致性。一致性是分为多个级别的：</p>
+<ul>
+<li><strong>强一致性</strong>：保证所有节点都拥有数据的最新版本，用户读取的永远是最新值</li>
+<li><strong>弱一致性</strong>：无法保证立刻能取得最新值，但在一定时间后或许能实现一致</li>
+<li><strong>最终一致性</strong>：弱一致性的特殊形式，指的是能保证数据在更新前，返回最新值。最终一致性是目前在工业界在大型分布式系统上广泛使用的一种一致性模型</li>
+</ul>
+<h2 id="12-availability-可用性">1.2 Availability 可用性</h2>
+<p>可用性指的是在分布式系统中，系统提供的服务必须一直处于可用的状态，对用户的所有请求都必须能在有限时间内响应。</p>
+<p>其中，<strong>有限时间</strong>指的是在系统设计之初就就设定好的指标。<strong>响应</strong>指的是系统在处理完后应该返回一个明确的结果而不该令用户感到困惑。</p>
+<p>和一致性一样，这里的可用性指的是<strong>极致可用性</strong>。可用性的值域可以定义成0到100%的连续区间。</p>
+<h2 id="13-partition-tolerance-分区容错性">1.3 Partition tolerance 分区容错性</h2>
+<p>在分布式系统中，一般节点在各个网络中应该是连通的，然而由于网络或其它原因，节点之间的通信可能会失败，网络就给划分成了若干区域，这些区域就是分区。</p>
+<p>假设当某项数据只存储在系统的一个节点中，当出现分区时，这个数据就可能无法被访问；或者用户的某些操作在系统中涉及多个节点，但由于分区使得操作无法进行，这些都是难以接受的。所以分区容错性就是在网络出现分区时，系统依然能够正常运行，或者说依然能保证一致性或可用性。</p>
+<p>准确的定义是：</p>
+<blockquote>
+<p>In order to model partition tolerance, the network will be allowed to losearbitrarily many messages sent from one node to another.</p>
+</blockquote>
+<p><strong>系统能够容忍节点间通信时丢失任意多的消息</strong></p>
+<h1 id="2-矛盾与选择">2. 矛盾与选择</h1>
+<p>CAP 理论告诉我们，一致性、可用性和分区容错性无法兼得，为什么三者无法同时成立呢？我们先来考虑能选择的三种情况。</p>
+<h2 id="21-ca">2.1 CA</h2>
+<p>放弃分区容错性，强一致性和极致可用性是可以保证的，但这意味着不允许系统中存在分区。实际上这在分布式系统中几乎是不可能的，由于各种天灾人祸，分区无法避免。所以 CA 系统基本就是传统的单机系统。或者说，分布式系统无法舍弃 P ，我们也默认 P 是必须实现的。</p>
+<h2 id="22-cp">2.2 CP</h2>
+<p>降低对可用性的要求，追求强一致性和分区容错性。相当于对数据的任何操作都需要在节点间同步，而分区问题可能导致同步时间无限延长，可用性便降低了。</p>
+<h2 id="23-ap">2.3 AP</h2>
+<p>追求可用性并允许分区，则当分区发生时，为了能够保持可用性，每个节点只能用本地的可能是过时的数据来提供服务，这就放弃了强一致性。AP 还是目前大多数分布式系统的选择。</p>
 ]]></content>
     </entry>
 </feed>
