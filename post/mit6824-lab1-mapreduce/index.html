@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>MIT6.824 Lab1 MapReduce | x³u³</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdn.staticfile.org/font-awesome/4.7.0/css/font-awesome.css">
+<link rel="shortcut icon" href="https://xxxuuu.me/favicon.ico?v=1711163867024">
+<link rel="stylesheet" href="https://xxxuuu.me/styles/main.css">
+
+
+
+<link href="https://cdn.bootcdn.net/ajax/libs/animate.css/4.1.0/animate.min.css" rel="stylesheet">
+<style>
+:root {
+  --animate-duration: 800ms;
+}
+</style>
+<script src="https://cdn.bootcdn.net/ajax/libs/vue/2.6.9/vue.min.js"></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T8WGT1LJ6G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-T8WGT1LJ6G');
+</script>
+
+
+    <meta name="description" content="Lab 地址：6.824 Lab 1: MapReduce
+论文：MapReduce: Simplified Data Processing on Large Clusters
+一个中文翻译：MapReduce：在大型集群上简化数据处理
+
+..." />
+    <meta name="keywords" content="分布式系统" />
+    
+      <link href="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.11.1/katex.min.css" rel="stylesheet">
+      <script src="https://cdn.bootcdn.net/ajax/libs/KaTeX/0.11.1/katex.min.js"></script>
+    
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.js"></script>
+    <link href="https://cdn.bootcdn.net/ajax/libs/fancybox/3.5.7/jquery.fancybox.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <header class="header">
+  <div class="banner animate__animated animate__fadeIn">
+    <div class="top-container">
+      <div class="site-title-container">
+        <img src="https://xxxuuu.me/images/avatar.png?v=1711163867024" class="site-logo">
+        <div class="site-text">
+          <h1 class="site-title">
+            x³u³
+          </h1>
+          <div class="site-description-social">
+            <div class="site-description">
+              🗒 碎碎念
+            </div>
+            <div class="site-social">
+              
+                
+                  <a class="social-link" href="https://github.com/xxxuuu" target="_blank">
+                    <i class="fa fa-github"></i>
+                  </a>
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="links">
+      
+        
+            <a href="/" class="site-nav">
+              🏠 首页
+            </a>
+          
+        
+        
+            <a href="/archives" class="site-nav">
+              📃 归档
+            </a>
+          
+        
+        
+            <a href="/tags" class="site-nav">
+              🏷 标签
+            </a>
+          
+        
+        
+            <a href="/post/about" class="site-nav">
+              👤 关于
+            </a>
+          
+        
+        
+            <a href="/post/friend-links/" class="site-nav">
+              👬 友链
+            </a>
+          
+        
+    </div>
+  </div>
+</header>
+
+      <div class="main-container">
+        <div class="content-container animate__animated animate__fadeInUp">
+          <div class="post-detail">
+            <h2 class="post-title">MIT6.824 Lab1 MapReduce</h2>
+            <div class="post-date">2022-02-12&emsp;&emsp;3842 字 &emsp;阅读时间 18 分钟</div>
+            
+            <div class="post-content" v-pre>
+              <p>Lab 地址：<a href="http://nil.csail.mit.edu/6.824/2020/labs/lab-mr.html">6.824 Lab 1: MapReduce</a></p>
+<p>论文：<a href="http://static.googleusercontent.com/media/research.google.com/zh-CN//archive/mapreduce-osdi04.pdf">MapReduce: Simplified Data Processing on Large Clusters</a></p>
+<p>一个中文翻译：<a href="https://zhuanlan.zhihu.com/p/122571315">MapReduce：在大型集群上简化数据处理</a></p>
+<br/>
+<br/>
+<p>MIT6.824 的第一节课要做的 Lab 就是大名鼎鼎的 Google 分布式系统三驾马车之一的 MapReduce（另外两个是 GFS 和 BigTable），课程需要我们阅读 MapReduce 的论文后实现一个简化版的 MapReduce Framework</p>
+<br/>
+<br/>
+<p>首先应该先看论文，再 <code>clone</code> 项目，看看涉及 Lab1 部分的结构，弄清楚要基于什么去完成实验</p>
+<p>从用户的角度来看，应该看我们将要实现的东西能给 Client 提供怎样的抽象。首先 <code>/mrapps</code> 中的就是使用 MapReduce 库的 Clients，例如 Getting started 中的 <code>/mrapps/wc.go</code> 是进行词频统计的，MapReduce 库需要用户实现 Map 和 Reduce 两个函数：</p>
+<pre><code class="language-go">func Map(filename string, contents string) []mr.KeyValue {}
+func Reduce(key string, values []string) string {}
+</code></pre>
+<p>它们的语义和论文中的一致，不同的是，这里在 <code>Map</code> 中没有论文中的 <code>Emit</code> 操作，而是要求用户返回一个 key-value 列表，列表的每一项就相当于一个 <code>Emit</code> 的 key-value 对</p>
+<p>最后将 Client 通过 <code>go build -buildmode=plugin xxx.go</code>  编译为动态链接库，启动一个 MapReduce Job 时和输入文件一起作为参数传入</p>
+<br/>
+<p>实验提供了一个简单的顺序单机 MapReduce 实现在 <code>mrsequential.go</code> 内，可以看下它的实现，有助于理解执行过程。其首先加载了被编译为动态链接库的用户代码：</p>
+<pre><code class="language-go">func loadPlugin(filename string) (func(string, string) []mr.KeyValue, func(string, []string) string) {
+	p, err := plugin.Open(filename)
+	if err != nil {
+		log.Fatalf(&quot;cannot load plugin %v&quot;, filename)
+	}
+	xmapf, err := p.Lookup(&quot;Map&quot;)
+	if err != nil {
+		log.Fatalf(&quot;cannot find Map in %v&quot;, filename)
+	}
+	mapf := xmapf.(func(string, string) []mr.KeyValue)
+	xreducef, err := p.Lookup(&quot;Reduce&quot;)
+	if err != nil {
+		log.Fatalf(&quot;cannot find Reduce in %v&quot;, filename)
+	}
+	reducef := xreducef.(func(string, []string) string)
+
+	return mapf, reducef
+}
+</code></pre>
+<p>然后加载输入文件传递给用户代码的 <code>Map</code> 执行，将执行的中间结果存储起来</p>
+<pre><code class="language-go">intermediate := []mr.KeyValue{}
+for _, filename := range os.Args[2:] {
+	file, err := os.Open(filename)
+	if err != nil {
+		log.Fatalf(&quot;cannot open %v&quot;, filename)
+	}
+	content, err := ioutil.ReadAll(file)
+	if err != nil {
+		log.Fatalf(&quot;cannot read %v&quot;, filename)
+	}
+	file.Close()
+	kva := mapf(filename, string(content))
+	intermediate = append(intermediate, kva...)
+}
+</code></pre>
+<p><code>Map</code> 执行完后对中间结果排序</p>
+<pre><code class="language-go">sort.Sort(ByKey(intermediate))
+</code></pre>
+<p>最后调用 <code>Reduce</code> 并写入结果文件</p>
+<pre><code class="language-go">i := 0
+for i &lt; len(intermediate) {
+	j := i + 1
+	for j &lt; len(intermediate) &amp;&amp; intermediate[j].Key == intermediate[i].Key {
+		j++
+	}
+	values := []string{}
+	for k := i; k &lt; j; k++ {
+		values = append(values, intermediate[k].Value)
+	}
+	output := reducef(intermediate[i].Key, values)
+
+	// this is the correct format for each line of Reduce output.
+	fmt.Fprintf(ofile, &quot;%v %v\n&quot;, intermediate[i].Key, output)
+
+	i = j
+}
+</code></pre>
+<p>总体流程基本对应论文的图 1 的各个阶段，只不过是单机顺序实现，没有调度和网络部分</p>
+<figure data-type="image" tabindex="1"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/mr-1.png" alt="mr-1" loading="lazy"></figure>
+<br/>
+<p>然后我们需要实现自己的 MapReduce 库在 <code>mr/master.go</code>，<code>mr/worker.go</code>，<code>mr/rpc.go</code>  三个文件中，里面已经有一些定义好的方法。要实现一些细节和要注意的点包括：</p>
+<ol>
+<li>
+<p>一个 Master，一个或多个 Worker，通过 RPC 通信。在开始一个 MapReduce Job 时，通常先启动 Master，然后启动一个或多个 Worker（通过 <code>main/mrmaster.go</code> 和 <code>main/mrworker.go</code>）</p>
+</li>
+<li>
+<p>容错机制，包括 Worker、Master 宕机的处理</p>
+<p>Master 的宕机可以和论文一样，交给客户端重试，不同之处是论文中持久化了 checkpoint 使得 Master 在宕机恢复后可以恢复任务进度，但 Lab 中没有要求我们实现；对于 Worker，如果执行任务超时，则 Master 将认为它宕机或执行缓慢，此时重新分配任务到另一个 Worker</p>
+<p>另一方面，应该确保宕机时不会出现文件部分写入的情况，一个方法是在文件写入后重命名（大部分操作系统的文件系统实现中，重命名是原子操作）</p>
+</li>
+<li>
+<p>同论文一样，<code>Map</code> 的输出（中间结果）也应该写入到文件中，然后划分成多个 bucket，这保证相同 key 都在同一文件中，能在同一 Worker 里被打包到 <code>Reduce</code> 执行，这个分区数量可以通过启动 Master 时的参数指定</p>
+</li>
+<li>
+<p>每个 <code>Reduce</code> 的结果输出到单独的文件上</p>
+</li>
+<li>
+<p>Master 应该实现 <code>Done</code> 以明确地告知客户端 MapReduce 是否执行完毕</p>
+</li>
+<li>
+<p>结束后应该正确地回收每个 Worker 进程</p>
+</li>
+</ol>
+<br/>
+<p>参考论文第 3 节，捋一下我们的流程：</p>
+<ol>
+<li>首先启动 Master，然后启动一个或多个 Worker，Worker 启动时向 Master 获取任务</li>
+<li>Master 为 Worker 分配任务后，要监视其是否完成或超时，超时后将任务分配给其他 Worker。任务一开始只应该分配 <code>Map</code> ，所有 <code>Map</code> 执行完成后才分配 <code>Reduce</code></li>
+<li>当 Worker 完成一个任务后，继续获取任务</li>
+<li><code>Map</code> 中，Master 需要传递给 Worker 输入文件的位置，Worker 执行 <code>Map</code> 完后写入中间结果到本地并进行分区，然后返回位置给 Master</li>
+<li>Master 需要等待 <code>Map</code> 都执行完毕才分配 <code>Reduce</code>，为 Worker 分配 <code>Reduce</code> 时要传递同一分区的中间结果文件的位置，Worker 读取文件并进行排序以将相同的 key 排到一起，然后将相同的 key 对应的 value 集合传入 <code>Reduce</code> 函数中</li>
+<li>所有任务执行完后，Master 告知客户端以结束对 MapReduce 的调用</li>
+</ol>
+<p><br/><br/></p>
+<p>逻辑都清楚后就可以开始实现了，Master 作为最重要的节点，其存储了大多数必要的数据，如论文 3.2 节所示：</p>
+<figure data-type="image" tabindex="2"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/mr-2.png" alt="mr-2" loading="lazy"></figure>
+<p>大致分为：</p>
+<ol>
+<li><code>Map</code> 和 <code>Reduce</code> 任务的状态</li>
+<li>Worker 节点信息</li>
+<li>输入和中间文件的位置</li>
+</ol>
+<p>这里我们可以不需要存储 Worker 节点信息，因为这里是 Worker 向 Master 拉任务，而不是 Master 推任务给 Worker，Master 可以不用知道 Worker 的具体情况。只存储任务状态和文件位置即可，Master 的结构大致如下：</p>
+<pre><code class="language-go">// taskState 任务状态
+type taskState int
+
+const (
+	// IDLE 空闲
+	IDLE taskState = iota
+	// IN_PROGRESS 运行中
+	IN_PROGRESS
+	// COMPLETED 完成
+	COMPLETED
+)
+
+type Master struct {
+	// 每个任务的输入文件列表
+	files map[TaskType][][]string
+	// 任务状态
+	tasks map[TaskType]map[int]taskState
+	// 空闲任务
+	idleTasks map[TaskType]map[int]struct{}
+	// 完成的任务数量
+	cnt map[TaskType]int
+	// reduce分区数
+	nReduce int
+	// 修改任务状态的互斥锁
+	lock sync.Mutex
+	// 响应客户端是否完成
+	finish chan struct{}
+}
+</code></pre>
+<p><code>TaskType</code> 要在 RPC 中传输，定义在 <code>mr/rpc.go</code> 中，多了一个 <code>None</code> 用以表示当前无任务可分配的情况：</p>
+<pre><code class="language-go">type TaskType int
+
+const (
+	None TaskType = iota
+	Map
+	Reduce
+)
+</code></pre>
+<p>客户端（<code>main/mrmaster.go</code>）会调用 <code>MakeMaster</code> 初始化 Master 并启动 Master 的 RPC 服务器，初始化时把输入文件列表添加到 <code>Map</code> 任务中并标记为空闲：</p>
+<pre><code class="language-go">func MakeMaster(files []string, nReduce int) *Master {
+	t1 := map[TaskType]map[int]taskState{
+		Map:    {},
+		Reduce: {},
+	}
+	t2 := map[TaskType]map[int]struct{}{
+		Map:    {},
+		Reduce: {},
+	}
+
+	f := map[TaskType][][]string{
+		Map:    {},
+		Reduce: make([][]string, nReduce),
+	}
+	for i := range files {
+		t1[Map][i] = IDLE
+		t2[Map][i] = struct{}{}
+		f[Map] = append(f[Map], []string{files[i]})
+	}
+
+	m := Master{
+		f,
+		t1,
+		t2,
+		make(map[TaskType]int),
+		nReduce,
+		sync.Mutex{},
+		make(chan struct{}),
+	}
+
+	m.server()
+	return &amp;m
+}
+</code></pre>
+<br/>
+<p>Master 中应该给 Worker 提供三种 RPC 接口：</p>
+<ul>
+<li>心跳接口，供 Worker 判断 Master 是否活着</li>
+<li>获取任务接口，Worker 从这个接口获取新任务以执行</li>
+<li>通知任务完成接口，Worker 完成任务后通过该接口通知 Master</li>
+</ul>
+<p>RPC 这里用的是 Go 内置的 <code>net/rpc</code>，一些 RPC 过程中的数据类型定义如下：</p>
+<pre><code class="language-go">type EmptyArgs struct{}
+
+type Task struct {
+	ID       int
+	NReduce  int
+	TaskType TaskType
+	Files    []string
+}
+
+type FinishNotify struct {
+	Err       error
+	Task      Task
+	Filenames []string
+}
+</code></pre>
+<p><code>net/rpc</code> 使用的 gob 来序列化，它不支持传递空值，所以定义一个 <code>EmptyArgs</code> 空结构体来表示，空结构体不占用实际内存，在 Master 中的空闲任务队列中也使用了这个方法<br>
+<code>Task</code> 是 Master 返回任务给 Worker 时传递的类型，包括任务 ID，Reduce 分区数，任务类型（Map 或 Reduce）和输入文件列表<br>
+<code>FinishNotify</code> 是 Worker 完成任务时向 Master 通知传递的类型，包括错误信息，完成的任务内容本身，输出的文件列表</p>
+<br/>
+<p>然后是 Master 的三个 RPC 接口实现：</p>
+<p>心跳接口实际上不需要返回任何数据，RPC 调用底层会知道是否调用成功，这就够了</p>
+<pre><code class="language-go">func (m *Master) Ping(args EmptyArgs, reply *EmptyArgs) error {
+    return nil
+}
+</code></pre>
+<p>获取任务接口，因为需要并发修改任务状态，得加锁。然后确定待分配的任务类型，<code>Map</code> 全部执行完后才执行 <code>Reduce</code>，从空闲队列中取出后，返回即可。最后新建了个 goroutine 来检查任务情况，如果 10 秒内未执行完毕，可以认为 Worker 宕机或执行缓慢，重置任务进度等待下次分配</p>
+<pre><code class="language-go">func (m *Master) PullTask(args EmptyArgs, reply *Task) error {
+    m.lock.Lock()
+    defer m.lock.Unlock()
+
+    taskType := Map
+    // map全部完成才分配reduce
+    if len(m.tasks[Map]) == m.cnt[Map] {
+        taskType = Reduce
+    }
+
+    // 无空闲任务
+    if len(m.idleTasks[taskType]) == 0 {
+        reply.TaskType = None
+        return nil
+    }
+
+    // 从空闲区里选一个 分配任务
+    var idx int
+    for k := range m.idleTasks[taskType] {
+        idx = k
+        break
+    }
+    reply.TaskType = taskType
+    reply.Files = m.files[taskType][idx]
+    reply.ID = idx
+    reply.NReduce = m.nReduce
+
+    delete(m.idleTasks[taskType], idx)
+    m.tasks[taskType][idx] = IN_PROGRESS
+
+    // 分配后检查任务状态
+    go func() {
+        time.Sleep(time.Second * 10)
+        m.lock.Lock()
+        if m.tasks[taskType][idx] == IN_PROGRESS {
+            m.tasks[taskType][idx] = IDLE
+            m.idleTasks[taskType][idx] = struct{}{}
+        }
+        m.lock.Unlock()
+    }()
+
+    return nil
+}
+</code></pre>
+<p>最后一个通知任务完成接口，如果成功完成，就进行记录，同时如果完成的任务是 <code>Map</code> 的话，要将其输出的中间结果作为 <code>Reduce</code> 任务添加进任务队列里。最后检查是否所有任务都已完成</p>
+<pre><code class="language-go">func (m *Master) FinishTask(data FinishNotify, reply *EmptyArgs) error {
+    m.lock.Lock()
+    defer m.lock.Unlock()
+    id := data.Task.ID
+
+    // 已经完成 忽略
+    if data.Task.TaskType == None || m.tasks[data.Task.TaskType][id] == COMPLETED {
+        return nil
+    }
+
+    // 发生错误 重置任务状态 等待下次调度
+    if data.Err != nil {
+        log.Printf(&quot;%v\n&quot;, data.Err)
+        m.tasks[data.Task.TaskType][id] = IDLE
+        m.idleTasks[data.Task.TaskType][id] = struct{}{}
+        return nil
+    }
+
+    // 记录完成
+    m.tasks[data.Task.TaskType][id] = COMPLETED
+    m.cnt[data.Task.TaskType]++
+
+    // Map 结果加到待执行 Reduce 里，按分区划分
+    if data.Task.TaskType == Map {
+        for i := range data.Filenames {
+            m.files[Reduce][i] = append(m.files[Reduce][i], data.Filenames[i])
+            m.tasks[Reduce][i] = IDLE
+            m.idleTasks[Reduce][i] = struct{}{}
+        }
+    }
+
+    // 全部完成 Done() 可以返回了
+    if len(m.tasks[Map]) == m.cnt[Map] &amp;&amp;
+        len(m.tasks[Reduce]) == m.cnt[Reduce] {
+        log.Println(&quot;MapReduce 结束&quot;)
+        m.finish &lt;- struct{}{}
+    }
+
+    return nil
+}
+</code></pre>
+<p>最后完成这里有个 <code>finish</code> ，它的作用是通知 <code>Done</code> 可以返回给客户端任务已完成</p>
+<pre><code class="language-go">func (m *Master) Done() bool {
+    &lt;-m.finish
+    return true
+}
+</code></pre>
+<p><br/><br/></p>
+<p>Master 的实现基本完成，接下来是 Worker，Worker 信息的定义如下，存储 <code>Map</code> 函数，<code>Reduce</code> 函数，是否可以退出和接收的任务队列：</p>
+<pre><code class="language-go">type WorkerInfo struct {
+	mapf    func(string, string) []KeyValue
+	reducef func(string, []string) string
+	exit    chan struct{}
+	tasks   chan Task
+}
+</code></pre>
+<p>客户端（<code>main/mrworker.go</code>）会调用 <code>Worker()</code> 来启动 Worker，在其中进行我们的初始化</p>
+<ul>
+<li>首先新建一个 goroutine 在后台对 Master 进行心跳检测，设定中当 Master 10s 内未响应时，Worker 可以认为 Master 已经关闭，自身便可以关闭。Worker 退出的另一个设计思路是可以添加一个 <code>TaskType</code> 表示「请关闭」，Worker 接收到该任务后就可以自行关闭</li>
+<li>然后是一个循环，不断从 Master 处获取任务并执行，当收到退出信号时就退出</li>
+</ul>
+<pre><code class="language-go">func Worker(mapf func(string, string) []KeyValue,
+	reducef func(string, []string) string) {
+
+	w := WorkerInfo{
+		mapf,
+		reducef,
+		make(chan struct{}),
+		make(chan Task, 1),
+	}
+
+	// Master 10秒没响应就认为它已经关闭， Worker可以退出
+	go func() {
+		before := time.Now().UnixNano()
+		TIMEOUT := time.Second.Nanoseconds() * 10
+		for {
+			if w.healthCheck() {
+				before = time.Now().UnixNano()
+			} else if time.Now().UnixNano()-before &gt;= TIMEOUT {
+				log.Println(&quot;Master 无响应，可以退出&quot;)
+				w.exit &lt;- struct{}{}
+				return
+			}
+			time.Sleep(time.Second)
+		}
+	}()
+
+	// 超时退出或等待分配新任务
+	for {
+		select {
+		case &lt;-w.exit:
+			close(w.tasks)
+			close(w.exit)
+			return
+		case t := &lt;-w.tasks:
+			w.execTask(t)
+		default:
+			if ok, t := w.pullTask(); !ok {
+				time.Sleep(time.Second)
+			} else {
+				w.tasks &lt;- t
+			}
+		}
+	}
+}
+</code></pre>
+<p>其中 <code>healthCheck</code> 和 <code>pullTask</code> 实现如下，<code>call</code> 是 Lab 本身已经实现好的对 RPC 调用的封装：</p>
+<pre><code class="language-go">// 健康检查
+func (w *WorkerInfo) healthCheck() bool {
+	return call(&quot;Master.Ping&quot;, EmptyArgs{}, &amp;EmptyArgs{})
+}
+
+// 从Master处获取任务
+func (w *WorkerInfo) pullTask() (bool, Task) {
+	t := Task{}
+	ok := call(&quot;Master.PullTask&quot;, EmptyArgs{}, &amp;t)
+	if !ok || t.TaskType == None {
+		return false, Task{}
+	}
+	return true, t
+}
+</code></pre>
+<p>当接收到任务时，就调用 <code>execTask</code> 来执行任务，它根据任务类型调用 <code>execMap</code> 或 <code>execReduce</code> 来执行，最后处理执行结果，通知回 Master</p>
+<pre><code class="language-go">func (w *WorkerInfo) execTask(t Task) {
+	var notifyData FinishNotify
+	notifyData.Task = t
+	defer func() {
+		err := recover()
+		if err != nil {
+			notifyData.Err = fmt.Errorf(&quot;%v&quot;, err)
+		}
+
+		// 向 Master 报告执行完毕
+		call(&quot;Master.FinishTask&quot;, notifyData, &amp;EmptyArgs{})
+	}()
+
+	log.Printf(&quot;执行任务 %v\n&quot;, t)
+
+	var fun func(task Task) ([]string, error)
+	if t.TaskType == Map {
+		fun = w.execMap
+	} else if t.TaskType == Reduce {
+		fun = w.execReduce
+	} else {
+		return
+	}
+
+	if outfile, err := fun(t); err != nil {
+		notifyData.Err = err
+	} else {
+		notifyData.Filenames = outfile
+	}
+}
+</code></pre>
+<p><code>execMap</code> 内首先循环读入每个文件，将它们的内容传递给用户的 <code>Map</code> 函数执行，结果追加到 key-value 列表中，然后创建指定分区数量（<code>NReduce</code>）的临时文件，通过 <code>ihash</code> 来确定每个 key 映射到哪个分区中，序列化数据写入到该分区的临时文件上。最后通过原子重命名来保证不会出现文件的部分写入</p>
+<pre><code class="language-go">func (w *WorkerInfo) execMap(t Task) ([]string, error) {
+	kva := []KeyValue{}
+	for i := range t.Files {
+		file, _ := os.Open(t.Files[i])
+		defer file.Close()
+		content, _ := ioutil.ReadAll(file)
+
+		tmpKva := w.mapf(t.Files[i], string(content))
+		kva = append(kva, tmpKva...)
+	}
+
+	// 根据 key 分别写入不同文件
+	tmpfiles := make([]*os.File, t.NReduce)
+
+	for i := range tmpfiles {
+		tmpfiles[i], _ = ioutil.TempFile(&quot;&quot;, &quot;*.tmp&quot;)
+		defer tmpfiles[i].Close()
+	}
+	tmpData := make([][]KeyValue, t.NReduce)
+	for i := range kva {
+		idx := ihash(kva[i].Key) % t.NReduce
+		tmpData[idx] = append(tmpData[idx], kva[i])
+	}
+	for i := range tmpData {
+		buf := &amp;bytes.Buffer{}
+		enc := gob.NewEncoder(buf)
+		if err := enc.Encode(&amp;tmpData[i]); err != nil {
+			os.Remove(tmpfiles[i].Name())
+			return []string{}, errors.New(&quot;cannot serialize&quot;)
+		}
+		tmpfiles[i].Write(buf.Bytes())
+	}
+
+	// 通过写入到临时文件 再重命名来保证原子性
+	// 格式 mr-X-Y X是Map任务号 Y是Reduce任务号 即ihash(X)
+	res := make([]string, 0, t.NReduce)
+	for i := range tmpfiles {
+		name := fmt.Sprintf(&quot;./mr-%d-%d&quot;, t.ID, i)
+		os.Rename(tmpfiles[i].Name(), name)
+		res = append(res, name)
+	}
+	return res, nil
+}
+
+func ihash(key string) int {
+	h := fnv.New32a()
+	h.Write([]byte(key))
+	return int(h.Sum32() &amp; 0x7fffffff)
+}
+</code></pre>
+<p><code>execReduce</code> 类似，读入文件，反序列化加载到 key-value 列表中，然后排序以让相同 key 排在一起，文件大到不足以放入内存时应该采用外部排序，不过 Lab 中可以假定不存在这种情况。然后对于相同的 key，将其 value 的集合打包调用用户的 <code>Reduce</code> 函数。结果也是一样写入临时文件再原子重命名</p>
+<pre><code class="language-go">func (w *WorkerInfo) execReduce(t Task) ([]string, error) {
+	kva := []KeyValue{}
+	for i := range t.Files {
+		file, _ := os.Open(t.Files[i])
+		defer file.Close()
+		content, _ := ioutil.ReadAll(file)
+
+		dec := gob.NewDecoder(bytes.NewBuffer(content))
+		var tmpKva []KeyValue
+		dec.Decode(&amp;tmpKva)
+		kva = append(kva, tmpKva...)
+	}
+
+	// 排序key 打包调用reduce
+	sort.Slice(kva, func(i, j int) bool {
+		return kva[i].Key &lt; kva[j].Key
+	})
+
+	ofile, _ := ioutil.TempFile(&quot;&quot;, &quot;*.tmp&quot;)
+	defer ofile.Close()
+	for i := 0; i &lt; len(kva); {
+		j := i + 1
+		for j &lt; len(kva) &amp;&amp; kva[j].Key == kva[i].Key {
+			j++
+		}
+		values := []string{}
+		for k := i; k &lt; j; k++ {
+			values = append(values, kva[k].Value)
+		}
+		output := w.reducef(kva[i].Key, values)
+
+		fmt.Fprintf(ofile, &quot;%v %v\n&quot;, kva[i].Key, output)
+
+		i = j
+	}
+	oname := fmt.Sprintf(&quot;mr-out-%d&quot;, t.ID)
+	os.Rename(ofile.Name(), oname)
+	return []string{oname}, nil
+}
+</code></pre>
+<p>Worker 也搞定，最后调用 <code>main/test-mr.sh</code> 进行测试，其会运行五个测试</p>
+<ol>
+<li>wc-test：词频统计应用测试</li>
+<li>indexer-test：索引构建应用测试</li>
+<li>map-parallelism-test： <code>Map</code> 并行测试</li>
+<li>reduce-parallelism-test： <code>Reduce</code> 并行测试</li>
+<li>crash-test： 宕机测试</li>
+</ol>
+<figure data-type="image" tabindex="3"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/mr-3.png" alt="mr-3" loading="lazy"></figure>
+<p>bingo</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xxxuuu.me/tag/YnvyCKwsP/" class="tag">
+                    分布式系统
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xxxuuu.me/post/2021summary/">
+                  <h3 class="post-title">
+                    蒟蒻的2021年度总结
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+          
+
+
+<script>
+  let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1;
+  let activeClass = 'active-toc';
+  let tocContent;
+  
+  function addActiveClass(index) {
+    if (index >= 0 && index < lList.length) {
+      lList[index].classList.add(activeClass);
+    }
+  }
+
+  function removeActiveClass(index) {
+    if (index >= 0 && index < lList.length) {
+      lList[index].classList.remove(activeClass);
+    }
+  }
+  
+  function getElementTop (el) {
+    let actualTop = el.offsetTop
+    let current = el.offsetParent
+    while (current !== null) {
+      actualTop += current.offsetTop
+      current = current.offsetParent
+    }
+    return actualTop
+  }
+
+  document.addEventListener('scroll', function (e) {
+    if (lList.length <= 0) {
+      return;
+    }
+    let scrollTop = document.scrollingElement.scrollTop;
+    let eps = window.innerHeight;
+
+    let current = 0, closestOffset = 0x3f3f3f3f, hasFind = false;
+    for (let i = 0; i < hList.length; i++) {
+      let offset = Math.abs(getElementTop(hList[i]) - scrollTop);
+      if (offset > eps) {
+        continue;
+      }
+      if (offset < closestOffset) {
+        current = i;
+        closestOffset = offset;
+        hasFind = true;
+      }
+    }
+    if(!hasFind) {
+      return;
+    }
+
+    removeActiveClass(lastIndex)
+    addActiveClass(current);
+    lastIndex = current;
+  });
+
+  window.addEventListener('load', function () {
+    tocContent = document.querySelector('.markdownIt-TOC');
+    if (!tocContent) return;
+
+    postBody = document.querySelector('.post-content');
+    for (let i = 0; i < postBody.children.length; i++) {
+      if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+        hList.push(postBody.children[i]);
+      }
+    }
+
+    let con = tocContent.children[0].children[0];
+    tocContent.innerHTML = con.innerHTML;
+    lList = document.querySelectorAll('.post-toc li');
+
+    setTimeout(function () {
+      if ("createEvent" in document) {
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("scroll", false, true);
+        document.dispatchEvent(evt);
+      }
+      else {
+        document.fireEvent("scroll");
+      }
+    }, 500)
+  })
+</script>
+
+        </div>
+      </div>
+
+      <footer class="footer animate__animated animate__flipInX">
+  <div class="site-footer">
+    <p></p>
+    <p>© x³u³ · Powered by <a href="https://gridea.dev/">Gridea</a> & <a href="https://github.com/xxxuuu/gridea-theme-autumn">Autumn</a> | <a class="rss" href="https://xxxuuu.me/atom.xml" target="_blank">RSS</a></p>
+  </div>
+</footer>
+
+
+    </div>
+
+    <script type="application/javascript">
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.bootcdn.net/ajax/libs/highlight.js/11.4.0/highlight.min.js"></script>
+  <script>
+    window.onload = () => {
+        hljs.highlightAll()
+    }
+  </script>
+
+
+<script>
+  const images = document.querySelectorAll('.post-content img');
+
+  console.log(images)
+  for (let i = 0; i < images.length; i++) {
+    const img = images[i];
+
+    const link = document.createElement('a');
+    link.href = img.src;
+	link.setAttribute("data-fancybox", "gallery");
+
+    img.parentNode.insertBefore(link, img);
+    link.appendChild(img);
+  }
+</script>
+
+
+
+
+  </body>
+</html>
