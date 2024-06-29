@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>PVE8 上启用 12 代 Intel CPU 核显 SR-IOV | x³u³</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<link rel="shortcut icon" href="https://xxxuuu.me/favicon.ico?v=1719665505520">
+<link rel="stylesheet" href="https://xxxuuu.me/styles/main.css">
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+<style>
+:root {
+  --animate-duration: 800ms;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.9/dist/vue.min.js"></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T8WGT1LJ6G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-T8WGT1LJ6G');
+</script>
+
+
+    <meta name="description" content="拯救我的 Galgame 和追番体验～
+
+背景
+前段时间买了台 MiniPC 装 PVE 作为 Homelab，打算作为媒体服务器 + NAS + 学习使用 （虽然最后主要是用来装 Windows 虚拟机玩 Galgame）
+机子的 U 是..." />
+    <meta name="keywords" content="折腾" />
+    
+      <link href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <header class="header">
+  <div class="banner animate__animated animate__fadeIn">
+    <div class="top-container">
+      <div class="site-title-container">
+        <img src="https://xxxuuu.me/images/avatar.png?v=1719665505520" class="site-logo">
+        <div class="site-text">
+          <h1 class="site-title">
+            x³u³
+          </h1>
+          <div class="site-description-social">
+            <div class="site-description">
+              🗒 碎碎念
+            </div>
+            <div class="site-social">
+              
+                
+                  <a class="social-link" href="https://github.com/xxxuuu" target="_blank">
+                    <i class="fa fa-github"></i>
+                  </a>
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="links">
+      
+        
+            <a href="/" class="site-nav">
+              🏠 首页
+            </a>
+          
+        
+        
+            <a href="/archives" class="site-nav">
+              📃 归档
+            </a>
+          
+        
+        
+            <a href="/tags" class="site-nav">
+              🏷 标签
+            </a>
+          
+        
+        
+            <a href="/post/about" class="site-nav">
+              👤 关于
+            </a>
+          
+        
+        
+            <a href="/post/friend-links/" class="site-nav">
+              👬 友链
+            </a>
+          
+        
+    </div>
+  </div>
+</header>
+
+      <div class="main-container">
+        <div class="content-container animate__animated animate__fadeInUp">
+          <div class="post-detail">
+            <h2 class="post-title">PVE8 上启用 12 代 Intel CPU 核显 SR-IOV</h2>
+            <div class="post-date">2023-08-06&emsp;&emsp;1174 字 &emsp;阅读时间 6 分钟</div>
+            
+            <div class="post-content" v-pre>
+              <p>拯救我的 Galgame 和追番体验～</p>
+<!-- more -->
+<h2 id="背景">背景</h2>
+<p>前段时间买了台 MiniPC 装 PVE 作为 Homelab，打算作为媒体服务器 + NAS + 学习使用 <s>（虽然最后主要是用来装 Windows 虚拟机玩 Galgame）</s></p>
+<p>机子的 U 是 12 代的 i3-N305，买的时候 PVE8 还没发布，装的是 PVE7，5.x 的内核，对 12 代 U 还没有很完善的支持，核显无法使用。这就导致在 Jellyfin 看番只能软解，以及玩 Galgame 时压力都在 CPU 上，全程 CPU 100%，体验说不上好</p>
+<p>最近发现 PVE8 发布了，升级到了 6.2 的内核，于是赶紧折腾一下。升级过程网上很多文章，这里略，无非就是配置下镜像源然后 <code>apt update &amp; apt dist-upgrade</code></p>
+<h2 id="开启核显-sr-iov">开启核显 SR-IOV</h2>
+<p>SR-IOV 是一种硬件虚拟化技术，简单来说，能将物理 PCIe 设备虚拟成多个虚拟设备，在网卡上被广泛使用。Intel Core CPU 在 11 代后支持了该技术用于 GPU 虚拟化，替换了过去的 GVT-g（<a href="https://www.intel.cn/content/www/cn/zh/support/articles/000093216/graphics.html">Intel 产品 GPU 虚拟化技术列表</a>）</p>
+<p>开启 SR-IOV 主要用到这个驱动程序：<a href="https://github.com/strongtz/i915-sriov-dkms">i915-sriov-dkms</a>，能够创建最多 7 个 VF（可以简单理解为 vGPU）</p>
+<p>按着文档里「PVE Host Installation Steps (Tested Kernel 6.1 and 6.2)」这步做即可。在 <code>update-grub</code> 和 <code>update-initramfs -u</code> 后多执行一句 <code>pve-efiboot-tool refresh</code></p>
+<p>但我这里遇到一个问题，重启后查看 <code>dmesg | grep i915</code> 有这样两条日志</p>
+<pre><code>i915: unknown parameter 'max_vfs' ignored
+....
+i915 0000:00:02.0: driver does not support SR-IOV configuration via sysfs
+</code></pre>
+<p>看了<a href="https://github.com/strongtz/i915-sriov-dkms/issues/53">这个 issue </a>后，尝试重装。删除了原来的 dkms 模块，修改 <code>dkms.conf</code> 里的 <code>PACKAGE_NAME</code> 为 6.2（原来是 6.1，不过这步感觉应该没影响），然后 install 时加上 <code>--force</code> 重新走遍安装流程</p>
+<p>这回正常了，上面两条日志没有了，也显示成功启用 VF，<code>lspci | grep VGA</code> 能看到多出来 7 个 GPU 设备，可以将其挂载到 LXC 或虚拟机中（00.02.0 那个物理 GPU / PF 不应该被使用）<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806170352.png" alt="lspci-output" width=800 /></p>
+<h2 id="windows-虚拟机挂载">Windows 虚拟机挂载</h2>
+<p>Windows 虚拟机要先配置好远程桌面，能连的上。虚拟机配置里「显示」选「无」（选「无」后就无法 VNC 连接了，所以要先配好远程桌面）</p>
+<p>添加 PCI 设备，选择 vGPU，勾上主 GPU<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806170517.png" alt="win-vm-config" width=800 /></p>
+<p>进入 Windows <a href="https://www.intel.cn/content/www/cn/zh/support/intel-driver-support-assistant.html">安装驱动</a>，Bingo<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806170548.png" alt="win-gpu" width=800 /></p>
+<h2 id="lxc-容器挂载">LXC 容器挂载</h2>
+<p>新建 LXC 容器要选择「嵌套」+「特权」（去掉无特权容器的 ✅）</p>
+<p>挂载设备到 LXC 容器里，在 PVE 里找下对应设备驱动，选一个未使用的 vGPU 记下第 5 、 6 列的 video id 和 render id（不要选了 0 的物理 GPU / PF），我这里选择 card2 和 renderD130</p>
+<pre><code class="language-bash">$ ls -l /dev/dri
+total 0
+drwxr-xr-x 2 root root        320 Aug  6 00:38 by-path
+crw-rw---- 1 root video  226,   0 Aug  6 00:30 card0
+crw-rw---- 1 root video  226,   2 Aug  6 00:30 card2
+crw-rw---- 1 root video  226,   3 Aug  6 00:30 card3
+crw-rw---- 1 root video  226,   4 Aug  6 00:30 card4
+crw-rw---- 1 root video  226,   5 Aug  6 00:30 card5
+crw-rw---- 1 root video  226,   6 Aug  6 00:30 card6
+crw-rw---- 1 root video  226,   7 Aug  6 00:30 card7
+crw-rw---- 1 root render 226, 128 Aug  6 00:30 renderD128
+crw-rw---- 1 root render 226, 130 Aug  6 00:30 renderD130
+crw-rw---- 1 root render 226, 131 Aug  6 00:30 renderD131
+crw-rw---- 1 root render 226, 132 Aug  6 00:30 renderD132
+crw-rw---- 1 root render 226, 133 Aug  6 00:30 renderD133
+crw-rw---- 1 root render 226, 134 Aug  6 00:30 renderD134
+crw-rw---- 1 root render 226, 135 Aug  6 00:30 renderD135
+</code></pre>
+<p>关闭 LXC 容器，然后修改对应 LXC 容器配置文件</p>
+<pre><code class="language-bash">$ vim /etc/pve/lxc/&lt;LXC_ID&gt;.conf
+</code></pre>
+<p>添加以下内容把设备挂载到 LXC 内（分别填入 video id 和 render id，以及映射对应 card 和 render）</p>
+<pre><code>lxc.cgroup2.devices.allow: c 226:2 rwm
+lxc.cgroup2.devices.allow: c 226:130 rwm
+lxc.mount.entry: /dev/dri/card2 dev/dri/card0 none bind,optional,create=file
+lxc.mount.entry: /dev/dri/renderD130 dev/dri/renderD128 none bind,optional,create=file
+</code></pre>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806170700.png" alt="lxc-gpu-config" width=800>
+<p>进入 LXC 容器安装驱动</p>
+<pre><code class="language-bash">$ apt update &amp;&amp; apt install intel-media-va-driver-non-free vainfo
+</code></pre>
+<p>如果 LXC 内也使用了容器，例如我在 LXC 内装了 Docker 部署 Jellyfin，则容器内也要有驱动，并把设备挂载进去</p>
+<pre><code class="language-bash">$ docker run ... \
+    ... \
+    --device /dev/dri:/dev/dri \
+    ...
+</code></pre>
+<p>然后 Jellyfin 容器内就可以找到对应设备，启用硬件加速即可<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806173300.png" alt="jellyfin-vaapi" width=800></p>
+<h2 id="总结">总结</h2>
+<p>核心就两步：</p>
+<ol>
+<li>在 host（PVE）上安装驱动模块，开启 SR-IOV</li>
+<li>配置虚拟机 or LXC 挂载 vGPU，并在里面安装驱动</li>
+</ol>
+<p>有了 GPU 后体验好了很多，无论是 Windows 玩 Galgame 还是 Jellyfin 追番硬解，CPU 压力基本不超 5%，十分流畅，释放了本就不强的 CPU 算力。而且相比独占的直通物理 GPU，SR-IOV 虚拟出来的多个 vGPU 能分给多台虚拟机使用，打造完美 Homelab</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://xxxuuu.me/tag/8Is6uGP83/" class="tag">
+                    折腾
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xxxuuu.me/post/container-spec-ecosystem/">
+                  <h3 class="post-title">
+                    容器标准和生态
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+          
+
+<div class="post-toc animate__animated animate__fadeInUp">
+    <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E8%83%8C%E6%99%AF">背景</a></li>
+<li><a href="#%E5%BC%80%E5%90%AF%E6%A0%B8%E6%98%BE-sr-iov">开启核显 SR-IOV</a></li>
+<li><a href="#windows-%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%8C%82%E8%BD%BD">Windows 虚拟机挂载</a></li>
+<li><a href="#lxc-%E5%AE%B9%E5%99%A8%E6%8C%82%E8%BD%BD">LXC 容器挂载</a></li>
+<li><a href="#%E6%80%BB%E7%BB%93">总结</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+
+<script>
+  let lastTop = 0, lList = [], hList = [], postBody, lastIndex = -1;
+  let activeClass = 'active-toc';
+  let tocContent;
+  
+  function addActiveClass(index) {
+    if (index >= 0 && index < lList.length) {
+      lList[index].classList.add(activeClass);
+    }
+  }
+
+  function removeActiveClass(index) {
+    if (index >= 0 && index < lList.length) {
+      lList[index].classList.remove(activeClass);
+    }
+  }
+  
+  function getElementTop (el) {
+    let actualTop = el.offsetTop
+    let current = el.offsetParent
+    while (current !== null) {
+      actualTop += current.offsetTop
+      current = current.offsetParent
+    }
+    return actualTop
+  }
+
+  document.addEventListener('scroll', function (e) {
+    if (lList.length <= 0) {
+      return;
+    }
+    let scrollTop = document.scrollingElement.scrollTop;
+    let eps = window.innerHeight;
+
+    let current = 0, closestOffset = 0x3f3f3f3f, hasFind = false;
+    for (let i = 0; i < hList.length; i++) {
+      let offset = Math.abs(getElementTop(hList[i]) - scrollTop);
+      if (offset > eps) {
+        continue;
+      }
+      if (offset < closestOffset) {
+        current = i;
+        closestOffset = offset;
+        hasFind = true;
+      }
+    }
+    if(!hasFind) {
+      return;
+    }
+
+    removeActiveClass(lastIndex)
+    addActiveClass(current);
+    lastIndex = current;
+  });
+
+  window.addEventListener('load', function () {
+    tocContent = document.querySelector('.markdownIt-TOC');
+    if (!tocContent) return;
+
+    postBody = document.querySelector('.post-content');
+    for (let i = 0; i < postBody.children.length; i++) {
+      if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+        hList.push(postBody.children[i]);
+      }
+    }
+
+    let con = tocContent.children[0].children[0];
+    tocContent.innerHTML = con.innerHTML;
+    lList = document.querySelectorAll('.post-toc li');
+
+    setTimeout(function () {
+      if ("createEvent" in document) {
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("scroll", false, true);
+        document.dispatchEvent(evt);
+      }
+      else {
+        document.fireEvent("scroll");
+      }
+    }, 500)
+  })
+</script>
+
+        </div>
+      </div>
+
+      <footer class="footer animate__animated animate__flipInX">
+  <div class="site-footer">
+    <p></p>
+    <p>© x³u³ · Powered by <a href="https://gridea.dev/">Gridea</a> & <a href="https://github.com/xxxuuu/gridea-theme-autumn">Autumn</a> | <a class="rss" href="https://xxxuuu.me/atom.xml" target="_blank">RSS</a></p>
+  </div>
+</footer>
+
+
+    </div>
+
+    <script type="application/javascript">
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js"></script>
+  <script>
+    window.onload = () => {
+        hljs.highlightAll()
+    }
+  </script>
+
+
+<script>
+  const images = document.querySelectorAll('.post-content img');
+
+  console.log(images)
+  for (let i = 0; i < images.length; i++) {
+    const img = images[i];
+
+    const link = document.createElement('a');
+    link.href = img.src;
+	link.setAttribute("data-fancybox", "gallery");
+
+    img.parentNode.insertBefore(link, img);
+    link.appendChild(img);
+  }
+</script>
+
+
+
+
+  </body>
+</html>
