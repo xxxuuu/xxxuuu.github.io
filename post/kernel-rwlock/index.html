@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>从 Linux 内核看读写锁设计 | x³u³</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<link rel="shortcut icon" href="https://xxxuuu.me/favicon.ico?v=1723216798723">
+<link rel="stylesheet" href="https://xxxuuu.me/styles/main.css">
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+<style>
+:root {
+  --animate-duration: 800ms;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.9/dist/vue.min.js"></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T8WGT1LJ6G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-T8WGT1LJ6G');
+</script>
+
+
+    <meta name="description" content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的
+
+读/写自旋锁..." />
+    <meta name="keywords" content="Linux,内核" />
+    
+      <link href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <header class="header">
+  <div class="banner animate__animated animate__fadeIn">
+    <div class="top-container">
+      <div class="site-title-container">
+        <img src="https://xxxuuu.me/images/avatar.png?v=1723216798723" class="site-logo">
+        <div class="site-text">
+          <h1 class="site-title">
+            x³u³
+          </h1>
+          <div class="site-description-social">
+            <div class="site-description">
+              🗒 碎碎念
+            </div>
+            <div class="site-social">
+              
+                
+                  <a class="social-link" href="https://github.com/xxxuuu" target="_blank">
+                    <i class="fa fa-github"></i>
+                  </a>
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="links">
+      
+        
+            <a href="/" class="site-nav">
+              🏠 首页
+            </a>
+          
+        
+        
+            <a href="/archives" class="site-nav">
+              📃 归档
+            </a>
+          
+        
+        
+            <a href="/tags" class="site-nav">
+              🏷 标签
+            </a>
+          
+        
+        
+            <a href="/post/about" class="site-nav">
+              👤 关于
+            </a>
+          
+        
+        
+            <a href="/post/friend-links/" class="site-nav">
+              👬 友链
+            </a>
+          
+        
+    </div>
+  </div>
+</header>
+
+      <div class="main-container">
+        <div class="content-container animate__animated animate__fadeInUp">
+          <div class="post-detail">
+            <h2 class="post-title">从 Linux 内核看读写锁设计</h2>
+            <div class="post-date">2024-01-04&emsp;&emsp;3143 字 &emsp;阅读时间 16 分钟</div>
+            
+            <div class="post-content" v-pre>
+              <p>前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的</p>
+<!-- more -->
+<h2 id="读写自旋锁">读/写自旋锁</h2>
+<p>内核代码中，要定义读/写自旋锁，通过下面的宏进行初始化：</p>
+<pre><code class="language-C">DEFINE_RWLOCK(mr_rwlock);
+</code></pre>
+<p>使用上读锁和写锁是分开加锁的</p>
+<pre><code class="language-C">read_lock(&amp;mr_rwlock);
+// 只读临界区
+read_unlock(&amp;mr_rwlock);
+
+write_lock(&amp;mr_rwlock);
+// 读写临界区
+write_unlock(&amp;mr_rwlock);
+</code></pre>
+<p><strong>不能</strong>像这样将一个读锁升级成写锁，这会导致死锁；并且写锁也是不可重入的：</p>
+<pre><code class="language-C">read_lock(&amp;mr_rwlock);
+write_lock(&amp;mr_rwlock);
+</code></pre>
+<p>读/写自旋锁的汇编级别实现比较类似信号量，都是在寄存器上对值做增减，但为了区分读锁和写锁，读锁是固定减 1，写锁则是固定减去一个很大的 magic number，通过结果值比较就能判断锁持有情况</p>
+<p>代码分别位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwlock.h">include/asm-x86_64/rwlock.h</a> 和 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/spinlock.h">/include/asm-x86_64/spinlock.h</a> 中，这两块涉及的核心代码融合一下大致如下：</p>
+<pre><code class="language-C">#define RW_LOCK_BIAS 0x01000000
+
+// 初始化时设置这个值为 magic number
+#define rwlock_init(x)	do { *(x) = RW_LOCK_UNLOCKED; } while(0)
+
+// 获取读锁
+// 将eax寄存器指向的地址，也就是变量rw的值减1（subl $1）
+// 根据结果是否小于0（js 2f）做跳转，小于0就去调用传入的helper做获取失败的处理
+// 没有写锁的情况下是不会小于0的，不可能有这么多读者能让它减到0，所以不小于0就是获取成功
+#define __build_read_lock_ptr(rw, helper)   \
+	asm volatile(LOCK &quot;subl $1,(%0)\n\t&quot; \ 
+		     &quot;js 2f\n&quot; \ 
+		     &quot;1:\n&quot; \
+		    LOCK_SECTION_START(&quot;&quot;) \
+		     &quot;2:\tcall &quot; helper &quot;\n\t&quot; \
+		     &quot;jmp 1b\n&quot; \
+		    LOCK_SECTION_END \
+		     ::&quot;a&quot; (rw) : &quot;memory&quot;)
+
+// 传入的helper位于arch/i386/kernel/semaphore.c
+// 这里就是一个自旋的逻辑，持续操作rw直到它是大于等于0的，相当于:
+// 
+// lock_failed:
+// rw++;
+// while(rw &lt; 1) {}
+// rw--;
+// if(rw &lt; 0) goto lock_failed;
+// 
+// 这里结尾还要判断一次，是因为前面的操作整体上不是原子或互斥的，所以decl后要再check一下
+asm(
+&quot;.text\n&quot;
+&quot;.align	4\n&quot;
+&quot;.globl	__read_lock_failed\n&quot;
+&quot;__read_lock_failed:\n\t&quot;
+	LOCK &quot;incl	(%eax)\n&quot;
+&quot;1:	rep; nop\n\t&quot;
+	&quot;cmpl	$1,(%eax)\n\t&quot;
+	&quot;js	1b\n\t&quot;
+	LOCK &quot;decl	(%eax)\n\t&quot;
+	&quot;js	__read_lock_failed\n\t&quot;
+	&quot;ret&quot;
+);
+
+// 获取写锁
+// eax寄存器指向的地址值，也就是rw减去magic number
+// 判断结果是否刚好为0（jnz 2f），不是则说明有读锁在占用，跳转到helper调用
+#define __build_write_lock_ptr(rw, helper) \
+	asm volatile(LOCK &quot;subl $&quot; RW_LOCK_BIAS_STR &quot;,(%0)\n\t&quot; \
+		     &quot;jnz 2f\n&quot; \
+		     &quot;1:\n&quot; \
+		     LOCK_SECTION_START(&quot;&quot;) \
+		     &quot;2:\tcall &quot; helper &quot;\n\t&quot; \
+		     &quot;jmp 1b\n&quot; \
+		     LOCK_SECTION_END \
+		     ::&quot;a&quot; (rw) : &quot;memory&quot;)
+
+// 写锁传入的helper同样位于arch/i386/kernel/semaphore.c
+// 逻辑和读锁的基本一样
+asm(
+&quot;.text\n&quot;
+&quot;.align	4\n&quot;
+&quot;.globl	__write_lock_failed\n&quot;
+&quot;__write_lock_failed:\n\t&quot;
+	LOCK &quot;addl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n&quot;
+&quot;1:	rep; nop\n\t&quot;
+	&quot;cmpl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n\t&quot;
+	&quot;jne	1b\n\t&quot;
+	LOCK &quot;subl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n\t&quot;
+	&quot;jnz	__write_lock_failed\n\t&quot;
+	&quot;ret&quot;
+);
+
+// 解锁时就是加上1或magic number
+#define _raw_read_unlock(rw) asm volatile(&quot;lock ; incl %0&quot; :&quot;=m&quot; ((rw)-&gt;lock) : : &quot;memory&quot;)
+#define _raw_write_unlock(rw)	asm volatile(&quot;lock ; addl $&quot; RW_LOCK_BIAS_STR &quot;,%0&quot;:&quot;=m&quot; ((rw)-&gt;lock) : : &quot;memory&quot;)
+</code></pre>
+<p>可以看出，读/写自旋锁是<strong>读优先</strong>的，会导致写饥饿。当有一个或多个读者持有读锁时，写操作无法获取锁，如果此时读锁被长时间占有，写锁将一直自旋等待，此时自旋会导致一个核心上的高昂开销</p>
+<p>这里有一个处理上的细节，在真正开始自旋获取到写锁之前，就已经互斥了（减去 magic number），这时候新的读锁是无法获取的，这避免了写锁和读锁的争抢，能稍微缓解下写饥饿问题，例如这样的情况：</p>
+<pre><code>                            TIME
+─────────────────────────────────────────────────────────►
+ ┌──────────────┐
+ │    reader    │
+ └──────────────┘
+     ┌──────────┬────────────────────┐
+     │   spin   │       writer       │
+     └──────────┴────────────────────┘
+           ┌─────────────────────────┬───────────────┐
+           │           spin          │     reader    │
+           └─────────────────────────┴───────────────┘
+                        ┌────────────┬───────────┐
+                        │    spin    │   reader  │
+                        └────────────┴───────────┘
+</code></pre>
+<h2 id="读写信号量">读/写信号量</h2>
+<p>读/写信号量的使用上和读/写自旋锁是类似的，但功能上要强大一些，分别支持静态和动态的初始化方法</p>
+<pre><code class="language-C">// 静态定义
+static DECLARE_RWSEM(name);
+// 动态定义
+init_rwsem(struct rw_semaphore *sem);
+</code></pre>
+<p>读/写信号量支持 trylock 操作和动态地将写锁降级为读锁</p>
+<pre><code class="language-C">static DECLARE_RWSEM(mr_rwsem);
+
+down_read(&amp;mr_rwsem);
+// 只读临界区
+up_read(&amp;mr_rwsem);
+
+down_write(&amp;mr_rwsem);
+// 读写临界区
+up_write(&amp;mr_rwsem);
+
+down_write(&amp;mr_rwsem);
+// 读写临界区
+downgrade_write(&amp;mr_rwsem); // 写锁降级读锁
+// 只读临界区
+up_read(&amp;mr_rwsem);
+</code></pre>
+<p><a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwsem.h#L99">include/asm-x86_64/rwsem.h</a> 中定义了汇编级别上的实现，和前面读/写自旋锁是类似的，但没有自旋，这里就不细说，内核源码这里也直接附带注释了：</p>
+<pre><code class="language-C">#define RWSEM_UNLOCKED_VALUE		  0x00000000
+#define RWSEM_ACTIVE_BIAS		      0x00000001
+#define RWSEM_ACTIVE_MASK		      0x0000ffff
+#define RWSEM_WAITING_BIAS		    (-0x00010000)
+#define RWSEM_ACTIVE_READ_BIAS		RWSEM_ACTIVE_BIAS
+#define RWSEM_ACTIVE_WRITE_BIAS		(RWSEM_WAITING_BIAS + RWSEM_ACTIVE_BIAS)
+
+/*
+ * lock for reading
+ */
+static inline void __down_read(struct rw_semaphore *sem)
+{
+	__asm__ __volatile__(
+		&quot;# beginning down_read\n\t&quot;
+LOCK_PREFIX	&quot;  incl      (%%rdi)\n\t&quot; /* adds 0x00000001, returns the old value */
+		&quot;  js        2f\n\t&quot; /* jump if we weren't granted the lock */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;) \
+		&quot;2:\n\t&quot;
+		&quot;  call      rwsem_down_read_failed_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END \
+		&quot;# ending down_read\n\t&quot;
+		: &quot;+m&quot;(sem-&gt;count)
+		: &quot;D&quot;(sem)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * lock for writing
+ */
+static inline void __down_write(struct rw_semaphore *sem)
+{
+	int tmp;
+
+	tmp = RWSEM_ACTIVE_WRITE_BIAS;
+	__asm__ __volatile__(
+		&quot;# beginning down_write\n\t&quot;
+LOCK_PREFIX	&quot;  xaddl      %0,(%%rdi)\n\t&quot; /* subtract 0x0000ffff, returns the old value */
+		&quot;  testl     %0,%0\n\t&quot; /* was the count 0 before? */
+		&quot;  jnz       2f\n\t&quot; /* jump if we weren't granted the lock */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  call      rwsem_down_write_failed_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending down_write&quot;
+		: &quot;=&amp;r&quot; (tmp) 
+		: &quot;0&quot;(tmp), &quot;D&quot;(sem)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * unlock after reading
+ */
+static inline void __up_read(struct rw_semaphore *sem)
+{
+	__s32 tmp = -RWSEM_ACTIVE_READ_BIAS;
+	__asm__ __volatile__(
+		&quot;# beginning __up_read\n\t&quot;
+LOCK_PREFIX	&quot;  xaddl      %[tmp],(%%rdi)\n\t&quot; /* subtracts 1, returns the old value */
+		&quot;  js        2f\n\t&quot; /* jump if the lock is being waited upon */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  decw      %w[tmp]\n\t&quot; /* do nothing if still outstanding active readers */
+		&quot;  jnz       1b\n\t&quot;
+		&quot;  call      rwsem_wake_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending __up_read\n&quot;
+		: &quot;+m&quot;(sem-&gt;count), [tmp] &quot;+r&quot; (tmp)
+		: &quot;D&quot;(sem)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * unlock after writing
+ */
+static inline void __up_write(struct rw_semaphore *sem)
+{
+	unsigned tmp; 
+	__asm__ __volatile__(
+		&quot;# beginning __up_write\n\t&quot;
+		&quot;  movl     %[bias],%[tmp]\n\t&quot;
+LOCK_PREFIX	&quot;  xaddl     %[tmp],(%%rdi)\n\t&quot; /* tries to transition 0xffff0001 -&gt; 0x00000000 */
+		&quot;  jnz       2f\n\t&quot; /* jump if the lock is being waited upon */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  decw      %w[tmp]\n\t&quot; /* did the active count reduce to 0? */
+		&quot;  jnz       1b\n\t&quot; /* jump back if not */
+		&quot;  call      rwsem_wake_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending __up_write\n&quot;
+		: &quot;+m&quot;(sem-&gt;count), [tmp] &quot;=r&quot; (tmp)
+		: &quot;D&quot;(sem), [bias] &quot;i&quot;(-RWSEM_ACTIVE_WRITE_BIAS)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+</code></pre>
+<p>信号量是睡眠锁，读锁和写锁在获取锁失败时最后都会进入到 <code>rwsem_down_failed_common</code>（位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/lib/rwsem.c#L123">lib/rwsem.c</a>） 中，这里会将进程加入等待队列中，然后重新调度进程</p>
+<pre><code class="language-C">static inline struct rw_semaphore *rwsem_down_failed_common(struct rw_semaphore *sem,
+								 struct rwsem_waiter *waiter,
+								 signed long adjustment)
+{
+	struct task_struct *tsk = current;
+	signed long count;
+
+	set_task_state(tsk,TASK_UNINTERRUPTIBLE);
+
+	/* set up my own style of waitqueue */
+	spin_lock(&amp;sem-&gt;wait_lock);
+	waiter-&gt;task = tsk;
+
+	list_add_tail(&amp;waiter-&gt;list,&amp;sem-&gt;wait_list);
+
+	/* note that we're now waiting on the lock, but no longer actively read-locking */
+	count = rwsem_atomic_update(adjustment,sem);
+
+	/* if there are no longer active locks, wake the front queued process(es) up
+	 * - it might even be this process, since the waker takes a more active part
+	 */
+	if (!(count &amp; RWSEM_ACTIVE_MASK))
+		sem = __rwsem_do_wake(sem,1);
+
+	spin_unlock(&amp;sem-&gt;wait_lock);
+
+	/* wait to be given the lock */
+	for (;;) {
+		if (!waiter-&gt;flags)
+			break;
+		schedule();
+		set_task_state(tsk, TASK_UNINTERRUPTIBLE);
+	}
+
+	tsk-&gt;state = TASK_RUNNING;
+
+	return sem;
+}
+</code></pre>
+<p>值得一提的是 <code>trylock</code> 和 <code>downgrade_write</code> 操作，这两个操作是读/写自旋锁中没有的</p>
+<p>两个 <code>trylock</code> 是类似的，都是用 <code>cmpxchg</code> 指令来做 CAS（compare-and-swap） 操作。写锁的 <code>trylock</code> 比较简单，因为是互斥的，所以只需要对初始值做 CAS 即可。而读锁可能被持有多个，所以它的 <code>trylock</code> 需要先将 <code>sem-&gt;count</code> 赋值给 <code>tmp</code>，再自增 <code>tmp</code> ，利用 <code>tmp</code> 的值进行 CAS</p>
+<pre><code class="language-C">/*
+ * trylock for reading -- returns 1 if successful, 0 if contention
+ */
+static inline int __down_read_trylock(struct rw_semaphore *sem)
+{
+	__s32 result, tmp;
+	__asm__ __volatile__(
+		&quot;# beginning __down_read_trylock\n\t&quot;
+		&quot;  movl      %0,%1\n\t&quot;
+		&quot;1:\n\t&quot;
+		&quot;  movl	     %1,%2\n\t&quot;
+		&quot;  addl      %3,%2\n\t&quot;
+		&quot;  jle	     2f\n\t&quot;
+LOCK_PREFIX	&quot;  cmpxchgl  %2,%0\n\t&quot;
+		&quot;  jnz	     1b\n\t&quot;
+		&quot;2:\n\t&quot;
+		&quot;# ending __down_read_trylock\n\t&quot;
+		: &quot;+m&quot;(sem-&gt;count), &quot;=&amp;a&quot;(result), &quot;=&amp;r&quot;(tmp)
+		: &quot;i&quot;(RWSEM_ACTIVE_READ_BIAS)
+		: &quot;memory&quot;, &quot;cc&quot;);
+	return result&gt;=0 ? 1 : 0;
+}
+
+/*
+ * trylock for writing -- returns 1 if successful, 0 if contention
+ */
+static inline int __down_write_trylock(struct rw_semaphore *sem)
+{
+	signed long ret = cmpxchg(&amp;sem-&gt;count,
+				  RWSEM_UNLOCKED_VALUE, 
+				  RWSEM_ACTIVE_WRITE_BIAS);
+	if (ret == RWSEM_UNLOCKED_VALUE)
+		return 1;
+	return 0;
+}
+</code></pre>
+<p>downgrade_write 的实现则类似写锁解锁，然后判断是否有必要唤醒等待队列中的项，这里其实和写锁解锁（<code>up_write</code>）的主要差别就是给 <code>sem-&gt;count</code> 加上的偏移量少了 1（可以回去看前面几个 <code>RWSEM_</code> 开头的宏定义），而这个 1 就是读锁占的值</p>
+<pre><code class="language-C">/*
+ * downgrade write lock to read lock
+ */
+static inline void __downgrade_write(struct rw_semaphore *sem)
+{
+	__asm__ __volatile__(
+		&quot;# beginning __downgrade_write\n\t&quot;
+LOCK_PREFIX	&quot;  addl      %[bias],(%%rdi)\n\t&quot; /* transitions 0xZZZZ0001 -&gt; 0xYYYY0001 */
+		&quot;  js        2f\n\t&quot; /* jump if the lock is being waited upon */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  call	     rwsem_downgrade_thunk\n&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending __downgrade_write\n&quot;
+		: &quot;=m&quot;(sem-&gt;count)
+		: &quot;D&quot;(sem), [bias] &quot;i&quot;(-RWSEM_WAITING_BIAS), &quot;m&quot;(sem-&gt;count)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * downgrade a write lock into a read lock
+ * - caller incremented waiting part of count, and discovered it to be still negative
+ * - just wake up any readers at the front of the queue
+ */
+struct rw_semaphore *rwsem_downgrade_wake(struct rw_semaphore *sem)
+{
+	rwsemtrace(sem,&quot;Entering rwsem_downgrade_wake&quot;);
+
+	spin_lock(&amp;sem-&gt;wait_lock);
+
+	/* do nothing if list empty */
+	if (!list_empty(&amp;sem-&gt;wait_list))
+		sem = __rwsem_do_wake(sem,0);
+
+	spin_unlock(&amp;sem-&gt;wait_lock);
+
+	rwsemtrace(sem,&quot;Leaving rwsem_downgrade_wake&quot;);
+	return sem;
+}
+</code></pre>
+<p>总结一下，读/写信号量和读/写自旋锁类似，两者语义上是相同的，也都是读优先的，只不过信号量是睡眠锁，当有长时间获取不到锁的情况时，不会导致过多的 CPU 开销</p>
+<h2 id="顺序锁">顺序锁</h2>
+<p>顺序锁和前面两者有个重要的区别，顺序锁是<strong>写优先</strong>的，让我们来分析下它是如何实现的</p>
+<p>首先还是使用方式上：</p>
+<pre><code class="language-C">// 定义一个顺序锁
+seqlock_t mr_seq_lock = DEFINE_SEQLOCK(mr_seq_lock);
+
+write_seqlock(&amp;mr_seq_lock);
+// 读写临界区
+write_sequnlock(&amp;mr_seq_lock);
+
+// 读锁的使用有较大区别
+unsigned long seq;
+do {
+	seq = read_seqbegin(&amp;mr_seq_lock);
+  // 读取数据...
+} while (read_seqretry(&amp;mr_seq_lock, seq));
+</code></pre>
+<p>一个使用例子是内核的 jiffies，它存储了机器启动到当前的时钟节拍，每次时钟中断时都会更新这个值，所以是一个高频写入的场景，<code>get_jiffies_64()</code> 函数用来获取这个值，它的实现是这样的</p>
+<pre><code class="language-C">u64 get_jiffies_64(void)
+{
+	unsigned long seq;
+	u64 ret;
+
+	do {
+		seq = read_seqbegin(&amp;xtime_lock);
+		ret = jiffies_64;
+	} while (read_seqretry(&amp;xtime_lock, seq));
+	return ret;
+}
+</code></pre>
+<p>顺序锁在读取时需要一个循环，这是为了判断在这个过程中是否有发生写入，如果没有，那么读取就是安全的，否则需要重试</p>
+<p>实现上，代码位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/linux/seqlock.h#L50">/include/linux/seqlock.h</a>，有比较清晰的注释：</p>
+<pre><code class="language-C">#define SEQLOCK_UNLOCKED { 0, SPIN_LOCK_UNLOCKED }
+#define seqlock_init(x)	do { *(x) = (seqlock_t) SEQLOCK_UNLOCKED; } while (0)
+
+/* Lock out other writers and update the count.
+ * Acts like a normal spin_lock/unlock.
+ * Don't need preempt_disable() because that is in the spin_lock already.
+ */
+static inline void write_seqlock(seqlock_t *sl)
+{
+	spin_lock(&amp;sl-&gt;lock);
+	++sl-&gt;sequence;
+	smp_wmb();			
+}	
+
+static inline void write_sequnlock(seqlock_t *sl) 
+{
+	smp_wmb();
+	sl-&gt;sequence++;
+	spin_unlock(&amp;sl-&gt;lock);
+}
+
+static inline int write_tryseqlock(seqlock_t *sl)
+{
+	int ret = spin_trylock(&amp;sl-&gt;lock);
+
+	if (ret) {
+		++sl-&gt;sequence;
+		smp_wmb();			
+	}
+	return ret;
+}
+
+/* Start of read calculation -- fetch last complete writer token */
+static inline unsigned read_seqbegin(const seqlock_t *sl)
+{
+	unsigned ret = sl-&gt;sequence;
+	smp_rmb();
+	return ret;
+}
+
+/* Test if reader processed invalid data.
+ * If initial values is odd, 
+ *	then writer had already started when section was entered
+ * If sequence value changed
+ *	then writer changed data while in section
+ *    
+ * Using xor saves one conditional branch.
+ */
+static inline int read_seqretry(const seqlock_t *sl, unsigned iv)
+{
+	smp_rmb();
+	return (iv &amp; 1) | (sl-&gt;sequence ^ iv);
+}
+</code></pre>
+<p>可以看到，顺序锁是基于一个自旋锁实现的。但额外依赖一个序列计数器，当获取写锁时，这个序列值会增加。读取数据时要先调用 <code>read_seqbegin</code>，它会返回这个序列值，读取完成后通过 <code>read_seqretry</code> 检查传入的值 <code>iv</code>，满足以下两个条件则说明读是安全的：</p>
+<ul>
+<li>如果 <code>iv</code> 是偶数（初始值为 0，写锁会加 1）则说明不是处在一个写操作进行的过程中</li>
+<li><code>iv</code> 和序列值相同（相同值异或结果为 0）说明没有写操作发生过</li>
+</ul>
+<p>这两者都满足，读取的值就是有效的</p>
+<p>所以，顺序锁是一种<strong>乐观锁</strong>，是不存在「读锁」的，而是通过类似版本号的机制来读，因此只要没有其他写者，随时都可以获取到写锁，以此实现写优先</p>
+
+            </div>
+
+            <div class="not-by-ai">
+              <img src="/media/images/not-by-ai-cn.svg"/>
+              <img src="/media/images/not-by-ai-jp.svg"/>
+              <img src="/media/images/not-by-ai-en.svg"/>
+            </div>
+
+            
+              <div class="tag-container">
+                
+                  <a href="https://xxxuuu.me/tag/N8TJ_6EbX/" class="tag">
+                    Linux
+                  </a>
+                
+                  <a href="https://xxxuuu.me/tag/YAELBbV8at/" class="tag">
+                    内核
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xxxuuu.me/post/2023summary/">
+                  <h3 class="post-title">
+                    2023 年度总结
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+            
+              <div id="giscus" class="giscus">
+                <script src="https://giscus.app/client.js" data-repo="xxxuuu/xxxuuu.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnkxODQ3Mjk3Mjg=" data-category="Announcements"  data-category-id="DIC_kwDOCwLAgM4ChgWc" data-mapping="title"  data-strict="0"  data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script>
+              </div>
+            
+          </div>
+
+          
+
+<div class="post-toc animate__animated animate__fadeInUp">
+  <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E8%AF%BB%E5%86%99%E8%87%AA%E6%97%8B%E9%94%81">读/写自旋锁</a></li>
+<li><a href="#%E8%AF%BB%E5%86%99%E4%BF%A1%E5%8F%B7%E9%87%8F">读/写信号量</a></li>
+<li><a href="#%E9%A1%BA%E5%BA%8F%E9%94%81">顺序锁</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+
+<script>
+  let lastTop = 0, linkList = [], headList = [], postBody, lastIndex = -1;
+  let activeClass = 'active-toc';
+  let tocContent;
+
+  function addActiveClass(index) {
+    if (index >= 0 && index < linkList.length) {
+      linkList[index].parentElement.classList.add(activeClass);
+    }
+  }
+
+  function removeActiveClass(index) {
+    if (index >= 0 && index < linkList.length) {
+      linkList[index].parentElement.classList.remove(activeClass);
+    }
+  }
+
+  function getElementTop (el) {
+    let actualTop = el.offsetTop
+    let current = el.offsetParent
+    while (current !== null) {
+      actualTop += current.offsetTop
+      current = current.offsetParent
+    }
+    return actualTop
+  }
+
+  function syncActiveClass() {
+    if (linkList.length <= 0) {
+      return;
+    }
+    let scrollTop = document.scrollingElement.scrollTop;
+    let eps = window.innerHeight;
+
+    let current = 0, closestOffset = 0x3f3f3f3f, hasFind = false;
+    for (let i = 0; i < headList.length; i++) {
+      let offset = Math.abs(getElementTop(headList[i]) - scrollTop);
+      if (offset > eps) {
+        continue;
+      }
+      if (offset < closestOffset) {
+        current = i;
+        closestOffset = offset;
+        hasFind = true;
+      }
+    }
+    if(!hasFind) {
+      return;
+    }
+
+    removeActiveClass(lastIndex)
+    addActiveClass(current);
+    lastIndex = current;
+  }
+
+  document.addEventListener('scroll', syncActiveClass);
+  window.addEventListener('load', function () {
+    tocContent = document.querySelector('.markdownIt-TOC');
+    if (!tocContent) return;
+
+    postBody = document.querySelector('.post-content');
+    for (let i = 0; i < postBody.children.length; i++) {
+      if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+        headList.push(postBody.children[i]);
+      }
+    }
+    linkList = document.querySelectorAll('.post-toc a');
+
+    setTimeout(function () {
+      if ("createEvent" in document) {
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("scroll", false, true);
+        document.dispatchEvent(evt);
+      }
+      else {
+        document.fireEvent("scroll");
+      }
+    }, 500)
+  })
+</script>
+
+        </div>
+      </div>
+
+      <footer class="footer animate__animated animate__flipInX">
+  <div class="site-footer">
+    <p></p>
+    <p>© x³u³ · Powered by <a href="https://gridea.dev/">Gridea</a> & <a href="https://github.com/xxxuuu/gridea-theme-autumn">Autumn</a> | <a class="rss" href="https://xxxuuu.me/atom.xml" target="_blank">RSS</a></p>
+  </div>
+</footer>
+
+
+    </div>
+
+    <script type="application/javascript">
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js"></script>
+  <script>
+    window.onload = () => {
+        hljs.highlightAll()
+    }
+  </script>
+
+
+<script>
+  const images = document.querySelectorAll('.post-content img');
+
+  for (let i = 0; i < images.length; i++) {
+    const img = images[i];
+
+    const link = document.createElement('a');
+    link.href = img.src;
+    link.setAttribute("data-fancybox", "gallery");
+
+    img.parentNode.insertBefore(link, img);
+    link.appendChild(img);
+  }
+</script>
+
+
+
+
+  </body>
+</html>

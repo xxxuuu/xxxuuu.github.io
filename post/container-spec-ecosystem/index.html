@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>容器标准和生态 | x³u³</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<link rel="shortcut icon" href="https://xxxuuu.me/favicon.ico?v=1723216798723">
+<link rel="stylesheet" href="https://xxxuuu.me/styles/main.css">
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+<style>
+:root {
+  --animate-duration: 800ms;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.9/dist/vue.min.js"></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T8WGT1LJ6G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-T8WGT1LJ6G');
+</script>
+
+
+    <meta name="description" content="OCI（Open Container Initiative）
+OCI（Open Container Initiative，开放容器提议），是围绕容器镜像格式和运行时设立的标准，在 2015 年 6 月推出。基于 Docker 捐赠的 run..." />
+    <meta name="keywords" content="Cloud Native" />
+    
+      <link href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <header class="header">
+  <div class="banner animate__animated animate__fadeIn">
+    <div class="top-container">
+      <div class="site-title-container">
+        <img src="https://xxxuuu.me/images/avatar.png?v=1723216798723" class="site-logo">
+        <div class="site-text">
+          <h1 class="site-title">
+            x³u³
+          </h1>
+          <div class="site-description-social">
+            <div class="site-description">
+              🗒 碎碎念
+            </div>
+            <div class="site-social">
+              
+                
+                  <a class="social-link" href="https://github.com/xxxuuu" target="_blank">
+                    <i class="fa fa-github"></i>
+                  </a>
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="links">
+      
+        
+            <a href="/" class="site-nav">
+              🏠 首页
+            </a>
+          
+        
+        
+            <a href="/archives" class="site-nav">
+              📃 归档
+            </a>
+          
+        
+        
+            <a href="/tags" class="site-nav">
+              🏷 标签
+            </a>
+          
+        
+        
+            <a href="/post/about" class="site-nav">
+              👤 关于
+            </a>
+          
+        
+        
+            <a href="/post/friend-links/" class="site-nav">
+              👬 友链
+            </a>
+          
+        
+    </div>
+  </div>
+</header>
+
+      <div class="main-container">
+        <div class="content-container animate__animated animate__fadeInUp">
+          <div class="post-detail">
+            <h2 class="post-title">容器标准和生态</h2>
+            <div class="post-date">2023-07-12&emsp;&emsp;4275 字 &emsp;阅读时间 21 分钟</div>
+            
+            <div class="post-content" v-pre>
+              <h2 id="ociopen-container-initiative">OCI（Open Container Initiative）</h2>
+<p><a href="https://opencontainers.org/about/overview/">OCI（Open Container Initiative，开放容器提议）</a>，是围绕容器镜像格式和运行时设立的标准，在 2015 年 6 月推出。基于 Docker 捐赠的 <a href="https://github.com/opencontainers/runc">runC</a> 实现之上发展而来</p>
+<p>其中，镜像标准（<a href="https://github.com/opencontainers/image-spec">image-spec</a>）规定了镜像如何组织文件层，镜像配置文件格式</p>
+<p>运行时标准（<a href="https://github.com/opencontainers/runtime-spec">runtime-spec</a>）规定了容器的生命周期和需要支持的操作、配置项等</p>
+<p>2022 年 5 月新增加了分发标准（<a href="https://github.com/opencontainers/distribution-spec">distribution-spec</a>），规定了镜像分发的 API 协议，包括认证方式、Push、Pull、内容发现、管理等</p>
+<h3 id="镜像组成">镜像组成</h3>
+<p>OCI 标准中，镜像由 index，config 和各个 layer 组成<br>
+<img src="https://github.com/opencontainers/image-spec/raw/main/img/build-diagram.png" alt="img-spec" width=800></p>
+<p>拉取一个 nginx 镜像并解压，可以看到其目录格式</p>
+<pre><code class="language-bash">$ docker pull nginx
+$ docker image save nginx -o nginx.tar
+$ mkdir nginx-image
+$ tar -C nginx-image -xvf nginx.tar
+$ tree nginx-image/
+nginx-image/
+├── 180ddd9cc15d32f0c1d5f85cf442ef1179f21ae197b60bf086b0e8c7ef153737
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 2002d33a54f72d1333751d4d1b4793a60a635eac6e94a98daf0acea501580c4f.json
+├── 3cba2048aa0f37f06b8b1a3949e6b67da78d9f49fb6d5f34fefa328a304dfe8e
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 570d178d9aab5e7b03bdf17302b91cece28924d72f204567dd6c2fcb1667e883
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 5839a53cafa501af1381d6f0db2084e32bb64d0a1461a278f587cc0ea4fc62e2
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 664733ad6a589f5aa51e830e2a10c0768b854f28cc278316938c00ce1c4c60e2
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 907ca8c9f37f4bb34cef8feea392fff0d811b7d1fff826dc84c8330c0b158227
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── ae5db48f55baf22a5d27ab7965647d55c3f6aba87733e5f0ae57188d956a8a7b
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── manifest.json
+└── repositories
+
+8 directories, 24 files
+</code></pre>
+<p>Docker 镜像并不符合 OCI 镜像标准，但 OCI 的镜像标准基于 Docker 镜像标准，因此两者在结构上是类似的，有一定对应关系</p>
+<p>使用 <a href="https://github.com/containers/skopeo">skopeo</a> 可以将 Docker 镜像转化为 OCI 镜像</p>
+<pre><code class="language-bash">$ skopeo copy docker-archive:nginx.tar oci:nginx-oci-image
+$ tree nginx-oci-image
+nginx-oci-image
+├── blobs
+│   └── sha256
+│       ├── 365ede46b010c470bbbd13f6bacc0df1700116f4c3a01f25a0fab726b7860e31
+│       ├── 50c4949e5433b622681d55d92f68bc289ed0b91536d07b0ed88d057fd95ba2bd
+│       ├── 55bc6f293903816a086b9803b0fac7d6e854976aa96cfaacd66b39b4754415d0
+│       ├── 7a33d678a8761d2b10b60fe4da32e70e201d65550d2601f9b2e3e5fb4cc6e115
+│       ├── 861c679dd19193ec028cddb97f5b1e18738ec0525617ff698df4a055606af93d
+│       ├── af84cea3992c73a86ca5b3fcb8043f0964308be3db3dbc93222c589b15e90ba7
+│       ├── ba28188e316f3a7d8b65f6496a57cb9ce5f59b636ed0b0fae8bf564723321448
+│       ├── c26fc88390de90988b10de0590c08942dd7b1346c9ec912e9a0c763bc6de1e9e
+│       └── f0baa6626451c47bb1cb7f72d5cb0e732283a231fa4cb001a36b55e5fc31640f
+├── index.json
+└── oci-layout
+
+3 directories, 11 files
+</code></pre>
+<p>index.json 是 <a href="https://github.com/opencontainers/image-spec/blob/main/image-index.md">image index</a>，用于索引 manifest 文件，跨平台和架构的镜像可能对每一个平台都有一个 manifest 文件</p>
+<pre><code class="language-bash">$ cat nginx-oci-image/index.json | json_pp
+{
+   &quot;manifests&quot; : [
+      {
+         &quot;digest&quot; : &quot;sha256:c26fc88390de90988b10de0590c08942dd7b1346c9ec912e9a0c763bc6de1e9e&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+         &quot;size&quot; : 1338
+      }
+   ],
+   &quot;schemaVersion&quot; : 2
+}
+</code></pre>
+<p><code>manifests.digest</code> 中就是 manifest 文件摘要值，同时也是文件名，由此可以很快找到 manifest 文件。<a href="https://github.com/opencontainers/image-spec/blob/master/manifest.md">image manifest</a> 索引了镜像的配置和 layer 层文件位置及其类型。可以看出，配置是一个 JSON 文件，而每一层是进行压缩后存储的。</p>
+<pre><code class="language-bash">$ cat nginx-oci-image/blobs/sha256/c26fc88390de90988b10de0590c08942dd7b1346c9ec912e9a0c763bc6de1e9e | json_pp
+{
+   &quot;config&quot; : {
+      &quot;digest&quot; : &quot;sha256:50c4949e5433b622681d55d92f68bc289ed0b91536d07b0ed88d057fd95ba2bd&quot;,
+      &quot;mediaType&quot; : &quot;application/vnd.oci.image.config.v1+json&quot;,
+      &quot;size&quot; : 7075
+   },
+   &quot;layers&quot; : [
+      {
+         &quot;digest&quot; : &quot;sha256:861c679dd19193ec028cddb97f5b1e18738ec0525617ff698df4a055606af93d&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 29922714
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:f0baa6626451c47bb1cb7f72d5cb0e732283a231fa4cb001a36b55e5fc31640f&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 39120911
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:ba28188e316f3a7d8b65f6496a57cb9ce5f59b636ed0b0fae8bf564723321448&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 630
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:7a33d678a8761d2b10b60fe4da32e70e201d65550d2601f9b2e3e5fb4cc6e115&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 975
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:af84cea3992c73a86ca5b3fcb8043f0964308be3db3dbc93222c589b15e90ba7&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 376
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:365ede46b010c470bbbd13f6bacc0df1700116f4c3a01f25a0fab726b7860e31&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 1234
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:55bc6f293903816a086b9803b0fac7d6e854976aa96cfaacd66b39b4754415d0&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 1439
+      }
+   ],
+   &quot;mediaType&quot; : &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+   &quot;schemaVersion&quot; : 2
+}
+</code></pre>
+<p><a href="https://github.com/opencontainers/image-spec/blob/main/config.md">image configuration</a> 描述了镜像所属的平台，配置（类似在 Dockerfile 中定义的环境变量、端口、ENTRYPOINT、CMD 等），以及各个层的历史记录，<code>created_by</code> 是创建层的命令，<code>empty_layer</code> 表示该层是否导致文件系统变化。最后是各个层未压缩内容的摘要（<code>diff_ids</code>）</p>
+<pre><code class="language-bash">$ cat nginx-oci-image/blobs/sha256/50c4949e5433b622681d55d92f68bc289ed0b91536d07b0ed88d057fd95ba2bd | json_pp
+{
+   &quot;architecture&quot; : &quot;arm64&quot;,
+   &quot;config&quot; : {
+      &quot;Cmd&quot; : [
+         &quot;nginx&quot;,
+         &quot;-g&quot;,
+         &quot;daemon off;&quot;
+      ],
+      &quot;Entrypoint&quot; : [
+         &quot;/docker-entrypoint.sh&quot;
+      ],
+      &quot;Env&quot; : [
+         &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+         &quot;NGINX_VERSION=1.25.1&quot;,
+         &quot;NJS_VERSION=0.7.12&quot;,
+         &quot;PKG_RELEASE=1~bookworm&quot;
+      ],
+      &quot;ExposedPorts&quot; : {
+         &quot;80/tcp&quot; : {}
+      },
+      &quot;Labels&quot; : {
+         &quot;maintainer&quot; : &quot;NGINX Docker Maintainers &lt;docker-maint@nginx.com&gt;&quot;
+      },
+      &quot;StopSignal&quot; : &quot;SIGQUIT&quot;
+   },
+   &quot;created&quot; : &quot;2023-07-04T04:07:41.151938228Z&quot;,
+   &quot;history&quot; : [
+      {
+         &quot;created&quot; : &quot;2023-07-04T01:57:35.692631089Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) ADD file:71fd66666294148382f2e6a09ae5e277d4c4e9c74402ab64b693a79387b67a09 in / &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T01:57:36.102524763Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  CMD [\&quot;bash\&quot;]&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:14.692138315Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  LABEL maintainer=NGINX Docker Maintainers &lt;docker-maint@nginx.com&gt;&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:14.774865505Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  ENV NGINX_VERSION=1.25.1&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:14.852567081Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  ENV NJS_VERSION=0.7.12&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:14.931774163Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  ENV PKG_RELEASE=1~bookworm&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.172513807Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c set -x     &amp;&amp; groupadd --system --gid 101 nginx     &amp;&amp; useradd --system --gid nginx --no-create-home --home /nonexistent --comment \&quot;nginx user\&quot; --shell /bin/false --uid 101 nginx     &amp;&amp; apt-get update     &amp;&amp; apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates     &amp;&amp;     NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62;     NGINX_GPGKEY_PATH=/usr/share/keyrings/nginx-archive-keyring.gpg;     export GNUPGHOME=\&quot;$(mktemp -d)\&quot;;     found='';     for server in         hkp://keyserver.ubuntu.com:80         pgp.mit.edu     ; do         echo \&quot;Fetching GPG key $NGINX_GPGKEY from $server\&quot;;         gpg1 --keyserver \&quot;$server\&quot; --keyserver-options timeout=10 --recv-keys \&quot;$NGINX_GPGKEY\&quot; &amp;&amp; found=yes &amp;&amp; break;     done;     test -z \&quot;$found\&quot; &amp;&amp; echo &gt;&amp;2 \&quot;error: failed to fetch GPG key $NGINX_GPGKEY\&quot; &amp;&amp; exit 1;     gpg1 --export \&quot;$NGINX_GPGKEY\&quot; &gt; \&quot;$NGINX_GPGKEY_PATH\&quot; ;     rm -rf \&quot;$GNUPGHOME\&quot;;     apt-get remove --purge --auto-remove -y gnupg1 &amp;&amp; rm -rf /var/lib/apt/lists/*     &amp;&amp; dpkgArch=\&quot;$(dpkg --print-architecture)\&quot;     &amp;&amp; nginxPackages=\&quot;         nginx=${NGINX_VERSION}-${PKG_RELEASE}         nginx-module-xslt=${NGINX_VERSION}-${PKG_RELEASE}         nginx-module-geoip=${NGINX_VERSION}-${PKG_RELEASE}         nginx-module-image-filter=${NGINX_VERSION}-${PKG_RELEASE}         nginx-module-njs=${NGINX_VERSION}+${NJS_VERSION}-${PKG_RELEASE}     \&quot;     &amp;&amp; case \&quot;$dpkgArch\&quot; in         amd64|arm64)             echo \&quot;deb [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bookworm nginx\&quot; &gt;&gt; /etc/apt/sources.list.d/nginx.list             &amp;&amp; apt-get update             ;;         *)             echo \&quot;deb-src [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bookworm nginx\&quot; &gt;&gt; /etc/apt/sources.list.d/nginx.list                         &amp;&amp; tempDir=\&quot;$(mktemp -d)\&quot;             &amp;&amp; chmod 777 \&quot;$tempDir\&quot;                         &amp;&amp; savedAptMark=\&quot;$(apt-mark showmanual)\&quot;                         &amp;&amp; apt-get update             &amp;&amp; apt-get build-dep -y $nginxPackages             &amp;&amp; (                 cd \&quot;$tempDir\&quot;                 &amp;&amp; DEB_BUILD_OPTIONS=\&quot;nocheck parallel=$(nproc)\&quot;                     apt-get source --compile $nginxPackages             )                         &amp;&amp; apt-mark showmanual | xargs apt-mark auto &gt; /dev/null             &amp;&amp; { [ -z \&quot;$savedAptMark\&quot; ] || apt-mark manual $savedAptMark; }                         &amp;&amp; ls -lAFh \&quot;$tempDir\&quot;             &amp;&amp; ( cd \&quot;$tempDir\&quot; &amp;&amp; dpkg-scanpackages . &gt; Packages )             &amp;&amp; grep '^Package: ' \&quot;$tempDir/Packages\&quot;             &amp;&amp; echo \&quot;deb [ trusted=yes ] file://$tempDir ./\&quot; &gt; /etc/apt/sources.list.d/temp.list             &amp;&amp; apt-get -o Acquire::GzipIndexes=false update             ;;     esac         &amp;&amp; apt-get install --no-install-recommends --no-install-suggests -y                         $nginxPackages                         gettext-base                         curl     &amp;&amp; apt-get remove --purge --auto-remove -y &amp;&amp; rm -rf /var/lib/apt/lists/* /etc/apt/sources.list.d/nginx.list         &amp;&amp; if [ -n \&quot;$tempDir\&quot; ]; then         apt-get purge -y --auto-remove         &amp;&amp; rm -rf \&quot;$tempDir\&quot; /etc/apt/sources.list.d/temp.list;     fi     &amp;&amp; ln -sf /dev/stdout /var/log/nginx/access.log     &amp;&amp; ln -sf /dev/stderr /var/log/nginx/error.log     &amp;&amp; mkdir /docker-entrypoint.d&quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.509711194Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:7b307b62e82255f040c9812421a30090bf9abf3685f27b02d77fcca99f997911 in / &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.592126807Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:5c18272734349488bd0c94ec8d382c872c1a0a435cca13bd4671353d6021d2cb in /docker-entrypoint.d &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.669169781Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:d4375883ed5db364232ccf781e8ad28514cd005edb385d43dbfb984f2c63edb9 in /docker-entrypoint.d &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.748027972Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:36429cfeeb299f9913b84ea136b004be12fbe4bb4f975a977a3608044e8bfa91 in /docker-entrypoint.d &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.825522699Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:e57eef017a414ca793499729d80a7b9075790c9a804f930f1417e56d506970cf in /docker-entrypoint.d &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.903102418Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  ENTRYPOINT [\&quot;/docker-entrypoint.sh\&quot;]&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.983008834Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  EXPOSE 80&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:41.065899155Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  STOPSIGNAL SIGQUIT&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:41.151938228Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  CMD [\&quot;nginx\&quot; \&quot;-g\&quot; \&quot;daemon off;\&quot;]&quot;,
+         &quot;empty_layer&quot; : true
+      }
+   ],
+   &quot;os&quot; : &quot;linux&quot;,
+   &quot;rootfs&quot; : {
+      &quot;diff_ids&quot; : [
+         &quot;sha256:efd1965f1684506744544d66c57387a60bd89607480e2dbc89bf3e8a30081bc1&quot;,
+         &quot;sha256:c58d5a26ffa8db76c403fb4c29965689bb96d291f6b7973fcd2da7458e77b09f&quot;,
+         &quot;sha256:4e6bef96e37ee051573dda6c367adb7310ef7a87128ce00fcf0ce2cbd2d8779b&quot;,
+         &quot;sha256:ad6517b0c9140f029ee765885ec82f571513bc8db2f834aa1d204f67d61cad12&quot;,
+         &quot;sha256:7cd1e5cbf1244b4fcca08e842c7672aba5ead973c2a4532496278aa5846802a3&quot;,
+         &quot;sha256:45437bbd87f23643f7893993d62b4affddbdf91808ff8cd0530b301acbc5f120&quot;,
+         &quot;sha256:0a13d2aaa54c14621a732a3ffe6f25a487aa726529ad152c4174d2e741b7ef66&quot;
+      ],
+      &quot;type&quot; : &quot;layers&quot;
+   },
+   &quot;variant&quot; : &quot;v8&quot;
+}
+</code></pre>
+<p>如果对层进行解压，就可以得到里面文件系统的内容</p>
+<pre><code class="language-bash">$ mkdir rootfs
+$ tar -zxvf nginx-oci-image/blobs/sha256/861c679dd19193ec028cddb97f5b1e18738ec0525617ff698df4a055606af93d -C rootfs/
+$ tree rootfs -L 1
+rootfs
+├── bin -&gt; usr/bin
+├── boot
+├── dev
+├── etc
+├── home
+├── lib -&gt; usr/lib
+├── media
+├── mnt
+├── opt
+├── proc
+├── root
+├── run
+├── sbin -&gt; usr/sbin
+├── srv
+├── sys
+├── tmp
+├── usr
+└── var
+
+19 directories, 0 files
+</code></pre>
+<h3 id="运行时">运行时</h3>
+<p>runC 是纯粹的 runtime，OCI 的 runtime-spec 基于 runC 制定</p>
+<p>要启动 runC（或其它符合 OCI runtime-spec 的运行时），需要一个 rootfs 和 <code>config.json</code>，rootfs 就是容器运行的文件系统，<code>config.json</code> 则定义了运行的配置</p>
+<p>rootfs 可以从镜像 layer 中一层层解包合并得到。<code>config.json</code> 的一个可能示例如下：</p>
+<pre><code class="language-json">{
+  &quot;ociVersion&quot;: &quot;0.1.0&quot;,
+  &quot;root&quot;: {
+    &quot;path&quot;: &quot;rootfs&quot;,
+    &quot;readonly&quot;: true
+  },
+  &quot;mounts&quot;: [
+    {
+      &quot;destination&quot;: &quot;/data&quot;,
+      &quot;type&quot;: &quot;none&quot;,
+      &quot;source&quot;: &quot;/volumes/testing&quot;,
+      &quot;options&quot;: [&quot;rbind&quot;,&quot;rw&quot;]
+    }
+  ],
+  &quot;process&quot;: {
+    &quot;env&quot;: [
+      &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+      &quot;TERM=xterm&quot;
+    ],
+    &quot;args&quot;: [&quot;sh&quot;]
+  }
+}
+</code></pre>
+<p>通过 <code>runc run</code> 即可启动容器，会自动读取路径下的 <code>config.json</code>。其中 <code>root.path</code> 指定了 rootfs 的路径</p>
+<p><code>config.json</code> 的配置和平常使用的 Docker 等基本都能大致对上，但 runC 是不包括网络实现的，通过 <code>runc exec</code> 进入容器内就可以发现只有一张 loop 网卡</p>
+<p>这些部分是留给更高级的容器运行时去完成，例如可以在标准中生命周期的 <code>createContainer</code> 和 <code>start</code> 之间进行网卡创建，存储挂载等操作</p>
+<p>runtime 这块还有一些有意思的实现，比如 <a href="https://katacontainers.io/">Kata</a> 和 <a href="https://gvisor.dev/">gVisor</a> 之类的内核容器，前者给容器跑了一个完整的 VMM（QEMU/KVM 等）来做内核隔离，后者给每个容器塞了一个 Go 写的模拟内核，重定向所有 syscall 过去，代替宿主机内核</p>
+<h3 id="一些历史">一些历史</h3>
+<p>在早期，Docker 拥有容器领域的绝对领导权，但作为一个商业公司，这实际上引发了其它公司（Red Hat、Google 等）的不满和担忧</p>
+<p>Google 也尝试过开源自身的容器方案，但未能成功。因此 Google 向 Docker 提议共同推动一个中立的容器运行时作为 Docker 项目的核心依赖，但没有得到 Docker 的同意</p>
+<p>在 2015 年，Docker 公司的强势长期饱受社区诟病，为了表示诚意，Docker 和 Google、Red Hat、CoreOS 决定成立一个「中立」的基金会，共同制定一套容器的标准和规范，这套标准就是 OCI。Docker 也将自身的 libcontainer 捐出，改名为 runC，作为 OCI 标准制定的基础</p>
+<p>Docker 作为当时容器的事实标准，本身并无多大动力去推进 OCI 的发展，OCI 也未能削弱 Docker 的地位。Google 和 Red Hat 利用自己在大规模集群和平台上的经验，又成立了 CNCF（Cloud Native Computing Foundation），以 Google 内部的 Borg 孵化出的 Kubernetes 项目为基础，从平台侧架空 Docker，从现在来看，这个战略非常成功，Docker Swarm 面对 Kubernetes 无疑是失败的，Swarm 项目被取消，Docker 企业版直接内置 Kubernetes，放弃开源社区竞争，进行商业化转型。现在，CNCF 涉及越来越多的领域，成为了云原生新的绝对权威</p>
+<h2 id="高级容器运行时">高级容器运行时</h2>
+<p>runC 只实现了 OCI 的 runtime-spec（这句话有点别扭，是先有的 runC，才有的 OCI），也就是说，它是无法处理镜像的，只负责运行进程和隔离。这是一种低级容器运行时，而且 OCI 也只专注核心的容器功能，网络、存储标准都没有进行定义（目前比较流行的网络和存储标准分别是 <a href="https://github.com/containernetworking/cni">CNI</a> 和 <a href="https://github.com/container-storage-interface/spec/blob/master/spec.md">CSI</a>）</p>
+<p>更多时候，我们指的容器运行时是高级容器运行时，高级容器运行时最基本的功能就是能够将镜像处理成 rootfs 来传递给 runC 等低级运行时，这个过程中还要处理镜像的 layer 共享等很多问题。通常也会包括监控、日志、管理、API 等更多功能</p>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/cncf-container-runtime.png" alt="container-runtime" width=800>
+<h3 id="containerd">containerd</h3>
+<p>一个典型的高级容器运行时就是 containerd（最典型的应该是 Docker，但大家都太熟悉了就懒得说了），containerd 从 Docker 项目中独立出来</p>
+<img src="https://containerd.io/img/architecture.png" alt="containerd-arch" width=800>
+<p><em>⬆️ Docker 是一个大而全的容器运行时，以至于在这里甚至将它划分为了一个平台</em></p>
+<p>containerd 的实现高度模块化，各个模块之间使用 ttrpc（gRPC 的改良）通信，并且支持通过插件来扩展。containerd 中默认使用 runC 作为低级容器运行时，也支持根据平台和需求替换成 runhcs、Kata 等</p>
+<p>containerd 没有打包网络和存储的实现，像网络就是使用 CNI 来让外部提供具体实现</p>
+<p>containerd 的设计目标是成为更高级系统中的一个组件来被调用，而非直接提供给用户使用，Docker 目前就是通过 containerd 来管理容器</p>
+<h3 id="cri-o">CRI-O</h3>
+<p>CRI-O 的目的是构建一个最简单的 K8s 专用运行时，是一个最小化的实现，不需要面向最终用户的那些复杂功能</p>
+<img src="https://cri-o.io/assets/images/architecture.png" alt="cri-o-arch" width=800>
+<p>当一个 kubelet 的创建请求来临时：</p>
+<ol>
+<li>CRI-O 会拉取镜像（如果不存在）</li>
+<li>将镜像解压，构建 rootfs 和 OCI runtime-spec 的 <code>config.json</code></li>
+<li>调用低层的 OCI runtime（runC 等）</li>
+<li>每个容器由一个 conmon 进程进行监控，它会为 PID 为 1 的进程提供一个 <code>pty</code>，同时处理日志和记录退出代码</li>
+<li>通过 CNI 调用网络插件配置网络</li>
+</ol>
+<h3 id="podman">Podman</h3>
+<p>containerd 和 CRI-O 都不是直接面向用户的，面向用户的容器运行时最典型的就是 Docker，而 Podman 也是一个 Docker 的竞品，由 Red Hat 推出</p>
+<p>Podman 兼容大部分的 Docker 命令，甚至可以直接 <code>alias podman=docker</code> 来无缝替换。</p>
+<p>Podman 的特色在于对 rootless container 的良好支持，这能带来更好的安全性；另外我个人比较喜欢的一个功能是 Pod 模式，能直接从一个 K8s 的 Pod YAML 中来运行容器</p>
+<h2 id="cricontainer-runtime-interface">CRI（Container Runtime Interface）</h2>
+<p><a href="https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/container-runtime-interface.md">CRI（Container Runtime Interface）</a> 是 K8s 的一套容器接口协议，用于 kubelet 和容器运行时之间的通信，避免直接依赖具体实现</p>
+<p>OCI runtime-spec 是面向低级容器运行时的标准，而 CRI 是面向高级容器运行时的协议，还包括了一些 Pod 映射到容器所需的相关接口，其基于 gRPC，接口定义如下</p>
+<pre><code>service RuntimeService {
+    rpc Version(VersionRequest) returns (VersionResponse) {}
+    rpc RunPodSandbox(RunPodSandboxRequest) returns (RunPodSandboxResponse) {}
+    rpc StopPodSandbox(StopPodSandboxRequest) returns (StopPodSandboxResponse) {}
+    rpc RemovePodSandbox(RemovePodSandboxRequest) returns (RemovePodSandboxResponse) {}
+    rpc PodSandboxStatus(PodSandboxStatusRequest) returns (PodSandboxStatusResponse) {}
+    rpc ListPodSandbox(ListPodSandboxRequest) returns (ListPodSandboxResponse) {}
+    rpc CreateContainer(CreateContainerRequest) returns (CreateContainerResponse) {}
+    rpc StartContainer(StartContainerRequest) returns (StartContainerResponse) {}
+    rpc StopContainer(StopContainerRequest) returns (StopContainerResponse) {}
+    rpc RemoveContainer(RemoveContainerRequest) returns (RemoveContainerResponse) {}
+    rpc ListContainers(ListContainersRequest) returns (ListContainersResponse) {}
+    rpc ContainerStatus(ContainerStatusRequest) returns (ContainerStatusResponse) {}
+    rpc UpdateContainerResources(UpdateContainerResourcesRequest) returns (UpdateContainerResourcesResponse) {}
+    rpc ReopenContainerLog(ReopenContainerLogRequest) returns (ReopenContainerLogResponse) {}
+    rpc ExecSync(ExecSyncRequest) returns (ExecSyncResponse) {}
+    rpc Exec(ExecRequest) returns (ExecResponse) {}
+    rpc Attach(AttachRequest) returns (AttachResponse) {}
+    rpc PortForward(PortForwardRequest) returns (PortForwardResponse) {}
+    rpc ContainerStats(ContainerStatsRequest) returns (ContainerStatsResponse) {}
+    rpc ListContainerStats(ListContainerStatsRequest) returns (ListContainerStatsResponse) {}
+    rpc PodSandboxStats(PodSandboxStatsRequest) returns (PodSandboxStatsResponse) {}
+    rpc ListPodSandboxStats(ListPodSandboxStatsRequest) returns (ListPodSandboxStatsResponse) {}
+    rpc UpdateRuntimeConfig(UpdateRuntimeConfigRequest) returns (UpdateRuntimeConfigResponse) {}
+    rpc Status(StatusRequest) returns (StatusResponse) {}
+    rpc CheckpointContainer(CheckpointContainerRequest) returns (CheckpointContainerResponse) {}
+    rpc GetContainerEvents(GetEventsRequest) returns (stream ContainerEventResponse) {}
+    rpc ListMetricDescriptors(ListMetricDescriptorsRequest) returns (ListMetricDescriptorsResponse) {}
+    rpc ListPodSandboxMetrics(ListPodSandboxMetricsRequest) returns (ListPodSandboxMetricsResponse) {}
+}
+
+service ImageService {
+    rpc ListImages(ListImagesRequest) returns (ListImagesResponse) {}
+    rpc ImageStatus(ImageStatusRequest) returns (ImageStatusResponse) {}
+    rpc PullImage(PullImageRequest) returns (PullImageResponse) {}
+    rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse) {}
+    rpc ImageFsInfo(ImageFsInfoRequest) returns (ImageFsInfoResponse) {}
+}
+</code></pre>
+<p>早期（1.6 版本之前）K8s 是直接调用 Docker API 的，但随着容器生态的发展，各个容器运行时都希望能在 K8s 这掺一脚，这为 kubelet 的维护带来了很大的负担。因此就有了 CRI。在过渡期时为了保持兼容，K8s 内置了 dockershim 作为 CRI 请求到 Docker API 的适配器，后来 K8s 的所谓「弃用 Docker」指的 containerd 成熟后不再单独为 Docker 维护一套接口适配器（dockershim），而是直接采用 CRI 接口，各个 shim（接口适配器）需要由用户自己安装，脱离出 K8s 的代码，于是就有了该说法</p>
+<h2 id="wasm">WASM</h2>
+<p>之前就有看到类似「WASM+WASI 替代 Docker」的说法，一直不是很能理解，WASM 在我的认知中应该是一个虚拟机，WASI 是 WASM 的系统接口，为了让 WASM 运行在非浏览器的 native 环境中（像 Node 一样）。因此 WASM+WASI 的对比对象应该是类似 JVM 一样的东西，为什么与容器扯上了关系？</p>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/wasm1.png" alt="wasm-arch" width=800>
+<p>参考这篇文章和 Docker 的官方文档</p>
+<ol>
+<li>https://wasmlabs.dev/articles/docker-without-containers/</li>
+<li>https://www.docker.com/blog/docker-wasm-technical-preview/</li>
+</ol>
+<p>简单来说，WasmEdge 提供了一个符合 OCI runtime-spec 的 WASI 运行时，因此可以使用 WasmEdge 替代 Docker 中的容器运行时。同时镜像不需要包含操作系统或任何基础镜像，单个 <code>.wasm</code> 二进制文件就可以直接执行</p>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/wasm2.png" alt="wasm-arch-2" width=800>
+<p>为什么 WASM+WASI 的方式被推崇：</p>
+<ol>
+<li>开放，业界广泛采用的标准，开源社区生态加成</li>
+<li>快速，没有 VM 或容器的冷启动</li>
+<li>安全，沙盒运行</li>
+<li>可移植，支持大多数 CPU 和操作系统</li>
+<li>高效，最小内存和 CPU 占用</li>
+</ol>
+<p>但目前来讲生态还不够完善，主要在于很多语言对编译为 <code>.wasm</code> 有诸多限制，大量常用的依赖库不进行修改的话都无法编译。同时作为容器 runtime 的话没有 Linux 内核，也导致很多 specific 的功能无法实现。明显优势基本只有镜像非常轻量了，大小在几百 K 到几 M，适合的场景还是像 WasmEdge 本身的名字一样，做些应用层的 Edge Computing 吧</p>
+
+            </div>
+
+            <div class="not-by-ai">
+              <img src="/media/images/not-by-ai-cn.svg"/>
+              <img src="/media/images/not-by-ai-jp.svg"/>
+              <img src="/media/images/not-by-ai-en.svg"/>
+            </div>
+
+            
+              <div class="tag-container">
+                
+                  <a href="https://xxxuuu.me/tag/7-RPfhUxG/" class="tag">
+                    Cloud Native
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xxxuuu.me/post/vim-as-an-ide/">
+                  <h3 class="post-title">
+                    Vim as an IDE
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+            
+              <div id="giscus" class="giscus">
+                <script src="https://giscus.app/client.js" data-repo="xxxuuu/xxxuuu.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnkxODQ3Mjk3Mjg=" data-category="Announcements"  data-category-id="DIC_kwDOCwLAgM4ChgWc" data-mapping="title"  data-strict="0"  data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script>
+              </div>
+            
+          </div>
+
+          
+
+<div class="post-toc animate__animated animate__fadeInUp">
+  <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#ociopen-container-initiative">OCI（Open Container Initiative）</a>
+<ul>
+<li><a href="#%E9%95%9C%E5%83%8F%E7%BB%84%E6%88%90">镜像组成</a></li>
+<li><a href="#%E8%BF%90%E8%A1%8C%E6%97%B6">运行时</a></li>
+<li><a href="#%E4%B8%80%E4%BA%9B%E5%8E%86%E5%8F%B2">一些历史</a></li>
+</ul>
+</li>
+<li><a href="#%E9%AB%98%E7%BA%A7%E5%AE%B9%E5%99%A8%E8%BF%90%E8%A1%8C%E6%97%B6">高级容器运行时</a>
+<ul>
+<li><a href="#containerd">containerd</a></li>
+<li><a href="#cri-o">CRI-O</a></li>
+<li><a href="#podman">Podman</a></li>
+</ul>
+</li>
+<li><a href="#cricontainer-runtime-interface">CRI（Container Runtime Interface）</a></li>
+<li><a href="#wasm">WASM</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+
+<script>
+  let lastTop = 0, linkList = [], headList = [], postBody, lastIndex = -1;
+  let activeClass = 'active-toc';
+  let tocContent;
+
+  function addActiveClass(index) {
+    if (index >= 0 && index < linkList.length) {
+      linkList[index].parentElement.classList.add(activeClass);
+    }
+  }
+
+  function removeActiveClass(index) {
+    if (index >= 0 && index < linkList.length) {
+      linkList[index].parentElement.classList.remove(activeClass);
+    }
+  }
+
+  function getElementTop (el) {
+    let actualTop = el.offsetTop
+    let current = el.offsetParent
+    while (current !== null) {
+      actualTop += current.offsetTop
+      current = current.offsetParent
+    }
+    return actualTop
+  }
+
+  function syncActiveClass() {
+    if (linkList.length <= 0) {
+      return;
+    }
+    let scrollTop = document.scrollingElement.scrollTop;
+    let eps = window.innerHeight;
+
+    let current = 0, closestOffset = 0x3f3f3f3f, hasFind = false;
+    for (let i = 0; i < headList.length; i++) {
+      let offset = Math.abs(getElementTop(headList[i]) - scrollTop);
+      if (offset > eps) {
+        continue;
+      }
+      if (offset < closestOffset) {
+        current = i;
+        closestOffset = offset;
+        hasFind = true;
+      }
+    }
+    if(!hasFind) {
+      return;
+    }
+
+    removeActiveClass(lastIndex)
+    addActiveClass(current);
+    lastIndex = current;
+  }
+
+  document.addEventListener('scroll', syncActiveClass);
+  window.addEventListener('load', function () {
+    tocContent = document.querySelector('.markdownIt-TOC');
+    if (!tocContent) return;
+
+    postBody = document.querySelector('.post-content');
+    for (let i = 0; i < postBody.children.length; i++) {
+      if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+        headList.push(postBody.children[i]);
+      }
+    }
+    linkList = document.querySelectorAll('.post-toc a');
+
+    setTimeout(function () {
+      if ("createEvent" in document) {
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("scroll", false, true);
+        document.dispatchEvent(evt);
+      }
+      else {
+        document.fireEvent("scroll");
+      }
+    }, 500)
+  })
+</script>
+
+        </div>
+      </div>
+
+      <footer class="footer animate__animated animate__flipInX">
+  <div class="site-footer">
+    <p></p>
+    <p>© x³u³ · Powered by <a href="https://gridea.dev/">Gridea</a> & <a href="https://github.com/xxxuuu/gridea-theme-autumn">Autumn</a> | <a class="rss" href="https://xxxuuu.me/atom.xml" target="_blank">RSS</a></p>
+  </div>
+</footer>
+
+
+    </div>
+
+    <script type="application/javascript">
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js"></script>
+  <script>
+    window.onload = () => {
+        hljs.highlightAll()
+    }
+  </script>
+
+
+<script>
+  const images = document.querySelectorAll('.post-content img');
+
+  for (let i = 0; i < images.length; i++) {
+    const img = images[i];
+
+    const link = document.createElement('a');
+    link.href = img.src;
+    link.setAttribute("data-fancybox", "gallery");
+
+    img.parentNode.insertBefore(link, img);
+    link.appendChild(img);
+  }
+</script>
+
+
+
+
+  </body>
+</html>

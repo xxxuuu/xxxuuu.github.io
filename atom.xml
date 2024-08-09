@@ -1,0 +1,1630 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+    <id>https://xxxuuu.me</id>
+    <title>x³u³</title>
+    <updated>2024-08-09T15:21:30.734Z</updated>
+    <generator>https://github.com/jpmonette/feed</generator>
+    <link rel="alternate" href="https://xxxuuu.me"/>
+    <link rel="self" href="https://xxxuuu.me/atom.xml"/>
+    <subtitle>🗒 碎碎念</subtitle>
+    <logo>https://xxxuuu.me/images/avatar.png</logo>
+    <icon>https://xxxuuu.me/favicon.ico</icon>
+    <rights>All rights reserved 2024, x³u³</rights>
+    <entry>
+        <title type="html"><![CDATA[Longhorn 浅析]]></title>
+        <id>https://xxxuuu.me/post/longhorn/</id>
+        <link href="https://xxxuuu.me/post/longhorn/">
+        </link>
+        <updated>2024-08-08T12:51:25.000Z</updated>
+        <summary type="html"><![CDATA[<p>Longhorn 是一个 Go 实现的 Cloud Native Storage，比较好奇作为一个提供块存储的分布式存储系统，使用 Go 实现，会面临哪些挑战，性能方面要又要如何优化</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>Longhorn 是一个 Go 实现的 Cloud Native Storage，比较好奇作为一个提供块存储的分布式存储系统，使用 Go 实现，会面临哪些挑战，性能方面要又要如何优化</p>
+<!-- more -->
+<p>从宏观视角来看，Longhorn 的数据流如下， Engine 是 volume 的 controller，每个 volume 都会有一个 engine 实例，replica 是卷的一个副本实例，负责具体的落盘，显然 Engine 就是数据面的核心</p>
+<figure data-type="image" tabindex="1"><img src="https://xxxuuu.me/post-images/1723121587075.png" alt="longhorn-architecture" loading="lazy"></figure>
+<p>Longhorn 是控制面则是基于 K8s 的，所有资源都以 K8s CRD 提供，通过 Operator 管控，称为 Manager</p>
+<br/>
+<h1 id="v1-engine">V1 Engine</h1>
+<h2 id="replica">Replica</h2>
+<p>Engine 有 V1 和 V2 两个版本，先从 V1 Engine 开始分析，自底向上看，最下面的是 replica。replica server 在启动时就会创建/打开对应的 replica，然后启动两个 grpc server，分别处理控制流和数据流</p>
+<p>replica 在节点上对应一组 sparse file，代码中这个结构称为 <code>diffDisk</code>，每个 file 有点类似于 LSM-Tree 中的 layer/level，这里称为 snapshot（除了最新一层叫 head/live data）：</p>
+<figure data-type="image" tabindex="2"><img src="https://xxxuuu.me/post-images/1723121620763.png" alt="diffdisk" loading="lazy"></figure>
+<p>每个 <code>diffDisk</code> 的元数据存在一个 <code>volume.meta</code> 文件中，还会有一个 <code>revision.counter</code> 文件记录写入的版本号。每一层 file 划分为多个 4K 大小的 sector，这是写入的最小单元，因为都是 sparse file，所以 Longhorn 的卷自然支持精简配置。file 之间从新到旧连接起来，索引表 <code>location</code> 则存储 sector 位于哪一个 file 中</p>
+<p>读写流程</p>
+<ul>
+<li>写入时先自增 revision，元数据中标为为 dirty，这里 revision 会落盘，但元数据不会。然后在 <code>diffDisk</code> 只会写入最新的一层，即 live data 或 head，是原地写入的，同时更新索引。前面提到 sector 是写入最小单元，如果写入不够一个 sector，就会先读出原数据，修改后再写</li>
+<li>读取时从索引中找到 sector 对应第几层的 file，如果找到就直接去读。否则从新到旧的 file 查找，对于每一个 file 使用 FIEMAP ioctl 查询指定范围内是否存在 extent，是则说明 sector 位于这个 file 中，更新索引后读取</li>
+</ul>
+<p>快照&amp;扩容流程</p>
+<ul>
+<li>快照：快照很简单，只是创建一个新的 head。删除就是将其内容覆盖到上一层 snapshot 中</li>
+<li>扩容：创建一个新的 head，相当于打了个快照，head 的大小被 truncate 为扩容后的大小，同时还需要修改元数据。由于 sector 变多了，<code>diffDisk</code> 内的 <code>location</code> 索引表也要扩容</li>
+</ul>
+<p>一开始还以为 <code>diffDisk</code> 会是类似 RocksDB 这种 LSM-Tree based 的存储引擎，但完全不是一回事。它没有存储引擎必须的各种功能，可以说只是一个能支持 snapshot 的数据格式</p>
+<p>首先接口语义上，<code>diffDisk</code> 是为块存储设计的，并不是 key-value 的，或者说 key 就是 offset；也没有删除接口，只有读和写。不过这也问题不大，块存储本身也没有“删除”的概念，真要添加删除接口也可以通过写入墓碑标记实现</p>
+<p><code>diffDisk</code> 中单个文件的数据布局和元数据维护是依赖文件系统的 extent 功能实现的，没有定义自己的格式。所以这套实现对文件系统有要求，需要支持 extent 功能，优点是文件很“干净“，这里如果没有 snapshot，实际上就是对单个文件的直接读写。但反之可以说没有任何优化，性能需要打个问号</p>
+<p>同时它没有 WAL，无法保证崩溃一致性。这种情况需要 rebuild，更不用提快照（revision）读和事务之类的功能了。rebuild 这些操作都依赖上层控制面触发，后续会提到</p>
+<h2 id="controller">Controller</h2>
+<p>Controller 负责整个 volume 视角的读写，它被调度在和最终 client 的 Pod 相同的节点上，从 frontend 中接受读写请求，往后连接到一个或多个 replica 上，将读写转发给这些 replica</p>
+<p>为了避免和 K8s 中的 Controller 混淆，后面都直接称这个 Controller 为 Engine</p>
+<figure data-type="image" tabindex="3"><img src="https://xxxuuu.me/post-images/1723121651584.png" alt="controller" loading="lazy"></figure>
+<p>Engine 启动时会监听一个 UDS（<code>/var/run/longhorn-{volume-name}.sock</code>），同时创建 frontend，frontend 实际上就是一个 iSCSI Target，通过<a href="https://github.com/rancher/tgt">定制的 tgtd</a> 创建，这个定制 tgtd 做的工作不多，主要是能支持将 iSCSI 流量包装成 Longhorn 自己的一个简单协议转发到前面的 UDS 中</p>
+<p>协议结构如下：</p>
+<pre><code class="language-go">type Message struct {
+	MagicVersion uint16
+	Seq          uint32
+	Type         uint32
+	Offset       int64
+	Size         uint32
+	Data         []byte
+}
+
+const (
+	TypeRead = iota
+	TypeWrite
+	TypeResponse
+	TypeError
+	TypeEOF
+	TypeClose
+	TypePing
+	TypeUnmap
+)
+
+const (
+	MagicVersion = uint16(0x1b01) // LongHorn01
+)
+</code></pre>
+<p>有了 iSCSI Target 后，还需要启动 iSCSI Initator 连接这个 Target，这步的目的是需要创建出一个块设备，然后通过 mknod 指定相同的主次设备号再创建出 <code>/dev/longhorn/{vol_name}</code>。这就是 client 最终直接操作的设备，对它的 I/O 会一路到 Initator → Target → UDS 上。到此 frontend 就算创建完成</p>
+<p>Engine 之后为 volume 的每一个 replica 创建对应的 backend(replicator)，并维持心跳。会从前面监听的 UDS 中解析协议并转发给 replica</p>
+<p>具体读写上 Engine 通过一个读写锁控制并发，read 只要任一一个 replica 成功即可，用的 round-robin 的策略做 balance。write 和 unmap 等操作是并发执行的，要求全部成功。IOPS 之类的监控和统计也在这个层级实现</p>
+<p>最后 Engine 会再启动一个 grpc server，处理控制流，例如卷扩容、快照等命令，也是通过 backend(replicator) 转发到 replica 上执行的。当然，这里调用的是处理控制流的 grpc server</p>
+<p>这里有一个优化，如果 volume 只有一个 replica（单副本）且设置了 struct local 模式。Manager 会将 replica 调度到和 Engine 同一个节点上。Engine 在创建 backend 时就会通过 UDS 连接而不是 TCP 连接。这种本地化的策略能够有效提升 IOPS 和改善延迟，不过这里约束了只能用单副本，限制比较大</p>
+<p>虽然 Engine 自身是单点，但是它运行在和 client 相同的节点上，因此如果节点故障，一般 client 也会同时不可用，是个不错的策略</p>
+<br/>
+<h1 id="manager">Manager</h1>
+<p>一开始提到，Longhorn 的控制面是作为 K8s Operator 实现的，称为 Manager。Longhorn 里所有元数据，包括 Engine 和 Replica 都以 CRD 呈现。</p>
+<p>这套方案的优点是很多东西都能依赖 K8s 的能力提供和管理，还能很好地融入生态。但同样很多元数据操作的链路都要通过 K8s，感觉还是会比较慢，也限制了规模和能力</p>
+<h2 id="rebuild-add-replica">rebuild &amp; add replica</h2>
+<p>如果 Engine 到某个 replica 心跳失败或读写或控制流命令错误，或发现 replica 的 revision 不是最新的，这个 replica 的 mode 就被设置为 ERR 不再读写</p>
+<p>Manager 中的 monitor 会定时请求 Engine 中处理控制流的 grpc server 获取其所有的 replica 信息，更新到 Engine CR 的 status 中。因此当在 Manager 中的 Engine Controller 对该 Engin CR 进行 reconcile 时就能检测到 replica 处于 ERR mode 或不存在，调用 Engine 触发 rebuild</p>
+<p>V1 Engine 的 rebuild 最终执行了 AddReplica Task，所以 rebuild 实际上流程和新增 replica 一致</p>
+<ul>
+<li>Engine 在创建新 replica 之前，会先对其他 replica 打一个快照，然后创建一个 WO（仅写入）模式的新 replica，因此它马上就可以接收写入</li>
+<li>然后从已有的 replica 中将 <code>diffDisk</code> 的元数据和剩下 snapshot 给 sync 过去。在 sync 完成后，通知 Engine 重新检验合法性，此时 replica 正式可用，设置回 RW 模式，启动对新 replica 的心跳</li>
+</ul>
+<p>这里在打完快照后，新 replica 的写入就全都在 head/live data 上了，写入是安全的。snapshot 的 sync 在后台异步进行，利用了 <code>diffDisk</code> 的特性和快照实现了在线 rebuild</p>
+<figure data-type="image" tabindex="4"><img src="https://xxxuuu.me/post-images/1723121696721.png" alt="rebuild" loading="lazy"></figure>
+<br/>
+<h1 id="file-storage">File storage</h1>
+<p>Longhorn 提供的 CSI 不支持 Block PVC 的 RWX 挂载，因为块层无法感知更高层（文件系统）的写入模式和内容，多个 client 写入就会把挂载的文件系统元数据写坏。为了支持 RWX 的 PVC，Longhorn 额外通过 Share Manager 组件提供了文件存储。这里有意思的是，它不叫 Filesystem Manager 而是叫 Share Manager，可以看出是完全以 K8s 视角考虑的</p>
+<p>当创建 RWX 的 volume （Longhorn 的 CR，非 PVC）时，Manager 中 volume controller 会创建对应的 share manager CR。share manager controller 再创建 share manager pod 并修改 volume 让其实际挂载在这个 share manager pod 的节点上</p>
+<p>controller 检测到 pod 启动之后，就会给其发起 RPC 请求将 <code>/dev/longhorn/{vol_name}</code> 块设备格式化为指定文件系统挂载到 <code>/export/{vol_name}</code> 中</p>
+<p>share manager 内运行了一个 nfs ganesha，作为 NFS server。最后 share manager 更新 nfs ganesha 配置，将 <code>/export/{vol_name}</code> 导出</p>
+<p>share manager 和 volume 的 status 在 controller reconcile 中被更新，设置 NFS 连接信息，现在 CSI 就可以获取到 NFS 连接配置，完成最终的用户 Pod 挂载流程</p>
+<figure data-type="image" tabindex="5"><img src="https://xxxuuu.me/post-images/1723121718884.png" alt="share-manager" loading="lazy"></figure>
+<p>这里 NFS server 是一个单点的 gateway。为了故障恢复，Longhorn 修改 nfs ganesha 添加了一个新的 recovery backend 类型 longhorn，这个定制的 recovery backend 的作用是将 nfs ganesha 的内部状态信息存储到 K8s ConfigMap 中</p>
+<p>当发生故障，新的 share manager pod 被创建出来后，nfs ganesha 就能从 ConfigMap 中恢复状态，nfs client 可以配置一定宽限期，此时再重试请求就能成功，恢复运行</p>
+<p>实际上 NFS server 可以配置 active/active（多活）和 active/passive（主备） 模式。这样恢复速度能比等待重建快得多，可以做到高可用，但目前看起来在这套架构上并不好实现</p>
+<p>首先这里 NFS server 本身就是跑在 iSCSI 块设备上的，无法处理多 client 写入，这就回到一开始的情况了，因此无法做到 active/active。而 Engine 则限制了必须和 Pod 在同一节点上，目前不支持存在一个备用的 Engine 连接同样的 Replica，自然也无法做到 active/passive</p>
+<br/>
+<h1 id="v2-engine">V2 Engine</h1>
+<p>V2 Engine 使用了 SPDK，基本是复用了 SPDK 自带的功能，Go 只是调用来创建，不会再直接处理 I/O，性能应该能得到很大提高。V2 Engine 目前还是 preview feature，一些功能支持的不完善，例如扩容</p>
+<p>在 V2 Engine 上，总体设计也类似于 V1 Engine，Engine 连接多个 Replica。Replica 就是一个 SPDK 的 lvol bdev（逻辑卷），还包括一个 NVMf Target 将 bdev 暴露出去。剩下的例如精简配置、快照等功能都是 SPDK 自身已经支持的，直接通过 JSON-RPC 调用即可</p>
+<figure data-type="image" tabindex="6"><img src="https://xxxuuu.me/post-images/1723121745694.png" alt="spdk-lvol" loading="lazy"></figure>
+<p>Replica 已经暴露了 NVMf bdev，Engine 同样通过 SPDK 连接到每个 Replica 的 NVMf bdev，再组成 RAID1 bdev，这样又利用了 SPDK 直接实现了多副本，最后暴露出 NVMf Target 给 client 连接</p>
+<figure data-type="image" tabindex="7"><img src="https://xxxuuu.me/post-images/1723121767161.png" alt="v2-engine" loading="lazy"></figure>
+<p>由于并不插手 I/O 流程，这里的容错处理稍微被动些。健康检查不再是心跳，而是定期（3s）获取 replica 上的 SPDK bdev 列表，在这个过程中更新一些统计数据。当 bdev 不存在或信息不一致时，就会设置为 ERR mode 让其 rebuild</p>
+<p>V2 Engine 中 rebuild 和 add replica 流程和 V1 Engine 大体类似：</p>
+<ol>
+<li>首先打快照，然后让新的 replica 直接通过 NVMf 连接源 replica 的 bdev，作为 external snapshot 创建新的 lvol bdev</li>
+<li>回到 V2 Engine，现在新 replica 的 lvol bdev 已经存在了，可以连接并添加到 RAID1 bdev 中。虽然这时也给新 replica 设置了 WO mode，但 Engine 已经不在 I/O 流程中了 管不着，SPDK 仍然可能从新的 bdev 中读，SPDK 能正确处理，但会有一定性能下降</li>
+<li>虽然新 replica 的 bdev 中已经有了完整数据（RAID1 bdev 会自动处理），但它上面并没有源 replica 上那些历史快照链，还需要一个恢复快照链的过程。这里会再创建一个新的 rebuilding lvol，使用 shallow copy 将源 replica 的快照一层层 copy 过去，每 copy 完一层就给 rebuilding lvol 打一次快照。这样从头给 rebuilding lvol 构建历史快照链</li>
+<li>最后再将第 1 步中的新 lvol 的 parent 从 external snapshot 改为 rebuilding lvol</li>
+</ol>
+<p>V2 Engine 的模式让我想起了 Kafka，Kafka 虽然是 Java 实现，但实际上 Java 本身没有做太多 key path 上的数据处理，而是 offload 到 kernel 去做，避免了 Java 的性能劣势。从这个角度来说，Kafka 的数据面更像一个细粒度的对 kernel 的控制面。Longhorn 的 V2 Engine 也是如此，基本就是对 SPDK 的控制面</p>
+<br/>
+<h1 id="performance">Performance</h1>
+<p>看一下性能，benchmark 可以看到，V1 Engine 的性能比较差，也在预期之内。不过这里测试用的 SSD 比较一般，完全没发挥出 SPDK 的性能，但到了那种程度网络也是瓶颈了，Longhorn 目前还不支持 RDMA<br>
+<img src="https://xxxuuu.me/post-images/1723121792152.png" alt="performance-iops" loading="lazy"><br>
+<img src="https://xxxuuu.me/post-images/1723121818937.png" alt="performance-bandwidth" loading="lazy"><br>
+<img src="https://xxxuuu.me/post-images/1723121843124.png" alt="performance-latency" loading="lazy"></p>
+<br/>
+<h1 id="summary">Summary</h1>
+<p>总的来说，Longhorn 架构简洁，基于简单朴素的想法构建，又很好地复用了已有的组件，无论是基于 K8s 的控制面，还是 V1 Engine 中的 sparse file，tgtd，nfs ganesha，V2 Engine 的 SPDK，都是这种想法的体现。使用起来也很友好</p>
+<p>缺点是一旦有舒适区内无法满足的需求，就会比较麻烦。例如现在已经修改了 tgtd 和 nfs ganesha，从社区的进展来看很快也要修改 SPDK 了。存算融合可能会导致负载互相影响，进一步降低性能，控制面的调度收敛速度估计也受限于 K8s，万卷规模时各种 CR 可能就数十万个了，而 etcd 还是单 Raft Group 的，瓶颈明显</p>
+<p>后续可以考虑的优化点不少，首先存储层就不支持 chunk/block 之类的 partition，这直接限制了单个卷能提供的容量，而且没有细粒度的 partition，容错和调度都会不够灵活。现在 rebuild 都是全量的，不仅影响速度，在大卷时这样的流量对集群也有压力。最后是一些业务功能，例如 QoS 等比较刚需的还不支持</p>
+<p>值得一提的是 Longhorn 的文档写的很不错，大部分 feature 都有详细提案文档和需求来源追溯，这点非常好，还是很适合作为入门学习的分布式存储项目</p>
+<p>Ref：</p>
+<ul>
+<li><a href="https://longhorn.io/docs/1.6.2/concepts/">Longhorn | Architecture and Concepts</a></li>
+<li><a href="https://github.com/longhorn/longhorn/wiki/Architecture-Overview-For-Developers">Architecture Overview For Developers</a></li>
+<li><a href="https://peteryj.github.io/2020/10/11/longhorn-engine-code-analysis/">longhorn-engine 源码分析 - Peter Yang's Blog</a></li>
+<li><a href="https://github.com/longhorn/longhorn/blob/master/enhancements/20221123-local-volume.md">20221123-local-volume.md</a></li>
+<li><a href="https://mp.weixin.qq.com/s/9eFYJ5OFRrShaKJezxV6Bg">Longhorn 的正确使用姿势：如何处理增量 replica 与其中的 snapshot/backup</a></li>
+<li><a href="https://longhorn.io/docs/1.6.2/nodes-and-volumes/volumes/rwx-volumes/">Longhorn | ReadWriteMany (RWX) Volume</a></li>
+<li><a href="https://github.com/longhorn/longhorn/blob/master/enhancements/20201220-rwx-volume-support.md">20201220-rwx-volume-support.md</a></li>
+<li><a href="https://github.com/longhorn/longhorn/blob/d5e8a44104f5e03c310870b47da7c8ab55f671b3/enhancements/20220727-dedicated-recovery-backend-for-rwx-volume-nfs-server.md">20220727-dedicated-recovery-backend-for-rwx-volume-nfs-server.md</a></li>
+<li><a href="https://github.com/longhorn/longhorn/blob/master/enhancements/20230619-spdk-engine.md">20230619-spdk-engine.md</a></li>
+<li><a href="https://spdk.io/doc/logical_volumes.html">SPDK: Logical Volumes</a></li>
+<li><a href="https://spdk.io/doc/nvmf.html">SPDK: NVMe over Fabrics Target</a></li>
+<li><a href="https://spdk.io/doc/bdev.html">SPDK: Block Device User Guide</a></li>
+<li><a href="https://github.com/longhorn/longhorn/issues/7199">v2 volume replica online rebuilding</a></li>
+<li><a href="https://github.com/longhorn/longhorn/blob/b58a7a3849e12fa4674723c1ce0dfe708fd8423a/enhancements/20231030-spdk-raid-delta-copy.md">20231030-spdk-raid-delta-copy.md</a></li>
+<li><a href="https://longhorn.io/docs/1.6.2/v2-data-engine/performance/">Longhorn | Performance</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[从 Linux 内核看读写锁设计]]></title>
+        <id>https://xxxuuu.me/post/kernel-rwlock/</id>
+        <link href="https://xxxuuu.me/post/kernel-rwlock/">
+        </link>
+        <updated>2024-01-04T12:24:48.000Z</updated>
+        <summary type="html"><![CDATA[<p>前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的</p>
+<!-- more -->
+<h2 id="读写自旋锁">读/写自旋锁</h2>
+<p>内核代码中，要定义读/写自旋锁，通过下面的宏进行初始化：</p>
+<pre><code class="language-C">DEFINE_RWLOCK(mr_rwlock);
+</code></pre>
+<p>使用上读锁和写锁是分开加锁的</p>
+<pre><code class="language-C">read_lock(&amp;mr_rwlock);
+// 只读临界区
+read_unlock(&amp;mr_rwlock);
+
+write_lock(&amp;mr_rwlock);
+// 读写临界区
+write_unlock(&amp;mr_rwlock);
+</code></pre>
+<p><strong>不能</strong>像这样将一个读锁升级成写锁，这会导致死锁；并且写锁也是不可重入的：</p>
+<pre><code class="language-C">read_lock(&amp;mr_rwlock);
+write_lock(&amp;mr_rwlock);
+</code></pre>
+<p>读/写自旋锁的汇编级别实现比较类似信号量，都是在寄存器上对值做增减，但为了区分读锁和写锁，读锁是固定减 1，写锁则是固定减去一个很大的 magic number，通过结果值比较就能判断锁持有情况</p>
+<p>代码分别位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwlock.h">include/asm-x86_64/rwlock.h</a> 和 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/spinlock.h">/include/asm-x86_64/spinlock.h</a> 中，这两块涉及的核心代码融合一下大致如下：</p>
+<pre><code class="language-C">#define RW_LOCK_BIAS 0x01000000
+
+// 初始化时设置这个值为 magic number
+#define rwlock_init(x)	do { *(x) = RW_LOCK_UNLOCKED; } while(0)
+
+// 获取读锁
+// 将eax寄存器指向的地址，也就是变量rw的值减1（subl $1）
+// 根据结果是否小于0（js 2f）做跳转，小于0就去调用传入的helper做获取失败的处理
+// 没有写锁的情况下是不会小于0的，不可能有这么多读者能让它减到0，所以不小于0就是获取成功
+#define __build_read_lock_ptr(rw, helper)   \
+	asm volatile(LOCK &quot;subl $1,(%0)\n\t&quot; \ 
+		     &quot;js 2f\n&quot; \ 
+		     &quot;1:\n&quot; \
+		    LOCK_SECTION_START(&quot;&quot;) \
+		     &quot;2:\tcall &quot; helper &quot;\n\t&quot; \
+		     &quot;jmp 1b\n&quot; \
+		    LOCK_SECTION_END \
+		     ::&quot;a&quot; (rw) : &quot;memory&quot;)
+
+// 传入的helper位于arch/i386/kernel/semaphore.c
+// 这里就是一个自旋的逻辑，持续操作rw直到它是大于等于0的，相当于:
+// 
+// lock_failed:
+// rw++;
+// while(rw &lt; 1) {}
+// rw--;
+// if(rw &lt; 0) goto lock_failed;
+// 
+// 这里结尾还要判断一次，是因为前面的操作整体上不是原子或互斥的，所以decl后要再check一下
+asm(
+&quot;.text\n&quot;
+&quot;.align	4\n&quot;
+&quot;.globl	__read_lock_failed\n&quot;
+&quot;__read_lock_failed:\n\t&quot;
+	LOCK &quot;incl	(%eax)\n&quot;
+&quot;1:	rep; nop\n\t&quot;
+	&quot;cmpl	$1,(%eax)\n\t&quot;
+	&quot;js	1b\n\t&quot;
+	LOCK &quot;decl	(%eax)\n\t&quot;
+	&quot;js	__read_lock_failed\n\t&quot;
+	&quot;ret&quot;
+);
+
+// 获取写锁
+// eax寄存器指向的地址值，也就是rw减去magic number
+// 判断结果是否刚好为0（jnz 2f），不是则说明有读锁在占用，跳转到helper调用
+#define __build_write_lock_ptr(rw, helper) \
+	asm volatile(LOCK &quot;subl $&quot; RW_LOCK_BIAS_STR &quot;,(%0)\n\t&quot; \
+		     &quot;jnz 2f\n&quot; \
+		     &quot;1:\n&quot; \
+		     LOCK_SECTION_START(&quot;&quot;) \
+		     &quot;2:\tcall &quot; helper &quot;\n\t&quot; \
+		     &quot;jmp 1b\n&quot; \
+		     LOCK_SECTION_END \
+		     ::&quot;a&quot; (rw) : &quot;memory&quot;)
+
+// 写锁传入的helper同样位于arch/i386/kernel/semaphore.c
+// 逻辑和读锁的基本一样
+asm(
+&quot;.text\n&quot;
+&quot;.align	4\n&quot;
+&quot;.globl	__write_lock_failed\n&quot;
+&quot;__write_lock_failed:\n\t&quot;
+	LOCK &quot;addl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n&quot;
+&quot;1:	rep; nop\n\t&quot;
+	&quot;cmpl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n\t&quot;
+	&quot;jne	1b\n\t&quot;
+	LOCK &quot;subl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n\t&quot;
+	&quot;jnz	__write_lock_failed\n\t&quot;
+	&quot;ret&quot;
+);
+
+// 解锁时就是加上1或magic number
+#define _raw_read_unlock(rw) asm volatile(&quot;lock ; incl %0&quot; :&quot;=m&quot; ((rw)-&gt;lock) : : &quot;memory&quot;)
+#define _raw_write_unlock(rw)	asm volatile(&quot;lock ; addl $&quot; RW_LOCK_BIAS_STR &quot;,%0&quot;:&quot;=m&quot; ((rw)-&gt;lock) : : &quot;memory&quot;)
+</code></pre>
+<p>可以看出，读/写自旋锁是<strong>读优先</strong>的，会导致写饥饿。当有一个或多个读者持有读锁时，写操作无法获取锁，如果此时读锁被长时间占有，写锁将一直自旋等待，此时自旋会导致一个核心上的高昂开销</p>
+<p>这里有一个处理上的细节，在真正开始自旋获取到写锁之前，就已经互斥了（减去 magic number），这时候新的读锁是无法获取的，这避免了写锁和读锁的争抢，能稍微缓解下写饥饿问题，例如这样的情况：</p>
+<pre><code>                            TIME
+─────────────────────────────────────────────────────────►
+ ┌──────────────┐
+ │    reader    │
+ └──────────────┘
+     ┌──────────┬────────────────────┐
+     │   spin   │       writer       │
+     └──────────┴────────────────────┘
+           ┌─────────────────────────┬───────────────┐
+           │           spin          │     reader    │
+           └─────────────────────────┴───────────────┘
+                        ┌────────────┬───────────┐
+                        │    spin    │   reader  │
+                        └────────────┴───────────┘
+</code></pre>
+<h2 id="读写信号量">读/写信号量</h2>
+<p>读/写信号量的使用上和读/写自旋锁是类似的，但功能上要强大一些，分别支持静态和动态的初始化方法</p>
+<pre><code class="language-C">// 静态定义
+static DECLARE_RWSEM(name);
+// 动态定义
+init_rwsem(struct rw_semaphore *sem);
+</code></pre>
+<p>读/写信号量支持 trylock 操作和动态地将写锁降级为读锁</p>
+<pre><code class="language-C">static DECLARE_RWSEM(mr_rwsem);
+
+down_read(&amp;mr_rwsem);
+// 只读临界区
+up_read(&amp;mr_rwsem);
+
+down_write(&amp;mr_rwsem);
+// 读写临界区
+up_write(&amp;mr_rwsem);
+
+down_write(&amp;mr_rwsem);
+// 读写临界区
+downgrade_write(&amp;mr_rwsem); // 写锁降级读锁
+// 只读临界区
+up_read(&amp;mr_rwsem);
+</code></pre>
+<p><a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwsem.h#L99">include/asm-x86_64/rwsem.h</a> 中定义了汇编级别上的实现，和前面读/写自旋锁是类似的，但没有自旋，这里就不细说，内核源码这里也直接附带注释了：</p>
+<pre><code class="language-C">#define RWSEM_UNLOCKED_VALUE		  0x00000000
+#define RWSEM_ACTIVE_BIAS		      0x00000001
+#define RWSEM_ACTIVE_MASK		      0x0000ffff
+#define RWSEM_WAITING_BIAS		    (-0x00010000)
+#define RWSEM_ACTIVE_READ_BIAS		RWSEM_ACTIVE_BIAS
+#define RWSEM_ACTIVE_WRITE_BIAS		(RWSEM_WAITING_BIAS + RWSEM_ACTIVE_BIAS)
+
+/*
+ * lock for reading
+ */
+static inline void __down_read(struct rw_semaphore *sem)
+{
+	__asm__ __volatile__(
+		&quot;# beginning down_read\n\t&quot;
+LOCK_PREFIX	&quot;  incl      (%%rdi)\n\t&quot; /* adds 0x00000001, returns the old value */
+		&quot;  js        2f\n\t&quot; /* jump if we weren't granted the lock */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;) \
+		&quot;2:\n\t&quot;
+		&quot;  call      rwsem_down_read_failed_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END \
+		&quot;# ending down_read\n\t&quot;
+		: &quot;+m&quot;(sem-&gt;count)
+		: &quot;D&quot;(sem)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * lock for writing
+ */
+static inline void __down_write(struct rw_semaphore *sem)
+{
+	int tmp;
+
+	tmp = RWSEM_ACTIVE_WRITE_BIAS;
+	__asm__ __volatile__(
+		&quot;# beginning down_write\n\t&quot;
+LOCK_PREFIX	&quot;  xaddl      %0,(%%rdi)\n\t&quot; /* subtract 0x0000ffff, returns the old value */
+		&quot;  testl     %0,%0\n\t&quot; /* was the count 0 before? */
+		&quot;  jnz       2f\n\t&quot; /* jump if we weren't granted the lock */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  call      rwsem_down_write_failed_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending down_write&quot;
+		: &quot;=&amp;r&quot; (tmp) 
+		: &quot;0&quot;(tmp), &quot;D&quot;(sem)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * unlock after reading
+ */
+static inline void __up_read(struct rw_semaphore *sem)
+{
+	__s32 tmp = -RWSEM_ACTIVE_READ_BIAS;
+	__asm__ __volatile__(
+		&quot;# beginning __up_read\n\t&quot;
+LOCK_PREFIX	&quot;  xaddl      %[tmp],(%%rdi)\n\t&quot; /* subtracts 1, returns the old value */
+		&quot;  js        2f\n\t&quot; /* jump if the lock is being waited upon */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  decw      %w[tmp]\n\t&quot; /* do nothing if still outstanding active readers */
+		&quot;  jnz       1b\n\t&quot;
+		&quot;  call      rwsem_wake_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending __up_read\n&quot;
+		: &quot;+m&quot;(sem-&gt;count), [tmp] &quot;+r&quot; (tmp)
+		: &quot;D&quot;(sem)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * unlock after writing
+ */
+static inline void __up_write(struct rw_semaphore *sem)
+{
+	unsigned tmp; 
+	__asm__ __volatile__(
+		&quot;# beginning __up_write\n\t&quot;
+		&quot;  movl     %[bias],%[tmp]\n\t&quot;
+LOCK_PREFIX	&quot;  xaddl     %[tmp],(%%rdi)\n\t&quot; /* tries to transition 0xffff0001 -&gt; 0x00000000 */
+		&quot;  jnz       2f\n\t&quot; /* jump if the lock is being waited upon */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  decw      %w[tmp]\n\t&quot; /* did the active count reduce to 0? */
+		&quot;  jnz       1b\n\t&quot; /* jump back if not */
+		&quot;  call      rwsem_wake_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending __up_write\n&quot;
+		: &quot;+m&quot;(sem-&gt;count), [tmp] &quot;=r&quot; (tmp)
+		: &quot;D&quot;(sem), [bias] &quot;i&quot;(-RWSEM_ACTIVE_WRITE_BIAS)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+</code></pre>
+<p>信号量是睡眠锁，读锁和写锁在获取锁失败时最后都会进入到 <code>rwsem_down_failed_common</code>（位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/lib/rwsem.c#L123">lib/rwsem.c</a>） 中，这里会将进程加入等待队列中，然后重新调度进程</p>
+<pre><code class="language-C">static inline struct rw_semaphore *rwsem_down_failed_common(struct rw_semaphore *sem,
+								 struct rwsem_waiter *waiter,
+								 signed long adjustment)
+{
+	struct task_struct *tsk = current;
+	signed long count;
+
+	set_task_state(tsk,TASK_UNINTERRUPTIBLE);
+
+	/* set up my own style of waitqueue */
+	spin_lock(&amp;sem-&gt;wait_lock);
+	waiter-&gt;task = tsk;
+
+	list_add_tail(&amp;waiter-&gt;list,&amp;sem-&gt;wait_list);
+
+	/* note that we're now waiting on the lock, but no longer actively read-locking */
+	count = rwsem_atomic_update(adjustment,sem);
+
+	/* if there are no longer active locks, wake the front queued process(es) up
+	 * - it might even be this process, since the waker takes a more active part
+	 */
+	if (!(count &amp; RWSEM_ACTIVE_MASK))
+		sem = __rwsem_do_wake(sem,1);
+
+	spin_unlock(&amp;sem-&gt;wait_lock);
+
+	/* wait to be given the lock */
+	for (;;) {
+		if (!waiter-&gt;flags)
+			break;
+		schedule();
+		set_task_state(tsk, TASK_UNINTERRUPTIBLE);
+	}
+
+	tsk-&gt;state = TASK_RUNNING;
+
+	return sem;
+}
+</code></pre>
+<p>值得一提的是 <code>trylock</code> 和 <code>downgrade_write</code> 操作，这两个操作是读/写自旋锁中没有的</p>
+<p>两个 <code>trylock</code> 是类似的，都是用 <code>cmpxchg</code> 指令来做 CAS（compare-and-swap） 操作。写锁的 <code>trylock</code> 比较简单，因为是互斥的，所以只需要对初始值做 CAS 即可。而读锁可能被持有多个，所以它的 <code>trylock</code> 需要先将 <code>sem-&gt;count</code> 赋值给 <code>tmp</code>，再自增 <code>tmp</code> ，利用 <code>tmp</code> 的值进行 CAS</p>
+<pre><code class="language-C">/*
+ * trylock for reading -- returns 1 if successful, 0 if contention
+ */
+static inline int __down_read_trylock(struct rw_semaphore *sem)
+{
+	__s32 result, tmp;
+	__asm__ __volatile__(
+		&quot;# beginning __down_read_trylock\n\t&quot;
+		&quot;  movl      %0,%1\n\t&quot;
+		&quot;1:\n\t&quot;
+		&quot;  movl	     %1,%2\n\t&quot;
+		&quot;  addl      %3,%2\n\t&quot;
+		&quot;  jle	     2f\n\t&quot;
+LOCK_PREFIX	&quot;  cmpxchgl  %2,%0\n\t&quot;
+		&quot;  jnz	     1b\n\t&quot;
+		&quot;2:\n\t&quot;
+		&quot;# ending __down_read_trylock\n\t&quot;
+		: &quot;+m&quot;(sem-&gt;count), &quot;=&amp;a&quot;(result), &quot;=&amp;r&quot;(tmp)
+		: &quot;i&quot;(RWSEM_ACTIVE_READ_BIAS)
+		: &quot;memory&quot;, &quot;cc&quot;);
+	return result&gt;=0 ? 1 : 0;
+}
+
+/*
+ * trylock for writing -- returns 1 if successful, 0 if contention
+ */
+static inline int __down_write_trylock(struct rw_semaphore *sem)
+{
+	signed long ret = cmpxchg(&amp;sem-&gt;count,
+				  RWSEM_UNLOCKED_VALUE, 
+				  RWSEM_ACTIVE_WRITE_BIAS);
+	if (ret == RWSEM_UNLOCKED_VALUE)
+		return 1;
+	return 0;
+}
+</code></pre>
+<p>downgrade_write 的实现则类似写锁解锁，然后判断是否有必要唤醒等待队列中的项，这里其实和写锁解锁（<code>up_write</code>）的主要差别就是给 <code>sem-&gt;count</code> 加上的偏移量少了 1（可以回去看前面几个 <code>RWSEM_</code> 开头的宏定义），而这个 1 就是读锁占的值</p>
+<pre><code class="language-C">/*
+ * downgrade write lock to read lock
+ */
+static inline void __downgrade_write(struct rw_semaphore *sem)
+{
+	__asm__ __volatile__(
+		&quot;# beginning __downgrade_write\n\t&quot;
+LOCK_PREFIX	&quot;  addl      %[bias],(%%rdi)\n\t&quot; /* transitions 0xZZZZ0001 -&gt; 0xYYYY0001 */
+		&quot;  js        2f\n\t&quot; /* jump if the lock is being waited upon */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  call	     rwsem_downgrade_thunk\n&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending __downgrade_write\n&quot;
+		: &quot;=m&quot;(sem-&gt;count)
+		: &quot;D&quot;(sem), [bias] &quot;i&quot;(-RWSEM_WAITING_BIAS), &quot;m&quot;(sem-&gt;count)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * downgrade a write lock into a read lock
+ * - caller incremented waiting part of count, and discovered it to be still negative
+ * - just wake up any readers at the front of the queue
+ */
+struct rw_semaphore *rwsem_downgrade_wake(struct rw_semaphore *sem)
+{
+	rwsemtrace(sem,&quot;Entering rwsem_downgrade_wake&quot;);
+
+	spin_lock(&amp;sem-&gt;wait_lock);
+
+	/* do nothing if list empty */
+	if (!list_empty(&amp;sem-&gt;wait_list))
+		sem = __rwsem_do_wake(sem,0);
+
+	spin_unlock(&amp;sem-&gt;wait_lock);
+
+	rwsemtrace(sem,&quot;Leaving rwsem_downgrade_wake&quot;);
+	return sem;
+}
+</code></pre>
+<p>总结一下，读/写信号量和读/写自旋锁类似，两者语义上是相同的，也都是读优先的，只不过信号量是睡眠锁，当有长时间获取不到锁的情况时，不会导致过多的 CPU 开销</p>
+<h2 id="顺序锁">顺序锁</h2>
+<p>顺序锁和前面两者有个重要的区别，顺序锁是<strong>写优先</strong>的，让我们来分析下它是如何实现的</p>
+<p>首先还是使用方式上：</p>
+<pre><code class="language-C">// 定义一个顺序锁
+seqlock_t mr_seq_lock = DEFINE_SEQLOCK(mr_seq_lock);
+
+write_seqlock(&amp;mr_seq_lock);
+// 读写临界区
+write_sequnlock(&amp;mr_seq_lock);
+
+// 读锁的使用有较大区别
+unsigned long seq;
+do {
+	seq = read_seqbegin(&amp;mr_seq_lock);
+  // 读取数据...
+} while (read_seqretry(&amp;mr_seq_lock, seq));
+</code></pre>
+<p>一个使用例子是内核的 jiffies，它存储了机器启动到当前的时钟节拍，每次时钟中断时都会更新这个值，所以是一个高频写入的场景，<code>get_jiffies_64()</code> 函数用来获取这个值，它的实现是这样的</p>
+<pre><code class="language-C">u64 get_jiffies_64(void)
+{
+	unsigned long seq;
+	u64 ret;
+
+	do {
+		seq = read_seqbegin(&amp;xtime_lock);
+		ret = jiffies_64;
+	} while (read_seqretry(&amp;xtime_lock, seq));
+	return ret;
+}
+</code></pre>
+<p>顺序锁在读取时需要一个循环，这是为了判断在这个过程中是否有发生写入，如果没有，那么读取就是安全的，否则需要重试</p>
+<p>实现上，代码位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/linux/seqlock.h#L50">/include/linux/seqlock.h</a>，有比较清晰的注释：</p>
+<pre><code class="language-C">#define SEQLOCK_UNLOCKED { 0, SPIN_LOCK_UNLOCKED }
+#define seqlock_init(x)	do { *(x) = (seqlock_t) SEQLOCK_UNLOCKED; } while (0)
+
+/* Lock out other writers and update the count.
+ * Acts like a normal spin_lock/unlock.
+ * Don't need preempt_disable() because that is in the spin_lock already.
+ */
+static inline void write_seqlock(seqlock_t *sl)
+{
+	spin_lock(&amp;sl-&gt;lock);
+	++sl-&gt;sequence;
+	smp_wmb();			
+}	
+
+static inline void write_sequnlock(seqlock_t *sl) 
+{
+	smp_wmb();
+	sl-&gt;sequence++;
+	spin_unlock(&amp;sl-&gt;lock);
+}
+
+static inline int write_tryseqlock(seqlock_t *sl)
+{
+	int ret = spin_trylock(&amp;sl-&gt;lock);
+
+	if (ret) {
+		++sl-&gt;sequence;
+		smp_wmb();			
+	}
+	return ret;
+}
+
+/* Start of read calculation -- fetch last complete writer token */
+static inline unsigned read_seqbegin(const seqlock_t *sl)
+{
+	unsigned ret = sl-&gt;sequence;
+	smp_rmb();
+	return ret;
+}
+
+/* Test if reader processed invalid data.
+ * If initial values is odd, 
+ *	then writer had already started when section was entered
+ * If sequence value changed
+ *	then writer changed data while in section
+ *    
+ * Using xor saves one conditional branch.
+ */
+static inline int read_seqretry(const seqlock_t *sl, unsigned iv)
+{
+	smp_rmb();
+	return (iv &amp; 1) | (sl-&gt;sequence ^ iv);
+}
+</code></pre>
+<p>可以看到，顺序锁是基于一个自旋锁实现的。但额外依赖一个序列计数器，当获取写锁时，这个序列值会增加。读取数据时要先调用 <code>read_seqbegin</code>，它会返回这个序列值，读取完成后通过 <code>read_seqretry</code> 检查传入的值 <code>iv</code>，满足以下两个条件则说明读是安全的：</p>
+<ul>
+<li>如果 <code>iv</code> 是偶数（初始值为 0，写锁会加 1）则说明不是处在一个写操作进行的过程中</li>
+<li><code>iv</code> 和序列值相同（相同值异或结果为 0）说明没有写操作发生过</li>
+</ul>
+<p>这两者都满足，读取的值就是有效的</p>
+<p>所以，顺序锁是一种<strong>乐观锁</strong>，是不存在「读锁」的，而是通过类似版本号的机制来读，因此只要没有其他写者，随时都可以获取到写锁，以此实现写优先</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[2023 年度总结]]></title>
+        <id>https://xxxuuu.me/post/2023summary/</id>
+        <link href="https://xxxuuu.me/post/2023summary/">
+        </link>
+        <updated>2023-12-31T08:43:47.000Z</updated>
+        <content type="html"><![CDATA[<iframe style="border-radius:12px" src="https://open.spotify.com/embed/track/3J99JXowSczha1Cp0LtFoc?utm_source=generator" width="100%" height="152" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+<h2 id="春招-毕业">春招 &amp; 毕业</h2>
+<p>回看去年的年度总结，总体上是比较消极的。确实当时被秋招的压力压得喘不过气，想起了那句话：「时代的一粒灰，落在个人头上就是一座山」，虽然现在也仍然对未来并不抱有乐观的想法，但就今年上半年春招的情况来说，还算是满意的（预期一旦被降低，就很容易满足）</p>
+<p>春招时已经接近半放弃的状态，只投了 7 家，想着有深信服保底，大多都投的 infra 方面的岗位。最后 2 个进面，1 个拿 Offer，也是我现在待的这家公司（再见了窑鸡厂👋</p>
+<p>进面但挂了的是 bilibili，岗位是「系统研发工程师」，面试的组是做内核开发的（应该主要是网络子系统相关），第一面时就被面试官拷打了，在相关方面上平时接触和学习的很少，各种内核知识一问三不知，到了感觉面试结束后会被面试官偷偷骂浪费时间的程度（所以后来抽空看完了《Linux内核设计与实现》，发现问的其实都是很基础的问题...</p>
+<p>不过神奇的是阿 b 还是给我到了二面，虽然二面的惨状和一面差不多就是了.... 面试结束后 HR 打电话问为什么本科只写了两年，只能如实供述<s>案底</s>专升本经历，也许是因为背景问题，也许是面试表现确实不够好，又或者两者都有，之后也就没下文了</p>
+<figure data-type="image" tabindex="1"><img src="https://xxxuuu.me/post-images/1704017159940.png" alt="" loading="lazy"></figure>
+<p>另一家公司是存储领域的<s>startup</s>（其实也成立蛮久了），Ceph 的 leadership 之一，前些年也是 Ceph 开源贡献最多的中国公司，不过现在的产品已经魔改得和 Ceph 没啥关系了 <s>（忒修斯之船</s></p>
+<p>面试过程还是蛮愉快的，刚好毕设打算做的也和存储相关，是 LSM-Tree 相关的工作，聊了不少，自我感觉良好。流程推进也比较快，最后拿了个 sp offer。拿 offer 时还在犹豫要不要去。毕竟整体公司规模比深信服还是小很多，会担心发展和稳定性的问题，所以决定去提前实习感受下；去了实习后才发现这里的工作时间和氛围相比深信服就是天堂 <s>（全员 Vim，微软级作息，wfh 自由）</s>，于是果断留下来，春招就此结束（再见了窑鸡厂👋× 2</p>
+<p>年初时还拿了个 CCPC 广州站铜牌（翻了下时间，好像其实是去年底的了），也算圆了个在本科也拿牌子的小心愿。但因为从去年初到春招一直在准备找工作的关系，其实一直没怎么训练（完全拖后腿了），还是蛮对不起队友的</p>
+<p>毕业前的最后两个月，都投入到毕设上了，题目是《LSM-Tree 存储引擎的 KV 分离优化实现》，看题目就知道，是基于 WiscKey 的 idea 改改，构造在特定场景下某个指标 benchmark 更优的情况，玩一手田忌赛马，我这种三流本科生也只能做到这个程度了，还好学士论文是不公开的，没给网上塞垃圾</p>
+<p>设计实在没什么新意，做这个毕设更多是想在工程上练练手，但最后也翻车了。一开始想着用 Rust 从 0 糊一个出来，但无论是时间还是各种 corner cases 的考虑来说都差了太多，只能赶在 ddl 的最后半个月重新找了份 WiscKey 的开源实现修改，跑出 benchmark 来交差，实在太丢人了...</p>
+<figure data-type="image" tabindex="2"><img src="https://xxxuuu.me/post-images/1704017295807.png" alt="" loading="lazy"></figure>
+<p>到回学校领毕业证书那天，问了一圈同学，班上的求职/考研情况也不容乐观，在这时代洪流下，还是没有谁能独善其身，自己也许已经是其中的幸运儿了。这一节就以今年看的一本书中的这句话收尾吧：</p>
+<figure data-type="image" tabindex="3"><img src="https://xxxuuu.me/post-images/1704017722454.jpg" alt="" loading="lazy"></figure>
+<h2 id="工作-技术">工作 &amp; 技术</h2>
+<p>前面提到，最后去了某存储公司。公司里氛围很 open，不打卡，1075 基础上比较弹性，大多数人10点半左右到，也有些人长期 wfh。看到公司里很多人用 Vim，我也入了坑，之前专门发了篇文章提到：<a href="https://xxxuuu.me/post/vim-as-an-ide/">Vim as an IDE</a></p>
+<p>虽然入职后，发现和面试的不是一个组，进的组主要是做一个 Hyper-converged 的新产品，但也蛮有意思的，接触到了很多虚拟机、数据中心和块存储相关的知识。另一点感受就是对于这类 infrastructure 的产品来说，发版周期很长，对质量的把控更严格</p>
+<p>因为产品全部部署在客户自己的环境里，部分还是离线运行的，在产品之上承载着大量的数据和业务应用，一旦出现事故和问题，轻则击穿到研发，有高昂的排查、修复和再次交付成本；重则影响客户数据和业务，这是万万不可接受的</p>
+<p>我也是入职近三个月后才提交了第一行代码。这点和互联网业务的产品还是有根本性不同，导致了两者在软件工程流程上的区别，互联网业务的产品，大多跑在自己可控的服务器和环境中，出问题后，无论是影响还是排查和恢复的「代价」都没那么高，相比之下为了控制质量反而可能要付出更高的成本</p>
+<p>后面逃过一波<s>裁员</s>业务变动后，重心主要转移到容器存储这边，前段时间刚挖了个大坑，发现就算到了今天，K8s 的存储机制还是有不少设计欠佳的地方 <s>（不知道 K8s SIG Storage 这班人干什么吃的）</s>，不过这就是后话了。结合前段时间的滴滴故障事件，感觉到「这个世界果然还是草台班子组成的」</p>
+<p>除了正式的工作外，今年由于各种机缘巧合，涉足了币圈，第一次认真看了中本聪的 Bitcoin 白皮书，也学习了 EVM 链上的各种东西，并赚到了一些些钱。果然在任何时候，信息差都能是割韭菜的方式，而在完全公开的公链上，利用技术手段，可以将这个信息差发挥到极致，大大拉开和散户的差距，有机会的话后面再发篇文章讨论下这个吧</p>
+<h2 id="生活-碎碎念">生活 &amp; 碎碎念</h2>
+<p>开始工作后，经济上宽裕了不少，买了一堆东西折腾，最有用的就是买了台零刻的 MiniPC 装 PVE 作为 Homelab，在上面跑了各种东西，包括家庭流媒体服务器（追番用）和一台 Windows 虚拟机（Galgame 用），以及一些其他的服务，有了稳定的 24×7 运行环境，再也不用在笔记本上折腾了。在给<a href="https://xxxuuu.me/post/pve8-intel-sr-iov/">核显配置 SR-IOV</a> 后也能有很不错的图形体验，下一步打算整一台专门的 NAS</p>
+<figure data-type="image" tabindex="4"><img src="https://xxxuuu.me/post-images/1704025855040.png" alt="" loading="lazy"></figure>
+<p>这两年除了玩了会《神界原罪2》和《博德之门3》外，别的时间都没什么动力玩游戏，很难提起兴趣。也许是因为上大学后基本没玩过游戏了，很久没接触过的东西要再重新捡起来就很困难，感觉已经完全得了电子 ED，前段时间刚好看到 PS5 Slim 出了，就买了台，想重新找回童年时通宵游戏的感觉。最近在从《对马岛之魂》、《死亡搁浅》和《GT赛车7》开始玩，打算把这几年的作品都补一下，目前来看电子 ED 治疗的还可以<br>
+<img src="https://xxxuuu.me/post-images/2023summary.jpg" alt="" loading="lazy"></p>
+<p><s>原神，启动！</s><br>
+<img src="https://xxxuuu.me/post-images/1704027687706.jpg" alt="" loading="lazy"></p>
+<p>今年还推了不少 Galgame <s>（某种意义上来说不算游戏）</s>，还算印象深刻的有三部：</p>
+<ul>
+<li>《常规脱离Creative》：废萌，但小天使实在太可爱了，小天使我的小天使😭没有你我怎么活</li>
+<li>《恋×シンアイ彼女》：新岛夕没活了，留了个开放式结局太意难平了，姬野星奏坏女人，你给我回来😭</li>
+<li>《纸上的魔法使》：剧情很不错 <s>（废萌玩多了，太久没玩过剧情作了）</s>，前期埋了很多伏笔，带着这些悬念推进，到后期的反转时也被震惊到了。不过这个故事从一开始就注定是一个悲剧，实在太刀了... 最后结尾夜子说出「可喜可贺，可喜可贺」时有种失实感，觉得「这就是结局了吗，果然没办法呢」</li>
+</ul>
+<figure data-type="image" tabindex="5"><img src="https://xxxuuu.me/post-images/1704020242519.png" alt="" loading="lazy"></figure>
+<p>去年底说学了点日语，现在考过了 JLPT N3，算下来从五十音开始也花了快一年；看小🍠上各种一年过 N1 还是蛮震惊的，感觉自己进度比较慢，希望明年能考过 N2（估计得再听两次「天気がいいから，散歩しましょう」了</p>
+<p>YOASOBI 今年的歌 アイドル 虽然很火，但个人不是很喜欢，勇者作为 フリーレン 的 OP 完全在整烂活，Biri-Biri 挺有新意的但重复度太高，前段时间的 HEART BEAT 倒蛮喜欢的，合唱部分很感动，有种群青的感觉，果然是给年轻人的歌啊</p>
+<img src="/post-images/1704029365549.jpg" width=400/>
+<p>另外偶然看了是枝裕和的几部电影，表面上都是很平淡的家庭片，但背后蕴含着无数的情感，还蛮喜欢这种感觉的</p>
+<p>最后，今年看完了不少社科方面的书，目的还是想更了解所处的社会，就像前面引用的那句话所表达的意思一样，时代和环境对个人命运的影响要远大于个人努力。这里比较推荐《可能性的艺术》、《大国大城》和《置身事内》几本 <s>（应该也被推荐烂了，比较入门的科普性质读物</s></p>
+<h2 id="尾声">尾声</h2>
+<p>好像今年就到这结束了，从学校毕业，走上工作岗位，捡回了之前的一些东西，也折腾了一些新玩意，明年的今天又会怎么样呢</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[混乱的软中断概念]]></title>
+        <id>https://xxxuuu.me/post/softirq-and-software-interrupt/</id>
+        <link href="https://xxxuuu.me/post/softirq-and-software-interrupt/">
+        </link>
+        <updated>2023-08-16T13:10:01.000Z</updated>
+        <summary type="html"><![CDATA[<p>软中断（softirq）和软件中断（software interrupt）</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>软中断（softirq）和软件中断（software interrupt）</p>
+<!-- more -->
+<hr>
+<h2 id="背景">背景</h2>
+<p>最近在看 <em>Linux Kernel Development</em>（中译《Linux 内核设计与实现》）， 在中断这一章的注释让我犯了迷糊：<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/softirq-in-book.png" width=800 /></p>
+<p>原来还有两种软中断？而且还是不同的概念？在理清后我才发现，原来自己之前一直将这这两者混为一谈</p>
+<p>首先，概念混淆很大程度上是名词翻译的问题（这也是为什么技术书籍最好看英文原版），让我们列出两者的原名并重新命名（翻译）：</p>
+<ul>
+<li>softirq：软中断</li>
+<li>software interrupt： 软件中断</li>
+</ul>
+<p>接着，再从中断开始讲起</p>
+<h2 id="中断和异常">中断和异常</h2>
+<p>中断是一种操作系统的异步处理机制，可以说就是一种硬件的 callback。当硬件设备（例如键盘）发出一个中断（本质上就是一种电信号），操作系统内核会感知 CPU 受到中断信号，执行中断处理程序</p>
+<p>内核在执行中断处理程序时，运行在中断上下文中，这意味着中断处理程序不可阻塞，它必须执行完成，不能被打断。硬件设备生成中断的时候并不考虑与处理器的时钟同步，换句话说就是中断随时可以产生。因此，内核随时可能因为新到来的中断而被打断</p>
+<p>中断可能随时发生，中断处理程序又必须执行完成才能恢复其它程序的执行。这就要求中断处理程序必须要快，但它又必须得响应硬件的事件完成工作，为此 Linux 内核将中断处理程序划分为两个部分：<strong>上半部（top half）<strong>和</strong>下半部（bottom half）</strong>， 上半部在收到中断后就马上执行，负责快速响应，不允许被打断；下半部则会推迟执行，处理一些实时性要求不高、耗时较长的工作，下半部的执行允许被打断。例如对于网卡，上半部通常只是拷贝网卡数据到内存中，下半部才会进入协议栈进行处理。</p>
+<p>说到中断，也必须得提到异常。异常是一种类似与中断的机制，但不同之处在于，异常由软件主动触发，因此它是和处理器时钟同步的，也被称为 <strong>「同步中断」</strong>，相对应的前面硬件触发的中断就是 <strong>「异步中断」</strong>。在处理器和操作系统内核中这两者的处理方式是几乎一致的，所以常常被一起讨论</p>
+<h2 id="下半部和软中断softirq">下半部和软中断（softirq）</h2>
+<p>对于中断下半部的实现，内核提供了多种机制和方法，其中一种就是「软中断（softirq）」</p>
+<p>内核代码中，<code>softirq_action</code> 表示一个软中断，<code>softirq_vec</code> 则数组存放了被注册的软中断：</p>
+<pre><code class="language-C">// &lt;linux/interrupt.h&gt;
+struct softirq_action {
+    void (*action)(struct softirq_action *);
+};
+
+// kernel/softirq.c
+statis struct softirq_action softirq_vec[NR_SOFTIRQS];
+</code></pre>
+<p>软中断本身的注册是在编译期静态分配的（即 <code>softirq_vec</code> 数组本身的项），软中断处理程序则可以在运行时通过 <code>open_softirq()</code> 注册（相当于 <code>softirq_vec[ITEM].action = action</code>）</p>
+<p>例如下面的代码为 <code>NET_TX_SOFTIRQ</code> 和 <code>NET_RX_SOFTIRQ</code> 两个软中断注册了处理程序：</p>
+<pre><code class="language-C">open_softirq(NET_TX_SOFTIRQ, net_tx_action);
+open_softirq(NET_RX_SOFTIRQ, net_rx_action);
+</code></pre>
+<p>当内核运行时在某些特殊的时刻和位置，例如从硬件中断中返回，或 <code>ksoftirqd</code> 内核线程中，软中断就会被触发执行，也可以使用 <code>raise_softirq()</code> 主动触发。</p>
+<p>通过这一系列机制，就实现了中断的下半部。所以，软中断到底和中断有什么关系呢？软中断只是实现中断下半部的一种机制而已。除此之外，在我看来，软中断就只是软件的 callback，对应中断是硬件的 callback，有这么一层名称上的对应。</p>
+<h2 id="软件中断software-interrupt">软件中断（software interrupt）</h2>
+<p>另一个概念是软件中断，软件中断实际上在上面已经提到过了。没错，它就是「异常」，或者说同步中断，下文统一称中断</p>
+<p>严格地说，软件中断特指的是指令 <code>int</code>，它的作用就是触发一个中断。例如在执行系统调用时，实际上就会执行 <code>int 0x80</code>，触发 128 号中断，在 Linux 内核中，128 号中断处理程序正是系统调用处理程序 <code>system_call()</code>。通过软件中断，用户态的程序就实现了控制权的转移，能切换到内核特权模式下执行危险的代码，这就是系统调用</p>
+<blockquote>
+<p>PS：所有系统调用都是用同一个中断号触发，如何区分不同的系统调用？根据体系结构的不同，在执行 <code>int 0x80</code> 前会在约定的寄存器中存储一个系统调用号，通过该系统调用号来判断执行哪一个系统调用</p>
+</blockquote>
+<blockquote>
+<p>PPS：实际上，现在的 Linux 已经不使用 <code>int 0x80</code> 执行系统调用了，这种方式还是需要走一遍完整的中断流程，性能不够好。现在的 Linux 能够在受支持的处理器上通过 <code>sysenter</code> 指令执行系统调用，它可以直接跳转到指定函数执行并完成特权和堆栈切换，而不需要绕一大圈触发中断</p>
+</blockquote>
+<blockquote>
+<p>PPPS：额外提一嘴，异常实际上还可以分为陷阱（trap）、故障（fault）和终止（abort）。<code>int</code> 就是陷阱，是有意的异常。故障也十分常见，例如缺页异常，当执行某个访存操作时，如果该虚拟地址对应的页面不在内存中，就会触发缺页异常，内核从硬盘上将这个页面换回内存，然后重新执行访存指令。可以发现故障和陷阱的区别是，故障在返回后，会重新执行触发故障的指令，而陷阱则从下一条开始执行</p>
+</blockquote>
+<h2 id="总结">总结</h2>
+<p>现在可以盖棺定论了，软中断（softirqs）只是实现下半部的机制<strong>之一</strong>，并没有产生中断；而软件中断（software interrupt）是会产生同步中断（异常）的，可以说它是真正的中断，只是由软件产生的</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[PVE8 上启用 12 代 Intel CPU 核显 SR-IOV]]></title>
+        <id>https://xxxuuu.me/post/pve8-intel-sr-iov/</id>
+        <link href="https://xxxuuu.me/post/pve8-intel-sr-iov/">
+        </link>
+        <updated>2023-08-06T04:20:37.000Z</updated>
+        <summary type="html"><![CDATA[<p>拯救我的 Galgame 和追番体验～</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>拯救我的 Galgame 和追番体验～</p>
+<!-- more -->
+<h2 id="背景">背景</h2>
+<p>前段时间买了台 MiniPC 装 PVE 作为 Homelab，打算作为媒体服务器 + NAS + 学习使用 <s>（虽然最后主要是用来装 Windows 虚拟机玩 Galgame）</s></p>
+<p>机子的 U 是 12 代的 i3-N305，买的时候 PVE8 还没发布，装的是 PVE7，5.x 的内核，对 12 代 U 还没有很完善的支持，核显无法使用。这就导致在 Jellyfin 看番只能软解，以及玩 Galgame 时压力都在 CPU 上，全程 CPU 100%，体验说不上好</p>
+<p>最近发现 PVE8 发布了，升级到了 6.2 的内核，于是赶紧折腾一下。升级过程网上很多文章，这里略，无非就是配置下镜像源然后 <code>apt update &amp; apt dist-upgrade</code></p>
+<h2 id="开启核显-sr-iov">开启核显 SR-IOV</h2>
+<p>SR-IOV 是一种硬件虚拟化技术，简单来说，能将物理 PCIe 设备虚拟成多个虚拟设备，在网卡上被广泛使用。Intel Core CPU 在 11 代后支持了该技术用于 GPU 虚拟化，替换了过去的 GVT-g（<a href="https://www.intel.cn/content/www/cn/zh/support/articles/000093216/graphics.html">Intel 产品 GPU 虚拟化技术列表</a>）</p>
+<p>开启 SR-IOV 主要用到这个驱动程序：<a href="https://github.com/strongtz/i915-sriov-dkms">i915-sriov-dkms</a>，能够创建最多 7 个 VF（可以简单理解为 vGPU）</p>
+<p>按着文档里「PVE Host Installation Steps (Tested Kernel 6.1 and 6.2)」这步做即可。在 <code>update-grub</code> 和 <code>update-initramfs -u</code> 后多执行一句 <code>pve-efiboot-tool refresh</code></p>
+<p>但我这里遇到一个问题，重启后查看 <code>dmesg | grep i915</code> 有这样两条日志</p>
+<pre><code>i915: unknown parameter 'max_vfs' ignored
+....
+i915 0000:00:02.0: driver does not support SR-IOV configuration via sysfs
+</code></pre>
+<p>看了<a href="https://github.com/strongtz/i915-sriov-dkms/issues/53">这个 issue </a>后，尝试重装。删除了原来的 dkms 模块，修改 <code>dkms.conf</code> 里的 <code>PACKAGE_NAME</code> 为 6.2（原来是 6.1，不过这步感觉应该没影响），然后 install 时加上 <code>--force</code> 重新走遍安装流程</p>
+<p>这回正常了，上面两条日志没有了，也显示成功启用 VF，<code>lspci | grep VGA</code> 能看到多出来 7 个 GPU 设备，可以将其挂载到 LXC 或虚拟机中（00.02.0 那个物理 GPU / PF 不应该被使用）<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806170352.png" alt="lspci-output" width=800 /></p>
+<h2 id="windows-虚拟机挂载">Windows 虚拟机挂载</h2>
+<p>Windows 虚拟机要先配置好远程桌面，能连的上。虚拟机配置里「显示」选「无」（选「无」后就无法 VNC 连接了，所以要先配好远程桌面）</p>
+<p>添加 PCI 设备，选择 vGPU，勾上主 GPU<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806170517.png" alt="win-vm-config" width=800 /></p>
+<p>进入 Windows <a href="https://www.intel.cn/content/www/cn/zh/support/intel-driver-support-assistant.html">安装驱动</a>，Bingo<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806170548.png" alt="win-gpu" width=800 /></p>
+<h2 id="lxc-容器挂载">LXC 容器挂载</h2>
+<p>新建 LXC 容器要选择「嵌套」+「特权」（去掉无特权容器的 ✅）</p>
+<p>挂载设备到 LXC 容器里，在 PVE 里找下对应设备驱动，选一个未使用的 vGPU 记下第 5 、 6 列的 video id 和 render id（不要选了 0 的物理 GPU / PF），我这里选择 card2 和 renderD130</p>
+<pre><code class="language-bash">$ ls -l /dev/dri
+total 0
+drwxr-xr-x 2 root root        320 Aug  6 00:38 by-path
+crw-rw---- 1 root video  226,   0 Aug  6 00:30 card0
+crw-rw---- 1 root video  226,   2 Aug  6 00:30 card2
+crw-rw---- 1 root video  226,   3 Aug  6 00:30 card3
+crw-rw---- 1 root video  226,   4 Aug  6 00:30 card4
+crw-rw---- 1 root video  226,   5 Aug  6 00:30 card5
+crw-rw---- 1 root video  226,   6 Aug  6 00:30 card6
+crw-rw---- 1 root video  226,   7 Aug  6 00:30 card7
+crw-rw---- 1 root render 226, 128 Aug  6 00:30 renderD128
+crw-rw---- 1 root render 226, 130 Aug  6 00:30 renderD130
+crw-rw---- 1 root render 226, 131 Aug  6 00:30 renderD131
+crw-rw---- 1 root render 226, 132 Aug  6 00:30 renderD132
+crw-rw---- 1 root render 226, 133 Aug  6 00:30 renderD133
+crw-rw---- 1 root render 226, 134 Aug  6 00:30 renderD134
+crw-rw---- 1 root render 226, 135 Aug  6 00:30 renderD135
+</code></pre>
+<p>关闭 LXC 容器，然后修改对应 LXC 容器配置文件</p>
+<pre><code class="language-bash">$ vim /etc/pve/lxc/&lt;LXC_ID&gt;.conf
+</code></pre>
+<p>添加以下内容把设备挂载到 LXC 内（分别填入 video id 和 render id，以及映射对应 card 和 render）</p>
+<pre><code>lxc.cgroup2.devices.allow: c 226:2 rwm
+lxc.cgroup2.devices.allow: c 226:130 rwm
+lxc.mount.entry: /dev/dri/card2 dev/dri/card0 none bind,optional,create=file
+lxc.mount.entry: /dev/dri/renderD130 dev/dri/renderD128 none bind,optional,create=file
+</code></pre>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806170700.png" alt="lxc-gpu-config" width=800>
+<p>进入 LXC 容器安装驱动</p>
+<pre><code class="language-bash">$ apt update &amp;&amp; apt install intel-media-va-driver-non-free vainfo
+</code></pre>
+<p>如果 LXC 内也使用了容器，例如我在 LXC 内装了 Docker 部署 Jellyfin，则容器内也要有驱动，并把设备挂载进去</p>
+<pre><code class="language-bash">$ docker run ... \
+    ... \
+    --device /dev/dri:/dev/dri \
+    ...
+</code></pre>
+<p>然后 Jellyfin 容器内就可以找到对应设备，启用硬件加速即可<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20230806173300.png" alt="jellyfin-vaapi" width=800></p>
+<h2 id="总结">总结</h2>
+<p>核心就两步：</p>
+<ol>
+<li>在 host（PVE）上安装驱动模块，开启 SR-IOV</li>
+<li>配置虚拟机 or LXC 挂载 vGPU，并在里面安装驱动</li>
+</ol>
+<p>有了 GPU 后体验好了很多，无论是 Windows 玩 Galgame 还是 Jellyfin 追番硬解，CPU 压力基本不超 5%，十分流畅，释放了本就不强的 CPU 算力。而且相比独占的直通物理 GPU，SR-IOV 虚拟出来的多个 vGPU 能分给多台虚拟机使用，打造完美 Homelab</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[容器标准和生态]]></title>
+        <id>https://xxxuuu.me/post/container-spec-ecosystem/</id>
+        <link href="https://xxxuuu.me/post/container-spec-ecosystem/">
+        </link>
+        <updated>2023-07-12T10:37:19.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="ociopen-container-initiative">OCI（Open Container Initiative）</h2>
+<p><a href="https://opencontainers.org/about/overview/">OCI（Open Container Initiative，开放容器提议）</a>，是围绕容器镜像格式和运行时设立的标准，在 2015 年 6 月推出。基于 Docker 捐赠的 <a href="https://github.com/opencontainers/runc">runC</a> 实现之上发展而来</p>
+<p>其中，镜像标准（<a href="https://github.com/opencontainers/image-spec">image-spec</a>）规定了镜像如何组织文件层，镜像配置文件格式</p>
+<p>运行时标准（<a href="https://github.com/opencontainers/runtime-spec">runtime-spec</a>）规定了容器的生命周期和需要支持的操作、配置项等</p>
+<p>2022 年 5 月新增加了分发标准（<a href="https://github.com/opencontainers/distribution-spec">distribution-spec</a>），规定了镜像分发的 API 协议，包括认证方式、Push、Pull、内容发现、管理等</p>
+<h3 id="镜像组成">镜像组成</h3>
+<p>OCI 标准中，镜像由 index，config 和各个 layer 组成<br>
+<img src="https://github.com/opencontainers/image-spec/raw/main/img/build-diagram.png" alt="img-spec" width=800></p>
+<p>拉取一个 nginx 镜像并解压，可以看到其目录格式</p>
+<pre><code class="language-bash">$ docker pull nginx
+$ docker image save nginx -o nginx.tar
+$ mkdir nginx-image
+$ tar -C nginx-image -xvf nginx.tar
+$ tree nginx-image/
+nginx-image/
+├── 180ddd9cc15d32f0c1d5f85cf442ef1179f21ae197b60bf086b0e8c7ef153737
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 2002d33a54f72d1333751d4d1b4793a60a635eac6e94a98daf0acea501580c4f.json
+├── 3cba2048aa0f37f06b8b1a3949e6b67da78d9f49fb6d5f34fefa328a304dfe8e
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 570d178d9aab5e7b03bdf17302b91cece28924d72f204567dd6c2fcb1667e883
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 5839a53cafa501af1381d6f0db2084e32bb64d0a1461a278f587cc0ea4fc62e2
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 664733ad6a589f5aa51e830e2a10c0768b854f28cc278316938c00ce1c4c60e2
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── 907ca8c9f37f4bb34cef8feea392fff0d811b7d1fff826dc84c8330c0b158227
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── ae5db48f55baf22a5d27ab7965647d55c3f6aba87733e5f0ae57188d956a8a7b
+│   ├── VERSION
+│   ├── json
+│   └── layer.tar
+├── manifest.json
+└── repositories
+
+8 directories, 24 files
+</code></pre>
+<p>Docker 镜像并不符合 OCI 镜像标准，但 OCI 的镜像标准基于 Docker 镜像标准，因此两者在结构上是类似的，有一定对应关系</p>
+<p>使用 <a href="https://github.com/containers/skopeo">skopeo</a> 可以将 Docker 镜像转化为 OCI 镜像</p>
+<pre><code class="language-bash">$ skopeo copy docker-archive:nginx.tar oci:nginx-oci-image
+$ tree nginx-oci-image
+nginx-oci-image
+├── blobs
+│   └── sha256
+│       ├── 365ede46b010c470bbbd13f6bacc0df1700116f4c3a01f25a0fab726b7860e31
+│       ├── 50c4949e5433b622681d55d92f68bc289ed0b91536d07b0ed88d057fd95ba2bd
+│       ├── 55bc6f293903816a086b9803b0fac7d6e854976aa96cfaacd66b39b4754415d0
+│       ├── 7a33d678a8761d2b10b60fe4da32e70e201d65550d2601f9b2e3e5fb4cc6e115
+│       ├── 861c679dd19193ec028cddb97f5b1e18738ec0525617ff698df4a055606af93d
+│       ├── af84cea3992c73a86ca5b3fcb8043f0964308be3db3dbc93222c589b15e90ba7
+│       ├── ba28188e316f3a7d8b65f6496a57cb9ce5f59b636ed0b0fae8bf564723321448
+│       ├── c26fc88390de90988b10de0590c08942dd7b1346c9ec912e9a0c763bc6de1e9e
+│       └── f0baa6626451c47bb1cb7f72d5cb0e732283a231fa4cb001a36b55e5fc31640f
+├── index.json
+└── oci-layout
+
+3 directories, 11 files
+</code></pre>
+<p>index.json 是 <a href="https://github.com/opencontainers/image-spec/blob/main/image-index.md">image index</a>，用于索引 manifest 文件，跨平台和架构的镜像可能对每一个平台都有一个 manifest 文件</p>
+<pre><code class="language-bash">$ cat nginx-oci-image/index.json | json_pp
+{
+   &quot;manifests&quot; : [
+      {
+         &quot;digest&quot; : &quot;sha256:c26fc88390de90988b10de0590c08942dd7b1346c9ec912e9a0c763bc6de1e9e&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+         &quot;size&quot; : 1338
+      }
+   ],
+   &quot;schemaVersion&quot; : 2
+}
+</code></pre>
+<p><code>manifests.digest</code> 中就是 manifest 文件摘要值，同时也是文件名，由此可以很快找到 manifest 文件。<a href="https://github.com/opencontainers/image-spec/blob/master/manifest.md">image manifest</a> 索引了镜像的配置和 layer 层文件位置及其类型。可以看出，配置是一个 JSON 文件，而每一层是进行压缩后存储的。</p>
+<pre><code class="language-bash">$ cat nginx-oci-image/blobs/sha256/c26fc88390de90988b10de0590c08942dd7b1346c9ec912e9a0c763bc6de1e9e | json_pp
+{
+   &quot;config&quot; : {
+      &quot;digest&quot; : &quot;sha256:50c4949e5433b622681d55d92f68bc289ed0b91536d07b0ed88d057fd95ba2bd&quot;,
+      &quot;mediaType&quot; : &quot;application/vnd.oci.image.config.v1+json&quot;,
+      &quot;size&quot; : 7075
+   },
+   &quot;layers&quot; : [
+      {
+         &quot;digest&quot; : &quot;sha256:861c679dd19193ec028cddb97f5b1e18738ec0525617ff698df4a055606af93d&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 29922714
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:f0baa6626451c47bb1cb7f72d5cb0e732283a231fa4cb001a36b55e5fc31640f&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 39120911
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:ba28188e316f3a7d8b65f6496a57cb9ce5f59b636ed0b0fae8bf564723321448&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 630
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:7a33d678a8761d2b10b60fe4da32e70e201d65550d2601f9b2e3e5fb4cc6e115&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 975
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:af84cea3992c73a86ca5b3fcb8043f0964308be3db3dbc93222c589b15e90ba7&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 376
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:365ede46b010c470bbbd13f6bacc0df1700116f4c3a01f25a0fab726b7860e31&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 1234
+      },
+      {
+         &quot;digest&quot; : &quot;sha256:55bc6f293903816a086b9803b0fac7d6e854976aa96cfaacd66b39b4754415d0&quot;,
+         &quot;mediaType&quot; : &quot;application/vnd.oci.image.layer.v1.tar+gzip&quot;,
+         &quot;size&quot; : 1439
+      }
+   ],
+   &quot;mediaType&quot; : &quot;application/vnd.oci.image.manifest.v1+json&quot;,
+   &quot;schemaVersion&quot; : 2
+}
+</code></pre>
+<p><a href="https://github.com/opencontainers/image-spec/blob/main/config.md">image configuration</a> 描述了镜像所属的平台，配置（类似在 Dockerfile 中定义的环境变量、端口、ENTRYPOINT、CMD 等），以及各个层的历史记录，<code>created_by</code> 是创建层的命令，<code>empty_layer</code> 表示该层是否导致文件系统变化。最后是各个层未压缩内容的摘要（<code>diff_ids</code>）</p>
+<pre><code class="language-bash">$ cat nginx-oci-image/blobs/sha256/50c4949e5433b622681d55d92f68bc289ed0b91536d07b0ed88d057fd95ba2bd | json_pp
+{
+   &quot;architecture&quot; : &quot;arm64&quot;,
+   &quot;config&quot; : {
+      &quot;Cmd&quot; : [
+         &quot;nginx&quot;,
+         &quot;-g&quot;,
+         &quot;daemon off;&quot;
+      ],
+      &quot;Entrypoint&quot; : [
+         &quot;/docker-entrypoint.sh&quot;
+      ],
+      &quot;Env&quot; : [
+         &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+         &quot;NGINX_VERSION=1.25.1&quot;,
+         &quot;NJS_VERSION=0.7.12&quot;,
+         &quot;PKG_RELEASE=1~bookworm&quot;
+      ],
+      &quot;ExposedPorts&quot; : {
+         &quot;80/tcp&quot; : {}
+      },
+      &quot;Labels&quot; : {
+         &quot;maintainer&quot; : &quot;NGINX Docker Maintainers &lt;docker-maint@nginx.com&gt;&quot;
+      },
+      &quot;StopSignal&quot; : &quot;SIGQUIT&quot;
+   },
+   &quot;created&quot; : &quot;2023-07-04T04:07:41.151938228Z&quot;,
+   &quot;history&quot; : [
+      {
+         &quot;created&quot; : &quot;2023-07-04T01:57:35.692631089Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) ADD file:71fd66666294148382f2e6a09ae5e277d4c4e9c74402ab64b693a79387b67a09 in / &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T01:57:36.102524763Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  CMD [\&quot;bash\&quot;]&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:14.692138315Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  LABEL maintainer=NGINX Docker Maintainers &lt;docker-maint@nginx.com&gt;&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:14.774865505Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  ENV NGINX_VERSION=1.25.1&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:14.852567081Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  ENV NJS_VERSION=0.7.12&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:14.931774163Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  ENV PKG_RELEASE=1~bookworm&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.172513807Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c set -x     &amp;&amp; groupadd --system --gid 101 nginx     &amp;&amp; useradd --system --gid nginx --no-create-home --home /nonexistent --comment \&quot;nginx user\&quot; --shell /bin/false --uid 101 nginx     &amp;&amp; apt-get update     &amp;&amp; apt-get install --no-install-recommends --no-install-suggests -y gnupg1 ca-certificates     &amp;&amp;     NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62;     NGINX_GPGKEY_PATH=/usr/share/keyrings/nginx-archive-keyring.gpg;     export GNUPGHOME=\&quot;$(mktemp -d)\&quot;;     found='';     for server in         hkp://keyserver.ubuntu.com:80         pgp.mit.edu     ; do         echo \&quot;Fetching GPG key $NGINX_GPGKEY from $server\&quot;;         gpg1 --keyserver \&quot;$server\&quot; --keyserver-options timeout=10 --recv-keys \&quot;$NGINX_GPGKEY\&quot; &amp;&amp; found=yes &amp;&amp; break;     done;     test -z \&quot;$found\&quot; &amp;&amp; echo &gt;&amp;2 \&quot;error: failed to fetch GPG key $NGINX_GPGKEY\&quot; &amp;&amp; exit 1;     gpg1 --export \&quot;$NGINX_GPGKEY\&quot; &gt; \&quot;$NGINX_GPGKEY_PATH\&quot; ;     rm -rf \&quot;$GNUPGHOME\&quot;;     apt-get remove --purge --auto-remove -y gnupg1 &amp;&amp; rm -rf /var/lib/apt/lists/*     &amp;&amp; dpkgArch=\&quot;$(dpkg --print-architecture)\&quot;     &amp;&amp; nginxPackages=\&quot;         nginx=${NGINX_VERSION}-${PKG_RELEASE}         nginx-module-xslt=${NGINX_VERSION}-${PKG_RELEASE}         nginx-module-geoip=${NGINX_VERSION}-${PKG_RELEASE}         nginx-module-image-filter=${NGINX_VERSION}-${PKG_RELEASE}         nginx-module-njs=${NGINX_VERSION}+${NJS_VERSION}-${PKG_RELEASE}     \&quot;     &amp;&amp; case \&quot;$dpkgArch\&quot; in         amd64|arm64)             echo \&quot;deb [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bookworm nginx\&quot; &gt;&gt; /etc/apt/sources.list.d/nginx.list             &amp;&amp; apt-get update             ;;         *)             echo \&quot;deb-src [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bookworm nginx\&quot; &gt;&gt; /etc/apt/sources.list.d/nginx.list                         &amp;&amp; tempDir=\&quot;$(mktemp -d)\&quot;             &amp;&amp; chmod 777 \&quot;$tempDir\&quot;                         &amp;&amp; savedAptMark=\&quot;$(apt-mark showmanual)\&quot;                         &amp;&amp; apt-get update             &amp;&amp; apt-get build-dep -y $nginxPackages             &amp;&amp; (                 cd \&quot;$tempDir\&quot;                 &amp;&amp; DEB_BUILD_OPTIONS=\&quot;nocheck parallel=$(nproc)\&quot;                     apt-get source --compile $nginxPackages             )                         &amp;&amp; apt-mark showmanual | xargs apt-mark auto &gt; /dev/null             &amp;&amp; { [ -z \&quot;$savedAptMark\&quot; ] || apt-mark manual $savedAptMark; }                         &amp;&amp; ls -lAFh \&quot;$tempDir\&quot;             &amp;&amp; ( cd \&quot;$tempDir\&quot; &amp;&amp; dpkg-scanpackages . &gt; Packages )             &amp;&amp; grep '^Package: ' \&quot;$tempDir/Packages\&quot;             &amp;&amp; echo \&quot;deb [ trusted=yes ] file://$tempDir ./\&quot; &gt; /etc/apt/sources.list.d/temp.list             &amp;&amp; apt-get -o Acquire::GzipIndexes=false update             ;;     esac         &amp;&amp; apt-get install --no-install-recommends --no-install-suggests -y                         $nginxPackages                         gettext-base                         curl     &amp;&amp; apt-get remove --purge --auto-remove -y &amp;&amp; rm -rf /var/lib/apt/lists/* /etc/apt/sources.list.d/nginx.list         &amp;&amp; if [ -n \&quot;$tempDir\&quot; ]; then         apt-get purge -y --auto-remove         &amp;&amp; rm -rf \&quot;$tempDir\&quot; /etc/apt/sources.list.d/temp.list;     fi     &amp;&amp; ln -sf /dev/stdout /var/log/nginx/access.log     &amp;&amp; ln -sf /dev/stderr /var/log/nginx/error.log     &amp;&amp; mkdir /docker-entrypoint.d&quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.509711194Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:7b307b62e82255f040c9812421a30090bf9abf3685f27b02d77fcca99f997911 in / &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.592126807Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:5c18272734349488bd0c94ec8d382c872c1a0a435cca13bd4671353d6021d2cb in /docker-entrypoint.d &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.669169781Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:d4375883ed5db364232ccf781e8ad28514cd005edb385d43dbfb984f2c63edb9 in /docker-entrypoint.d &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.748027972Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:36429cfeeb299f9913b84ea136b004be12fbe4bb4f975a977a3608044e8bfa91 in /docker-entrypoint.d &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.825522699Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop) COPY file:e57eef017a414ca793499729d80a7b9075790c9a804f930f1417e56d506970cf in /docker-entrypoint.d &quot;
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.903102418Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  ENTRYPOINT [\&quot;/docker-entrypoint.sh\&quot;]&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:40.983008834Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  EXPOSE 80&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:41.065899155Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  STOPSIGNAL SIGQUIT&quot;,
+         &quot;empty_layer&quot; : true
+      },
+      {
+         &quot;created&quot; : &quot;2023-07-04T04:07:41.151938228Z&quot;,
+         &quot;created_by&quot; : &quot;/bin/sh -c #(nop)  CMD [\&quot;nginx\&quot; \&quot;-g\&quot; \&quot;daemon off;\&quot;]&quot;,
+         &quot;empty_layer&quot; : true
+      }
+   ],
+   &quot;os&quot; : &quot;linux&quot;,
+   &quot;rootfs&quot; : {
+      &quot;diff_ids&quot; : [
+         &quot;sha256:efd1965f1684506744544d66c57387a60bd89607480e2dbc89bf3e8a30081bc1&quot;,
+         &quot;sha256:c58d5a26ffa8db76c403fb4c29965689bb96d291f6b7973fcd2da7458e77b09f&quot;,
+         &quot;sha256:4e6bef96e37ee051573dda6c367adb7310ef7a87128ce00fcf0ce2cbd2d8779b&quot;,
+         &quot;sha256:ad6517b0c9140f029ee765885ec82f571513bc8db2f834aa1d204f67d61cad12&quot;,
+         &quot;sha256:7cd1e5cbf1244b4fcca08e842c7672aba5ead973c2a4532496278aa5846802a3&quot;,
+         &quot;sha256:45437bbd87f23643f7893993d62b4affddbdf91808ff8cd0530b301acbc5f120&quot;,
+         &quot;sha256:0a13d2aaa54c14621a732a3ffe6f25a487aa726529ad152c4174d2e741b7ef66&quot;
+      ],
+      &quot;type&quot; : &quot;layers&quot;
+   },
+   &quot;variant&quot; : &quot;v8&quot;
+}
+</code></pre>
+<p>如果对层进行解压，就可以得到里面文件系统的内容</p>
+<pre><code class="language-bash">$ mkdir rootfs
+$ tar -zxvf nginx-oci-image/blobs/sha256/861c679dd19193ec028cddb97f5b1e18738ec0525617ff698df4a055606af93d -C rootfs/
+$ tree rootfs -L 1
+rootfs
+├── bin -&gt; usr/bin
+├── boot
+├── dev
+├── etc
+├── home
+├── lib -&gt; usr/lib
+├── media
+├── mnt
+├── opt
+├── proc
+├── root
+├── run
+├── sbin -&gt; usr/sbin
+├── srv
+├── sys
+├── tmp
+├── usr
+└── var
+
+19 directories, 0 files
+</code></pre>
+<h3 id="运行时">运行时</h3>
+<p>runC 是纯粹的 runtime，OCI 的 runtime-spec 基于 runC 制定</p>
+<p>要启动 runC（或其它符合 OCI runtime-spec 的运行时），需要一个 rootfs 和 <code>config.json</code>，rootfs 就是容器运行的文件系统，<code>config.json</code> 则定义了运行的配置</p>
+<p>rootfs 可以从镜像 layer 中一层层解包合并得到。<code>config.json</code> 的一个可能示例如下：</p>
+<pre><code class="language-json">{
+  &quot;ociVersion&quot;: &quot;0.1.0&quot;,
+  &quot;root&quot;: {
+    &quot;path&quot;: &quot;rootfs&quot;,
+    &quot;readonly&quot;: true
+  },
+  &quot;mounts&quot;: [
+    {
+      &quot;destination&quot;: &quot;/data&quot;,
+      &quot;type&quot;: &quot;none&quot;,
+      &quot;source&quot;: &quot;/volumes/testing&quot;,
+      &quot;options&quot;: [&quot;rbind&quot;,&quot;rw&quot;]
+    }
+  ],
+  &quot;process&quot;: {
+    &quot;env&quot;: [
+      &quot;PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin&quot;,
+      &quot;TERM=xterm&quot;
+    ],
+    &quot;args&quot;: [&quot;sh&quot;]
+  }
+}
+</code></pre>
+<p>通过 <code>runc run</code> 即可启动容器，会自动读取路径下的 <code>config.json</code>。其中 <code>root.path</code> 指定了 rootfs 的路径</p>
+<p><code>config.json</code> 的配置和平常使用的 Docker 等基本都能大致对上，但 runC 是不包括网络实现的，通过 <code>runc exec</code> 进入容器内就可以发现只有一张 loop 网卡</p>
+<p>这些部分是留给更高级的容器运行时去完成，例如可以在标准中生命周期的 <code>createContainer</code> 和 <code>start</code> 之间进行网卡创建，存储挂载等操作</p>
+<p>runtime 这块还有一些有意思的实现，比如 <a href="https://katacontainers.io/">Kata</a> 和 <a href="https://gvisor.dev/">gVisor</a> 之类的内核容器，前者给容器跑了一个完整的 VMM（QEMU/KVM 等）来做内核隔离，后者给每个容器塞了一个 Go 写的模拟内核，重定向所有 syscall 过去，代替宿主机内核</p>
+<h3 id="一些历史">一些历史</h3>
+<p>在早期，Docker 拥有容器领域的绝对领导权，但作为一个商业公司，这实际上引发了其它公司（Red Hat、Google 等）的不满和担忧</p>
+<p>Google 也尝试过开源自身的容器方案，但未能成功。因此 Google 向 Docker 提议共同推动一个中立的容器运行时作为 Docker 项目的核心依赖，但没有得到 Docker 的同意</p>
+<p>在 2015 年，Docker 公司的强势长期饱受社区诟病，为了表示诚意，Docker 和 Google、Red Hat、CoreOS 决定成立一个「中立」的基金会，共同制定一套容器的标准和规范，这套标准就是 OCI。Docker 也将自身的 libcontainer 捐出，改名为 runC，作为 OCI 标准制定的基础</p>
+<p>Docker 作为当时容器的事实标准，本身并无多大动力去推进 OCI 的发展，OCI 也未能削弱 Docker 的地位。Google 和 Red Hat 利用自己在大规模集群和平台上的经验，又成立了 CNCF（Cloud Native Computing Foundation），以 Google 内部的 Borg 孵化出的 Kubernetes 项目为基础，从平台侧架空 Docker，从现在来看，这个战略非常成功，Docker Swarm 面对 Kubernetes 无疑是失败的，Swarm 项目被取消，Docker 企业版直接内置 Kubernetes，放弃开源社区竞争，进行商业化转型。现在，CNCF 涉及越来越多的领域，成为了云原生新的绝对权威</p>
+<h2 id="高级容器运行时">高级容器运行时</h2>
+<p>runC 只实现了 OCI 的 runtime-spec（这句话有点别扭，是先有的 runC，才有的 OCI），也就是说，它是无法处理镜像的，只负责运行进程和隔离。这是一种低级容器运行时，而且 OCI 也只专注核心的容器功能，网络、存储标准都没有进行定义（目前比较流行的网络和存储标准分别是 <a href="https://github.com/containernetworking/cni">CNI</a> 和 <a href="https://github.com/container-storage-interface/spec/blob/master/spec.md">CSI</a>）</p>
+<p>更多时候，我们指的容器运行时是高级容器运行时，高级容器运行时最基本的功能就是能够将镜像处理成 rootfs 来传递给 runC 等低级运行时，这个过程中还要处理镜像的 layer 共享等很多问题。通常也会包括监控、日志、管理、API 等更多功能</p>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/cncf-container-runtime.png" alt="container-runtime" width=800>
+<h3 id="containerd">containerd</h3>
+<p>一个典型的高级容器运行时就是 containerd（最典型的应该是 Docker，但大家都太熟悉了就懒得说了），containerd 从 Docker 项目中独立出来</p>
+<img src="https://containerd.io/img/architecture.png" alt="containerd-arch" width=800>
+<p><em>⬆️ Docker 是一个大而全的容器运行时，以至于在这里甚至将它划分为了一个平台</em></p>
+<p>containerd 的实现高度模块化，各个模块之间使用 ttrpc（gRPC 的改良）通信，并且支持通过插件来扩展。containerd 中默认使用 runC 作为低级容器运行时，也支持根据平台和需求替换成 runhcs、Kata 等</p>
+<p>containerd 没有打包网络和存储的实现，像网络就是使用 CNI 来让外部提供具体实现</p>
+<p>containerd 的设计目标是成为更高级系统中的一个组件来被调用，而非直接提供给用户使用，Docker 目前就是通过 containerd 来管理容器</p>
+<h3 id="cri-o">CRI-O</h3>
+<p>CRI-O 的目的是构建一个最简单的 K8s 专用运行时，是一个最小化的实现，不需要面向最终用户的那些复杂功能</p>
+<img src="https://cri-o.io/assets/images/architecture.png" alt="cri-o-arch" width=800>
+<p>当一个 kubelet 的创建请求来临时：</p>
+<ol>
+<li>CRI-O 会拉取镜像（如果不存在）</li>
+<li>将镜像解压，构建 rootfs 和 OCI runtime-spec 的 <code>config.json</code></li>
+<li>调用低层的 OCI runtime（runC 等）</li>
+<li>每个容器由一个 conmon 进程进行监控，它会为 PID 为 1 的进程提供一个 <code>pty</code>，同时处理日志和记录退出代码</li>
+<li>通过 CNI 调用网络插件配置网络</li>
+</ol>
+<h3 id="podman">Podman</h3>
+<p>containerd 和 CRI-O 都不是直接面向用户的，面向用户的容器运行时最典型的就是 Docker，而 Podman 也是一个 Docker 的竞品，由 Red Hat 推出</p>
+<p>Podman 兼容大部分的 Docker 命令，甚至可以直接 <code>alias podman=docker</code> 来无缝替换。</p>
+<p>Podman 的特色在于对 rootless container 的良好支持，这能带来更好的安全性；另外我个人比较喜欢的一个功能是 Pod 模式，能直接从一个 K8s 的 Pod YAML 中来运行容器</p>
+<h2 id="cricontainer-runtime-interface">CRI（Container Runtime Interface）</h2>
+<p><a href="https://github.com/kubernetes/community/blob/master/contributors/devel/sig-node/container-runtime-interface.md">CRI（Container Runtime Interface）</a> 是 K8s 的一套容器接口协议，用于 kubelet 和容器运行时之间的通信，避免直接依赖具体实现</p>
+<p>OCI runtime-spec 是面向低级容器运行时的标准，而 CRI 是面向高级容器运行时的协议，还包括了一些 Pod 映射到容器所需的相关接口，其基于 gRPC，接口定义如下</p>
+<pre><code>service RuntimeService {
+    rpc Version(VersionRequest) returns (VersionResponse) {}
+    rpc RunPodSandbox(RunPodSandboxRequest) returns (RunPodSandboxResponse) {}
+    rpc StopPodSandbox(StopPodSandboxRequest) returns (StopPodSandboxResponse) {}
+    rpc RemovePodSandbox(RemovePodSandboxRequest) returns (RemovePodSandboxResponse) {}
+    rpc PodSandboxStatus(PodSandboxStatusRequest) returns (PodSandboxStatusResponse) {}
+    rpc ListPodSandbox(ListPodSandboxRequest) returns (ListPodSandboxResponse) {}
+    rpc CreateContainer(CreateContainerRequest) returns (CreateContainerResponse) {}
+    rpc StartContainer(StartContainerRequest) returns (StartContainerResponse) {}
+    rpc StopContainer(StopContainerRequest) returns (StopContainerResponse) {}
+    rpc RemoveContainer(RemoveContainerRequest) returns (RemoveContainerResponse) {}
+    rpc ListContainers(ListContainersRequest) returns (ListContainersResponse) {}
+    rpc ContainerStatus(ContainerStatusRequest) returns (ContainerStatusResponse) {}
+    rpc UpdateContainerResources(UpdateContainerResourcesRequest) returns (UpdateContainerResourcesResponse) {}
+    rpc ReopenContainerLog(ReopenContainerLogRequest) returns (ReopenContainerLogResponse) {}
+    rpc ExecSync(ExecSyncRequest) returns (ExecSyncResponse) {}
+    rpc Exec(ExecRequest) returns (ExecResponse) {}
+    rpc Attach(AttachRequest) returns (AttachResponse) {}
+    rpc PortForward(PortForwardRequest) returns (PortForwardResponse) {}
+    rpc ContainerStats(ContainerStatsRequest) returns (ContainerStatsResponse) {}
+    rpc ListContainerStats(ListContainerStatsRequest) returns (ListContainerStatsResponse) {}
+    rpc PodSandboxStats(PodSandboxStatsRequest) returns (PodSandboxStatsResponse) {}
+    rpc ListPodSandboxStats(ListPodSandboxStatsRequest) returns (ListPodSandboxStatsResponse) {}
+    rpc UpdateRuntimeConfig(UpdateRuntimeConfigRequest) returns (UpdateRuntimeConfigResponse) {}
+    rpc Status(StatusRequest) returns (StatusResponse) {}
+    rpc CheckpointContainer(CheckpointContainerRequest) returns (CheckpointContainerResponse) {}
+    rpc GetContainerEvents(GetEventsRequest) returns (stream ContainerEventResponse) {}
+    rpc ListMetricDescriptors(ListMetricDescriptorsRequest) returns (ListMetricDescriptorsResponse) {}
+    rpc ListPodSandboxMetrics(ListPodSandboxMetricsRequest) returns (ListPodSandboxMetricsResponse) {}
+}
+
+service ImageService {
+    rpc ListImages(ListImagesRequest) returns (ListImagesResponse) {}
+    rpc ImageStatus(ImageStatusRequest) returns (ImageStatusResponse) {}
+    rpc PullImage(PullImageRequest) returns (PullImageResponse) {}
+    rpc RemoveImage(RemoveImageRequest) returns (RemoveImageResponse) {}
+    rpc ImageFsInfo(ImageFsInfoRequest) returns (ImageFsInfoResponse) {}
+}
+</code></pre>
+<p>早期（1.6 版本之前）K8s 是直接调用 Docker API 的，但随着容器生态的发展，各个容器运行时都希望能在 K8s 这掺一脚，这为 kubelet 的维护带来了很大的负担。因此就有了 CRI。在过渡期时为了保持兼容，K8s 内置了 dockershim 作为 CRI 请求到 Docker API 的适配器，后来 K8s 的所谓「弃用 Docker」指的 containerd 成熟后不再单独为 Docker 维护一套接口适配器（dockershim），而是直接采用 CRI 接口，各个 shim（接口适配器）需要由用户自己安装，脱离出 K8s 的代码，于是就有了该说法</p>
+<h2 id="wasm">WASM</h2>
+<p>之前就有看到类似「WASM+WASI 替代 Docker」的说法，一直不是很能理解，WASM 在我的认知中应该是一个虚拟机，WASI 是 WASM 的系统接口，为了让 WASM 运行在非浏览器的 native 环境中（像 Node 一样）。因此 WASM+WASI 的对比对象应该是类似 JVM 一样的东西，为什么与容器扯上了关系？</p>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/wasm1.png" alt="wasm-arch" width=800>
+<p>参考这篇文章和 Docker 的官方文档</p>
+<ol>
+<li>https://wasmlabs.dev/articles/docker-without-containers/</li>
+<li>https://www.docker.com/blog/docker-wasm-technical-preview/</li>
+</ol>
+<p>简单来说，WasmEdge 提供了一个符合 OCI runtime-spec 的 WASI 运行时，因此可以使用 WasmEdge 替代 Docker 中的容器运行时。同时镜像不需要包含操作系统或任何基础镜像，单个 <code>.wasm</code> 二进制文件就可以直接执行</p>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/wasm2.png" alt="wasm-arch-2" width=800>
+<p>为什么 WASM+WASI 的方式被推崇：</p>
+<ol>
+<li>开放，业界广泛采用的标准，开源社区生态加成</li>
+<li>快速，没有 VM 或容器的冷启动</li>
+<li>安全，沙盒运行</li>
+<li>可移植，支持大多数 CPU 和操作系统</li>
+<li>高效，最小内存和 CPU 占用</li>
+</ol>
+<p>但目前来讲生态还不够完善，主要在于很多语言对编译为 <code>.wasm</code> 有诸多限制，大量常用的依赖库不进行修改的话都无法编译。同时作为容器 runtime 的话没有 Linux 内核，也导致很多 specific 的功能无法实现。明显优势基本只有镜像非常轻量了，大小在几百 K 到几 M，适合的场景还是像 WasmEdge 本身的名字一样，做些应用层的 Edge Computing 吧</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Vim as an IDE]]></title>
+        <id>https://xxxuuu.me/post/vim-as-an-ide/</id>
+        <link href="https://xxxuuu.me/post/vim-as-an-ide/">
+        </link>
+        <updated>2023-06-22T15:26:45.000Z</updated>
+        <summary type="html"><![CDATA[<p>记录 Vim 入教过程和折腾记录</p>
+]]></summary>
+        <content type="html"><![CDATA[<p>记录 Vim 入教过程和折腾记录</p>
+<!-- more -->
+<h2 id="从-jetbrains-到-vscode">从 JetBrains 到 VSCode</h2>
+<p>自己的开发工具在早期一直是 JetBrains IDE 为主，JetBrains 的产品自然不用多说，体验极佳，但仍然有几个痛点，促使我全面换到 VSCode 上进行开发工作：</p>
+<ol>
+<li><strong>资源占用高</strong>：这个问题在我之前的 Intel MacBook Pro 上还是比较明显的，每次一打开 IDE，风扇就会原地起飞，在图书馆里总能和隔壁的游戏本老哥竞争噪音冠军宝座。虽然之后换了 M1 Pro 的 MacBook Pro 14 后没再担心过噪音和性能问题，但 Activity Monitor 中的资源占用率还是看着难受</li>
+<li><strong>收费贵</strong>：学生时代一直用着学校邮箱白嫖教育 LICENSE，但临近毕业，这种方式也无法持续下去。公司提供的 LICENSE 服务器也只能在内网使用，无法用于个人电脑</li>
+<li><strong>Remote 功能羸弱</strong>：Remote Development 使用的 Gateway 问题很多，速度和稳定性都很差，体验一言难尽，几乎没法正常使用</li>
+<li><strong>单个产品功能单一</strong>：通常项目里会混杂着多种语言，但 JetBrains 的 IDE 被分为多个产品，单个产品对混合场景的支持不太理想</li>
+</ol>
+<p>其中一、二、四点都并非不可接受，还是有相对的解决方案。但第三点 Remote 功能的缺失就无法调和了，在 Tencent 实习时，做的是 SaaS 系统，还是比较应用层的后端开发，但项目本身具有一定规模，同时依赖许多内部组件，虽然在 macOS 上经过一些配置也能跑，但需要折腾一下，因此大家基本都是在开发机上 code，IDE/Editor 的 Remote 功能就必不可少了，也是在这时我切换到了 VSCode</p>
+<p>现在在公司内做虚拟化平台的开发，无论是开发还是调试，对 kernel 都有严重依赖，同时项目规模更进一步，跑全量的 unit tests 都要吃掉数十 G 内存，在 macOS 上开发就更不可能了</p>
+<p>VSCode 虽然一些分析的功能上比 JetBrains IDE 要弱不少，但 VSCode 开创的这类 Editor + LSP 的模式相比 JetBrains 的 specific 的模式要更具备扩展性和通用性，也大大降低了 Editor 开发的门槛。所以现在各类 Editor 如雨后春笋般冒出来，只要接入 LSP，就能直接提供现成的语言支持而不需要再花费大精力开发各个语言的支持功能，JetBrains 最新的 Fleet 也受此影响，采用了 LSP 的模式设计</p>
+<h2 id="vscode-vim">VSCode + Vim</h2>
+<p>VSCode 使用了很长时间，体验一直中规中矩，自身也比较习惯了各类快捷键和操作。让我有使用 Vim 想法的契机是入职现在这家公司一周后发现组内几个大佬都在用 Vim，有次 leader 在讲代码时噼里啪啦一通操作，给了我一点小小的震撼，实在太 cool 了</p>
+<p>因此我也决定开始使用 Vim，我选择的方式是 VSCode + Vim 插件，这样能在使用 Vim 的同时，如果某些操作不熟练，还可以用回熟悉的方式，不至于工作被 block。而且我将 Vim 当作一种编辑方式，或者说是一堆快捷键的组合，因此它是不和其它 IDE/Editor 相冲突的，IDE/Editor 本身的功能就交由它们自己去处理</p>
+<p>Vim 入门可以先使用 <code>vimtutor</code> 了解基本功能并能熟练使用，然后参考这两篇文章来逐步掌握更多技巧：</p>
+<ul>
+<li><a href="https://coolshell.cn/articles/5426.html">简明 Vim 练级攻略</a></li>
+<li><a href="https://github.com/wsdjeg/Learn-Vim_zh_cn">Learn-Vim_zh_cn</a></li>
+</ul>
+<p>一开始先从基本的操作做起，例如 <code>h</code>/<code>j</code>/<code>k</code>/<code>l</code>/<code>w</code>/<code>b</code>/<code>e</code>/<code>&lt;C-d&gt;</code>/<code>&lt;C-u&gt;</code>/<code>x</code> 等，完全习惯后再通过学习更多的命令和练习组合操作不断提高速度，例如 <code>#</code>/<code>*</code>/<code>%</code>/<code>&lt;C-o&gt;</code>/<code>&lt;C-i&gt;</code>/<code>c2i{</code>... 移动编辑都得心应手就可以尝试更多的高级功能了，例如搜索替换、多窗口、标记、折叠、宏等</p>
+<p>同时要注意和 IDE/Editor 的功能结合，例如 <code>gd</code>/<code>gh</code> 能够进行 LSP 相关的操作，某些不顺手的快捷键也可以自行定义，下面是我自己的一些配置：</p>
+<ul>
+<li><a href="https://gist.github.com/xxxuuu/a0e32e866b9d793dfac1625d9eff9635">vscode-vim.json</a></li>
+</ul>
+<p>在坚持了一个月之后，我使用 Vim 来阅读和编辑代码的速度已经远快于之前了，这个过程中为了避免自己的知识遗漏，如果遇到比较麻烦或者路径太长的操作，那说明肯定还有更高效的方式，我也会再翻文档或找 best practices 来优化自己的 flow。同时开始折腾一些如 easymontion 的插件来继续提高效率</p>
+<p>Vim 入门的难点在于全新概念和操作方式，学习路线陡峭。一开始做一个很简单的操作都要思考一会或者翻阅文档，但一旦坚持下来，经过阵痛期后形成肌肉记忆，就会感受到丝滑般的编辑体验，其组合式的交互也能轻松做到一些看起来很复杂的操作。手也不用在键盘和鼠标间反复移动，做到全键盘编辑/浏览，操作真正跟上思维速度，实现「人机合一」</p>
+<h2 id="lunarvim">LunarVim</h2>
+<p>虽然一开始想的是 Vim 和 IDE/Editor 是解耦的，但在使用 VSCode + Vim 的过程中还是发现，大部分 IDE/Editor 本身不是为 Vim 的编辑模式而设置的，一些与编辑无关的 IDE/Editor 自身的操作还是比较别扭，无法和 Vim 很好的结合在一起，这一点也不「Vim」。例如在 Explorer 中寻找文件时，或者 Terminal 和 Tab 间的跳转等都不太方便</p>
+<p>因此我开始寻找一种新的替代方案，或许应该用真正的 Vim as an IDE 方法，但都需要进行很多配置，对小白并不友好。直到后来我发现了 <a href="https://www.lunarvim.org/zh-Hans/">LunarVim</a> ，它基于 NeoVim，集成了众多常用 nvim 插件，结合各个语言的 LSP 和 DAP，能够提供一个开箱即用的解决方案，已经完全够用，试用了一下感觉非常满意，没有前面 VSCode + Vim 的几个不便之处，同时额外装了几个插件后，也有不弱于 VSCode 的 IDE/Editor 功能（况且 VSCode 的这些功能本身也是严重依赖插件提供），基本满足了我的需求</p>
+<img alt="lunarvim" src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/lunarvim-kubeadm.png?x-oss-process=style/compress" width=800 >
+<p>LunarVim 在 <a href="https://github.com/LunarVim/starter.lvim/tree/master">starter.lvim</a> 中提供了常见语言的全套配置，除此之外，个人还安装了以下插件：</p>
+<ol>
+<li><a href="https://github.com/chipsenkbeil/distant.nvim">distant</a>：实现类似 VSCode 中 Remote SSH 的功能，不过目前还不是特别稳定；直接在 Linux 开发机上安装 LunarVim 也是一种选择</li>
+<li><a href="https://github.com/sindrets/diffview.nvim">diffview</a>：显示 Git DiffView，效果比内置的那个插件好一些，直接使用内置的也可以</li>
+<li><a href="https://github.com/f-person/git-blame.nvim">git-blame</a>：在光标所在行后显示 Git Blame</li>
+<li><a href="https://github.com/folke/todo-comments.nvim">todo-comments</a>：对带有 TODO，FIX 的注释进行高亮，并提供搜索功能</li>
+<li><a href="https://github.com/phaazon/hop.nvim">hop</a>：类似 easymotion 的跳转插件</li>
+<li><a href="https://github.com/simrat39/symbols-outline.nvim">symbols-outline</a>：符号大纲</li>
+<li><a href="https://github.com/folke/trouble.nvim">trouble</a>：用于显示各种诊断信息和一些类 LSP 的操作</li>
+<li><a href="https://github.com/kylechui/nvim-surround">nvim-surround</a>：强大的 surround 操作</li>
+<li><a href="https://github.com/zbirenbaum/copilot-cmp">copilot-cmp</a>：Github Copilot 相关插件</li>
+</ol>
+<p>配置文件也丢在 Github Gist 中：<a href="https://gist.github.com/xxxuuu/268dd3d9248094ee189cc88518f7f88b">config.lua</a></p>
+<blockquote>
+<p>更新：<br>
+<span> </span><br>
+我又叛变了，开始改用 <a href="https://astronvim.com/">AstroNvim</a><br>
+<span> </span><br>
+因为已经脱离了小白阶段，有更多的自定义和修改需求，感觉 AstroNvim 的默认配置和设计比 LunarVim 更合理，修改起来更方便。所以 fork 了一份在自己仓库来自定义：<a href="https://github.com/xxxuuu/AstroNvim?tab=readme-ov-file">https://github.com/xxxuuu/AstroNvim</a><br>
+<span> </span><br>
+现在可以直接 <code>clone</code> 来开箱即用<br>
+<span> </span></p>
+<pre><code class="language-shell">git clone --depth 1 https://github.com/xxxuuu/AstroNvim ~/.config/nvim
+nvim
+</code></pre>
+</blockquote>
+<h2 id="浏览器也要-vim">浏览器也要 Vim！</h2>
+<p>从 VSCode 切换到 LunarVim 是为了 workflow 中 Vim 操作更加统一化，现在，已经可以完全享受 Vim Coding</p>
+<p>但，flow 中不只是 IDE/Editor，还有一大半时间是处于飞书等 IM 软件和浏览器中。在飞书中大多时间都是在输入，鼠标键盘切换不频繁，也可以容忍。但浏览器这侧，一个典型高频场景是一边在浏览器浏览文档，一边在 IDE/Editor 写代码，这就会导致鼠标键盘的切换非常频繁。上一秒还在用 Vim 愉快地 Coding，下一秒就要动鼠标在浏览器翻翻找找，破坏了良好的 Vim 体验。所以，浏览器也要 Vim！</p>
+<p>好在有同样想法的人不少，Chromium 上有非常成熟的 Vim 扩展 Vimium，可以将 Vim 操作带到浏览器上</p>
+<ul>
+<li><a href="https://chrome.google.com/webstore/detail/vimium/dbepggeogbaibhgnhhndojpepiihcmeb">Vimium</a></li>
+</ul>
+<p>现在，彻底 Vim！<br>
+<img alt="browser-vim" src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/browser-vim.png" width=800 ></p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[Kubernetes CSI]]></title>
+        <id>https://xxxuuu.me/post/kubernetes-csi/</id>
+        <link href="https://xxxuuu.me/post/kubernetes-csi/">
+        </link>
+        <updated>2023-06-17T15:04:51.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="基本概念">基本概念</h2>
+<p>K8s 的存储插件用于对接容器平台和底层存储资源，例如挂载 Volume 时可以配置的 nfs 或 gitRepo 等；第三方平台，如 AWS、Google Cloud 也都会提供存储插件用于接入它们的存储服务</p>
+<p>存储插件分为 In-Tree 和 Out-of-Tree 两类：</p>
+<ol>
+<li>In-Tree 的存储插件是包含在 K8s 内部的，因此构建、编译、交付都与 Kuberentes 本身绑定，前面的 nfs 和 gitRepo 都是 In-Tree 的插件</li>
+<li>Out-of-Tree 插件则是独立的，可以单独部署。Out-of-Tree 插件主要分为 FlexVolume 和 CSI（Container Storage Interface）两类方式，其中前者在 1.23 版本已经废弃</li>
+</ol>
+<p>从 1.17 版本开始，K8s 开始测试 CSI Migration，用于将 In-Tree 内的存储插件迁移到 Out-of-Tree 的 CSI 上，并<a href="https://kubernetes.io/blog/2022/09/26/storage-in-tree-to-csi-migration-status-update-1.25/">在 1.25 中正式发布</a>该功能</p>
+<p>因此，存储插件的开发目前基本只剩下 CSI 一种选择，其不仅仅局限于 K8s，更是目前容器存储的工业标准</p>
+<h2 id="csi-架构-规范">CSI 架构 &amp; 规范</h2>
+<p>CSI Driver 在 K8s 中的架构如下所示<br>
+<img alt="CSI Architecture" src="https://global.discourse-cdn.com/business6/uploads/kubernetes/original/2X/1/11e56624b12ec6f3c181a59fbd34e492ad9ae342.png"></p>
+<p>CSI Driver 会作为 Pod 运行在 K8s 中，通过监听资源（PVC、PV 等）事件触发对底层存储资源的操作，还有一些操作是 kubelet 通过 UDS（Unix Domain Socket）调用 CSI Driver 进行</p>
+<p>监听资源变更这部分都是通用逻辑，实现重复度比较高，因此 Kubernetes Team 提供了一系列 Sidecar 来完成（上图粉色部分），以简化开发，同时解耦与 K8s API 的交互实现：<a href="https://kubernetes-csi.github.io/docs/sidecar-containers.html">CSI Sidecar Containers</a></p>
+<p>那么我们要实现的 CSI Driver 最后可以分为三个 gRPC 服务（上图绿色部分）：</p>
+<ol>
+<li>Identity Service：用于暴露插件本身的信息和进行健康检查</li>
+<li>Controller Service：操作底层存储资源，对存储卷进行管理</li>
+<li>Node Service：执行和宿主机相关的操作，例如 mount 等</li>
+</ol>
+<p>CSI 规范文档中有几个比较重要的点：</p>
+<ol>
+<li>首先，CSI 接口<strong>必须保证幂等性</strong>。虽然 K8s 保证在在给定时间内对每个卷「正在进行」的调用不超过一个，但当发生 failover 时，这个保证可能就会失效，导致诸如重复创建同一个卷的情况发生，因此 CSI 侧必须实现幂等性，以防止存储卷泄露</li>
+<li>规范返回值，CSI 的 gRPC 接口<strong>必须返回标准错误码</strong>，以便 K8s 正确响应，这部分在<a href="https://github.com/container-storage-interface/spec/blob/master/spec.md">标准文档</a>的 Error Scheme 部分可以看到</li>
+</ol>
+<p>最后部署时一般分为 Node Plugin 和 Controller Plugin 进行部署：</p>
+<ol>
+<li>前者需要实现 Identity Service 和 Node Service，以 DaemonSet 方式运行在每个节点上</li>
+<li>后者需要实现 Identity Service 和 Controller Service，可以在任何地方运行，通常是个 Deployment 或 StatefulSet</li>
+</ol>
+<p>一个卷的生命周期如下所示</p>
+<pre><code>   CreateVolume +------------+ DeleteVolume
+ +-------------&gt;|  CREATED   +--------------+
+ |              +---+----^---+              |
+ |       Controller |    | Controller       v
++++         Publish |    | Unpublish       +++
+|X|          Volume |    | Volume          | |
++-+             +---v----+---+             +-+
+                | NODE_READY |
+                +---+----^---+
+               Node |    | Node
+              Stage |    | Unstage
+             Volume |    | Volume
+                +---v----+---+
+                |  VOL_READY |
+                +---+----^---+
+               Node |    | Node
+            Publish |    | Unpublish
+             Volume |    | Volume
+                +---v----+---+
+                | PUBLISHED  |
+                +------------+
+</code></pre>
+<p>例如，当创建一个使用 PVC 的 Pod 时：</p>
+<ol>
+<li>Volume Controller 监听到 PVC 创建，但其只负责 In-Tree 模式的管理，跳过执行</li>
+<li>Sidecar 监听到 PVC 创建，<strong>调用 CSI Controller Service 的 <code>CreateVolume</code></strong>，CSI Driver 这时会创建底层存储资源。之后卷处于 CREATED 状态，PV 被创建，并绑定到 PVC 上</li>
+<li>Volume Controller 创建 VolumeAttachment 资源，表示需要将 PV 挂载到宿主机上</li>
+<li>Sidecar 监听到 VolumeAttachment 创建，<strong>调用 CSI Controller Service 的 <code>ControllerPublishVolume</code></strong>。CSI Driver 这时一般会将底层存储资源与目标节点关联起来，之后卷处于 NODE_READY 状态，对于 Node 可见</li>
+<li>kubelet 感知到卷的存在，执行 MountDevice 操作，<strong>调用 CSI Node Service 的 <code>NodeStageVolume</code></strong>。CSI Driver 此时会初始化卷，例如进行分区和格式化、创建文件系统等，之后卷处于 VOL_READY 状态</li>
+<li>最后 kubelet 执行 Setup 操作，<strong>调用 CSI Node Service 的 <code>NodePublishVolume</code></strong>。CSI Driver 将卷挂载到容器（kubelet 指定的 Volume 目录）内，卷进入 PUBLISHED 状态，可以正常使用</li>
+</ol>
+<h2 id="部署">部署</h2>
+<p>前面提到，CSI Driver 是以 Pod 运行在 K8s 内的，因此本质上就是拉 Pod 运行即可。但 CSI 部署时也分为 Controller Plugin 和 Node Plugin，且可能涉及相关存储底层配置，要升级时也比较麻烦。因此一般会通过 Helm 进行部署：<br>
+<a href="https://helm.sh/zh/docs/topics/charts/">Chart Development Guide</a></p>
+<h2 id="测试">测试</h2>
+<p>kubernetes-csi/csi-test 仓库下提供了一些测试工具<br>
+<a href="https://github.com/kubernetes-csi/csi-test">kubernetes-csi/csi-test: CSI test frameworks</a></p>
+<p>首先 csi-test 里的 <code>pkg/sanity</code> 包可以帮助进行单元测试，其还提供了一个 CLI 程序 csi-sanity 可以用于检测 API 是否符合规范，但其没法很好的进行 API 和 E2E（End-to-End，端到端） 测试</p>
+<p>API 测试要手动进行也是可以的，CSI Driver 只是提供几个 gRPC 接口，所以接口测试时使用 grpcurl 等 gRPC 调试工具即可，但 csc（Container Storage Client）等工具也提供了更便利的包装：</p>
+<ul>
+<li><a href="https://github.com/rexray/gocsi/tree/master/csc">gocsi/csc at master · rexray/gocsi</a></li>
+<li><a href="https://github.com/kubernetes/cloud-provider-openstack/blob/master/docs/cinder-csi-plugin/csc-tool.md#list-volumes">cloud-provider-openstack/docs/cinder-csi-plugin/csc-tool.md at master · kubernetes/cloud-provider-openstack</a></li>
+</ul>
+<p>E2E 测试可以通过 kubectl 手动进行，官方也提供了一些套件用于进行自动化的 E2E 测试：<br>
+<a href="https://github.com/kubernetes/kubernetes/tree/master/test/e2e/storage/external">kubernetes/test/e2e/storage/external at master · kubernetes/kubernetes</a></p>
+<p>E2E 测试这部分，之后有空打算单独写一篇文章讲一下</p>
+<h2 id="相关资料">相关资料</h2>
+<ul>
+<li><a href="https://kubernetes-csi.github.io/docs/introduction.html">Kubernetes CSI Developer Documentation</a></li>
+<li><a href="https://github.com/kubernetes/design-proposals-archive/blob/main/storage/container-storage-interface.md">Container Storage Interface Proposal</a></li>
+<li><a href="https://github.com/container-storage-interface/spec/blob/master/spec.md">Container Storage Interface Specification</a></li>
+<li><a href="https://zhuanlan.zhihu.com/p/51757577">基于 CSI 的 Kubernetes 存储插件开发实践 ｜ QingCloud</a></li>
+<li><a href="https://cloudnative.to/blog/develop-a-csi-driver/">CSI 驱动开发指南 ｜云原生社区（中国）</a></li>
+</ul>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[2022 年度总结]]></title>
+        <id>https://xxxuuu.me/post/2022summary/</id>
+        <link href="https://xxxuuu.me/post/2022summary/">
+        </link>
+        <updated>2022-12-30T16:15:37.000Z</updated>
+        <content type="html"><![CDATA[<h2 id="暑期实习">暑期实习</h2>
+<p>上半年基本都是在准备暑期实习➡️投递简历➡️不停地笔试中度过的（没错，基本没有面试）</p>
+<p>今年大寒冬背景下，学历短板还是很致命的，哪怕笔试基本全都 AK，能拿到的面试机会也实在太少，最后投递了应该有 40 家，只有 3~4 个面试</p>
+<p>其中好不容易拿到个百度面试，全部面试三轮都过了。三面的面试官，应该是个 tech leader 的角色，对我说同样是 ACMer 很欣赏我，面评也挺好，offer 问题不大。当时我特别高兴，连去北京的路程都规划好了，结果最后一直泡着池子无下文，哈哈，像个 🤡 一样</p>
+<p>虽然最后也拿到了其他家的 offer，但还是蛮不容易的。后面实习刚入职时什么都觉得很新鲜，觉得办公环境又好，同事氛围也棒，还有喝不完的饮料等各种福利白嫖<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/tencent_badge.jpg" alt="badge" width="400"/></p>
+<p>进入工作状态后，感觉到实习所在的组业务比较边缘，项目也没什么亮点，坦白来讲学不到什么。也让我认识到大公司内部门与部门的差距可能比公司与公司之间的差距还大，不过好在公司资源够丰富，天天在内网冲浪还是 get 了不少干货</p>
+<p>到实习后期时秋招就陆续开始了，我也就直接进入摸鱼模式，在上班期间偷偷刷题，开会时上牛客看面经找公司疯狂投简历，可惜没体验到借公司会议室戴着工牌来面试秋招的感觉，不过这些都是后话了<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20221231005907.jpg" width="500"/></p>
+<h2 id="秋招失败">秋招失败</h2>
+<p>时间到了 9 月份，在实习转正 hc 不明朗的情况下，果断决定拿完中秋礼盒就跑路回家准备秋招，那天和大家在公司附近一个湘菜馆吃了最后一顿散伙饭<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/mooncake.jpeg" width="600" /></p>
+<p>有了春招投暑期实习的经验，秋招时内心预期就降低了不少，投递近 80 家最后只有 8~9 家进面，也算在意料之中</p>
+<p>到了 9 月中下旬，手头的几个面试流程都推进的差不多了，基本有百度、京东、深信服等几家。百度我又给了它一次机会，但鉴于暑期实习时被欺骗了感情，我没报太大希望；其次是深信服，深信服的面试官人很 nice，但感觉面试有些水，好几次我讲的东西面试官都不了解，我要重新解释，所以当时也没太考虑；京东面试流程推进很顺利，发挥也不错，后面 HR 面我还直接问结果，HR 和我说「面试都通过了，之后 offer 审批没问题，国庆完就发意向」</p>
+<p>听京东 HR 画完饼后我就开始摆烂了，后面几家去哪儿和一些游戏厂的面试和小 offer 直接推掉了，内心认定我的秋招已经结束。重新下回了弃坑很久的 FF14 玩，打算收到 offer 后再直接去提前实习，想着「结局也不算差」嘛<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/20221231162715.jpeg" width="400"/></p>
+<p>接着过了近一个月，时间来到十月中旬，此时京东还是没下文，发信息给 HR 也不回了。我意识到我又一次成了 🤡，并且是以相同的方式。我只能马上去邮件里翻出深信服前两天发的 offer，点击了 Accept。就这样，只能接受现实，我的秋招的确结束了<br>
+<img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/sxf_offer.png" width="600"/></p>
+<h2 id="尾声">尾声</h2>
+<p>秋招结束后，也复盘了一下，自己还是太菜了，很多机会都没把握住，有时觉得一直以来我的人生都是在不断的失败中度过的。其实一开始是打算秋招投基架岗，从去年来也一直在做些存储和 DB 的<s>项目</s>玩具。但实习时就看到和硕博佬的差距实在太大了，感觉自己挺笨的，实在没什么优势，便逐渐妥协，想着「只要方向有趣，做业务也不错」，结果最后连这点想法都实现不了，意识到自身的局限性，整个人开始颓了起来</p>
+<p>不过在这期间也接触了些别的的东西，稍微学了点日语（也就翻完新标日初级的水平），看了不少历史政经方面的书，还蛮有趣的。心态也转变了不少，让我明白「活得开心」才是最重要的，之后春招也许会再挣扎一下，不过无论结局如何我也都无所谓了。还有些更长期的计划，但这里就不透露了</p>
+<p><br/> <br/></p>
+<hr>
+<p style="text-align:center">抽象分界线</p>
+<h2 id="う阔え地">う阔え地</h2>
+<p>印象中五年前我应该还是个🐰🐰。但近几年，可能是受到了铁拳的冲击和社会的毒打，也可能是经历了不同文化思想的洗礼和冲击，又或是在地摊文学中从另一个视野重新看待了某些事情，我愈发地对现状不满了起来，开始向神神转变</p>
+<p>所以还是希望能见识到更广阔的世界，更多样的思想。无论这些是好是坏，也至少由我亲身感受再做出评价，拥有选择的权利。另一个契机就是也想借此机会继续读研，我对 Distributed System 和 Database 方向比较感兴趣，而相比在公司直接转到基架岗和相关的组，在学校里做研究是踏入大门最简单的方法了</p>
+<p>最后，想到一句话「We always overestimate the change that will occur in the next two years and underestimate the change that will occur in the next ten」。那么，希望将来确实能有不一样的改变</p>
+]]></content>
+    </entry>
+    <entry>
+        <title type="html"><![CDATA[The Google File System 论文概览]]></title>
+        <id>https://xxxuuu.me/post/gfs-paper/</id>
+        <link href="https://xxxuuu.me/post/gfs-paper/">
+        </link>
+        <updated>2022-02-14T11:21:13.000Z</updated>
+        <content type="html"><![CDATA[<p>MIT6.824 第三节课阅读的论文，三驾马车之一，Google 内部的大型分布式文件系统</p>
+<p>论文地址：<a href="http://nil.csail.mit.edu/6.824/2020/papers/gfs.pdf">The Google File System</a></p>
+<p>（PS：有讲的不对的，以论文为准</p>
+<br/>
+<br/>
+<p>Google File System（GFS）的诞生基于 Google 内部快速增长的数据处理需求，是 Google 针对其业务场景专门设计的分布式文件系统。GFS 使用的技术和算法并不算新颖，都是学术界在其几十年前就已经提出的，但它是最早一批将这些技术在工业界大规模落地的。而且以现在的眼光来看，在当时（2003年）的背景下，学术界普遍认为存储系统应该具备强一致性模型，而 GFS 认为在现实中可以接受弱一致性模型的异端一般的想法无疑是具有突破性的</p>
+<br/>
+<h2 id="设计概览">设计概览</h2>
+<p>Google 根据其内部的工作场景和负载，重新审视了系统设计上的传统选择，探索了一些不一样的观点</p>
+<h3 id="场景-or-假设">场景 or 假设</h3>
+<ul>
+<li>运行在廉价机器上，故障率高 —— 需要持续监控和容错</li>
+<li>大量（数百万）的大文件（100MB 或更大，通常为数 GB）</li>
+<li>读取负载通常是大文件的顺序读取，对于小型随机访问，通常是批量排序进行</li>
+<li>写入类似，追加（append）比随机写更常见</li>
+<li>存在大量并发，要保证小的同步开销和原子性语义</li>
+</ul>
+<p>总结：场景是在单个 IDC 内，由普通机器组成的大型集群。负载倾向于大文件的顺序读写（高吞吐比低延迟更重要）</p>
+<h3 id="接口">接口</h3>
+<p>GFS 提供了与 POSIX 不同的文件系统接口，不同的是文件在目录中按层次组织，通过路径名标识，包括 <strong>创建（create）、删除（delete）、打开（open）、关闭（close）、读取（read）、写入（write）</strong> 几个基本接口</p>
+<p>除此之外，还有 <strong>快照（snapshot）</strong> 和 <strong>记录追加（record append）</strong> 操作，前者可以低成本创建一个文件副本；后者可以对文件进行原子追加数据，在合并结果和生产者消费者队列中很有用</p>
+<br/>
+<h2 id="架构">架构</h2>
+<p>GFS 采用单 master 多 chunkservers，以及多 clients 的架构</p>
+<p>文件划分成固定大小的块（chunks），每个块由一个全局唯一的 64bit chunk handle 标识，chunservers 将块存储在本地磁盘上，块通常会被复制多份（用户指定，默认三份）存储在不同 chunkserver 中</p>
+<p>master 的工作：</p>
+<ul>
+<li>维护了整个文件系统的元数据，包括命名空间（namespace），访问控制和块的映射信息</li>
+<li>管理系统，控制块的租约（lease），孤立块的垃圾回收和 chunkserver 之间块的迁移</li>
+<li>和 chunkservers 之间进行周期的心跳检测和信息收集</li>
+</ul>
+<figure data-type="image" tabindex="1"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/gfs-1.png" alt="gfs-1" loading="lazy"></figure>
+<p>GFS 客户端被链接到应用程序内，客户端与 master 进行元数据操作，而数据传输和 chunkservers 进行，GFS 客户端提供的是有别于 POSIX 的文件系统接口，因此不会耦合于 Linux 的 vnode 层</p>
+<p>客户端也不会进行缓存文件（但会缓存元数据），前面提到 GFS 的设计场景是大型文件，难以缓存。取消缓存避免了缓存一致性问题。服务器也不需要额外的缓存逻辑，因为 chunk 是作为本地文件存储，操作系统已经提供了这样的缓存机制</p>
+<h3 id="单-master">单 Master</h3>
+<p>单 master 简化了设计和实现的复杂度，单主相比多主和无主架构能只需要更少的全局知识（global knowledge）就进行 chunk 的管理，这意味着更少的通信，能带来更好的性能</p>
+<p>相应的，单 master 也可能造成系统瓶颈，因此 GFS 不会通过 master 进行读写，而是通过 master 确定文件位于哪一个 chunkserver，然后访问它。同时客户端缓存了元数据，缓存命中时连 master 都不必访问，直接访问 chunkserver 即可。客户端交互流程见图 1</p>
+<h3 id="块chunk大小">块（Chunk）大小</h3>
+<p>在系统设计中，这种常数通常被称为巫毒常量（voo-doo constant），其很难被确定。在 GFS 中块的大小被设计为 64 MB，比普通文件系统大得多，这是 Google 根据 GFS 的设计场景而定的</p>
+<p>较大的块提供了几个优势：相比小块，它减少了客户端与 master 通信的次数，也更利于客户端缓存元数据（块越小，块个数就会越多，元数据也越大）；其次大的块也让客户端更可能在同一个 chunkserver 上执行操作，这样就可以通过持久（persistent） TCP 连接来减小网络开销</p>
+<p>大块的缺点在于可能造成空间浪费，例如当存在远小于块大小的文件时，大部分空间都被浪费了。一个解决方法是惰性空间分配（lazy space allocation），数据首先缓存在 buffer 中，等被 append 到接近块大小再实际分配物理空间。</p>
+<p>另外，对这种单块的文件的频繁访问可能造成块成为热点，可以通过更高的复制因子（更多副本）来均摊 chunkserver 的开销</p>
+<p>不过总的来说，在 GFS 的场景（为大文件设计）中，这种情况并不多见，大块带来的优点远比缺点多</p>
+<h3 id="元数据">元数据</h3>
+<p>master 主要存储了三种元数据：</p>
+<ul>
+<li>文件和块的命名空间</li>
+<li>文件到块的映射</li>
+<li>块副本的位置</li>
+</ul>
+<p>元数据存储在 master 的内存中，前两者还会持久化到硬盘的操作日志（operation log）中</p>
+<p>块副本的位置不持久化的原因是，chunkservers 对属于它自己的块拥有最终决定权，而 master 要保持这些数据的同步就需要在 chunkservers 状态变化时进行大量的通信，这是不必要的。所以 master 在启动时会向 chunkservers 获取它们的信息，之后的心跳消息会保持 master 上的元数据是最新的。当 master 宕机重启后，它会重新收集块位置</p>
+<p>因为元数据主要存储在内存中，所以它的维护效率很高，便于后台定期扫描以进行块的垃圾回收，和复制与迁移。但潜在问题是块个数受限于内存大小，Google 认为这种代价是可接受的</p>
+<p>GFS 的操作日志（operation log）存储了关键事件和元数据更改的历史记录，它是 GFS 的核心。其同时也作为并发操作顺序的逻辑时间线，文件和块还有它们的版本都由创建时的逻辑事件唯一标识</p>
+<p>操作日志会被复制到多台机器上，只有在本地和远程机器上都持久化写入后才能响应客户端操作，以此保证数据不会丢失。master 会在刷新日志前批量将不同的日志放到一起以降低对吞吐量的影响</p>
+<p>master 可以通过重放（replay）操作日志来在宕机时恢复文件系统状态，为此需要保持日志是小的，所以当日志到达一定大小，会进行快照，每个快照就是一个检查点（checkpoint），检查点是一个紧凑的类似 B 树的结构，它可以在内存中进行直接映射而不用额外解析，能加快恢复速度。快照期间日志会被写入另一个文件，对一个上百万文件的集群，检查点可以在约一分钟的时间作业被创建完毕然后被写入硬盘。这样在宕机恢复时，只需要用最近的检查点和它之后的操作日志恢复即可</p>
+<h3 id="一致性模型">一致性模型</h3>
+<p>GFS 采用了一个弱的一致性模型</p>
+<p>只有文件命名空间变化（mutation）是原子的（例如文件创建和重命名），master 上的锁保证了原子性和正确性。操作日志定义了这些操作的全序</p>
+<p>修改（mutation）后的文件区域（file region）状态取决于操作的类型，成功与否和存在并发操作（concurrent mutations），如下表所示</p>
+<figure data-type="image" tabindex="2"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/gfs-2.png" alt="gfs-2" loading="lazy"></figure>
+<p>文件区域状态可能有两种：</p>
+<ul>
+<li>（一致的）consistent：所有客户端看到的都是一样的数据</li>
+<li>（确定的）defined：一致并且客户端可以看到完整的修改</li>
+</ul>
+<p>可能存在「一致但未确定（consistent but undefined）」 的状态，当并发修改均成功时就可能产生这种情况，有点类似于数据库中的脏写</p>
+<p>数据的修改操作可能有写入（write）和记录追加（record append），在一系列成功的修改后，被修改的文件区域被保证是确定的（defined），GFS 通过以下方式实现这一目标：</p>
+<ol>
+<li>在所有副本上以相同顺序来对一个块进行修改</li>
+<li>使用块的版本号来检测块是否过时（可能因 chunkserver 宕机而错过一些修改），过时的副本将不会参与修改和参与对 master 报告块位置更新，它们会最早被垃圾回收</li>
+</ol>
+<p>由于客户端会缓存块位置，因此可能在信息刷新前读取到旧的副本，这与缓存超时时间和文件的下一次打开有关。此外因为大部分文件都是仅追加（append）写入的，所以旧副本可能会返回一个过早结束的分块，而不是过时的数据，这种时候客户端就会立即重试并联系 master，获得当前块位置而不会产生一致性问题</p>
+<p>GFS 会通过和 chunkservers 间进行定期心跳来检测故障，对于数据本身也会使用校验和来检测数据损坏，并进行恢复。只有当恢复完成前，一个块的所有副本都损坏时才是不可逆的</p>
+<p>通过 GFS 使用的这些技术，它可以实现弱一致性模型，这些技术包括文件写入通常是追加而非覆盖，检查点，写时自验证（writing self-validating），自标识记录（self-identifying records）：</p>
+<ul>
+<li>几乎所有的应用修改文件都只追加（appending）而不覆写（overwriting），一个典型用法就是，从头到尾生成一个新文件，然后通过原子重命名来替换掉旧文件，这样就只有追加而没有覆写数据</li>
+<li>检查点可能还包括应用程序级的校验和，读取时只处理上个检查点之后区域的校验和，因为在它之前的状态肯定是确定的（defined）。检查点使得写入过程宕机，随后恢复时可以逐步重启（从上个检查点开始恢复），这时读也只读到上个检查点（因为从应用角度来说，上个检查点之后的数据还是没有被提交的）</li>
+<li>在合并结果数据或生产者消费者队列场景下，会对一个文件进行并发追加（concurrently append），记录追加操作的「至少一次（least once）」语义保存了每个写操作的输出，每一个写入都包含了如校验和的额外的信息，读取时就可以通过这些检验和来判断数据是否完整，以及通过唯一标识区分重复记录（记录追加可能产生重复数据，后面会提到）</li>
+</ul>
+<br/>
+<h2 id="系统交互">系统交互</h2>
+<p>前面提到，单 master 可能成为系统瓶颈，所以系统交互的一个设计原则就是尽量减少同 master 的交互</p>
+<h3 id="租约和修改顺序">租约和修改顺序</h3>
+<p>修改操作会应用在块的所有副本上，GFS 使用租约（leases）机制维护多副本上的修改一致性</p>
+<p>租约是为了减少 master 的管理开销，master 向块的一个副本授予租约，这个副本就成为 primary，primary 决定修改操作的顺序，其它副本（secondary）跟随 primary。租约时间默认为 60s，当块被修改时，primary 就会请求续约。当 master 想要禁止某些操作时，就会主动取消租约，即使它没到期</p>
+<p>下图展示了一个写操作的控制流：</p>
+<ol>
+<li>客户端询问 master 哪个 chunkservers 持有某个块的租约及其位置，如果没有租约，master 会选择一个副本授予租约</li>
+<li>master 回复客户端，客户端会缓存这些数据，只有 primary 不可达或租约过期才会再请求 master</li>
+<li>客户端将数据推到所有 secondary 副本，chunkserver 会将数据缓存到 LRU buffer 内，IDC 内的网络拓扑也会优化数据传输效率</li>
+<li>一旦所有 secondary 副本都确认接收数据，客户端将向 primary 发送写请求，primary 确定操作顺序并按顺序在本地应用操作</li>
+<li>然后 primary 将写请求发送到所有副本，每个副本按相同顺序应用修改操作</li>
+<li>所有 secondary 副本通知 primary 确认操作完成</li>
+<li>primary 回复客户端结果，包括 secondary 副本上可能的错误，这时客户端会尝试重试 3-7</li>
+</ol>
+<figure data-type="image" tabindex="3"><img src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/gfs-3.png" alt="gfs-3" loading="lazy"></figure>
+<p>如果一些操作的数据很大或者跨越了块，GFS 可能将它们分割成多个写操作来进行，单个写操作内可以保证顺序，但多个交叉的写操作顺序就无法保证。这可能就会导致前面提到的「一致但未确定（consistent but undefined）」 的状态，例如一个副本上先写入了块 A 再写入块 B，而另一个副本上是相反的顺序，这样最后就不符合确定的（defined）状态的定义，因为对于一个写操作来说，块 A 或 B 的数据丢失了，不是一个完整的修改</p>
+<h3 id="数据流">数据流</h3>
+<p>GFS 中数据流和控制流被区分开来，控制流从客户端到 primary，再到所有 secondary 副本上。</p>
+<p>而数据流沿着 chunkservers 的链进行线性传输，而不是如树之类的其它拓扑，这样的拓扑结构保证了每台机器的出口带宽都被用来传输数据而不是分配给多个接收者。并且为了避免延迟，每台机器都只推送数据给网络中最近的机器</p>
+<p>在 TCP 连接上还会通过流水线（pipelining）的方式来优化延迟，一旦服务端接收到数据，就会立即转发给链上的下一个 chunkserver，在全双工交换网络下这并不会降低数据接收速率</p>
+<h3 id="原子记录追加">原子记录追加</h3>
+<p>记录追加（record append）是原子的，这在分布式文件系统上很有用，因为可以避免需要如分布式锁之类复杂的同步机制</p>
+<p>每次追加的大小被限定在不超过块大小的 1/4，因为当 primary 检测到一个块在追加后超过了最大大小（64MB），它就会填充这个块到最大大小，然后将追加操作应用到新块上。如果每次追加的大小都很大，那就会有很多块充满了碎片，大量空间被浪费</p>
+<p>如果某个副本上的记录追加失败，客户端会重试，因此可能某些副本上这个记录被写入多次。也就是 GFS 不保证他们是一致的，只保证作为一个原子单元至少被写入一次（least once），出现这种情况时需要使用前面一致性模型中提到的方法处理</p>
+<h3 id="快照">快照</h3>
+<p>快照（snapshot）可以在几乎一瞬间就给一个文件或目录树创建一个拷贝。GFS 使用写时拷贝（Copy-On-Write）实现这一点，当 master 收到一个快照请求时，会取消和快照相关文件块的所有租约，然后将操作日志写入硬盘，再复制源文件或目录树在内存上的元数据，新创建的快照文件与源文件指向相同块</p>
+<p>在客户端向快照文件写入前，master 通过引用计数发现这是一个快照块，然后会拷贝源块再执行修改，这个拷贝会在和源块相同的 chunkserver 上执行以避免网络开销，这个过程对客户端来说是透明的</p>
+<br/>
+<h2 id="master-操作">Master 操作</h2>
+<p>master 执行所有的命名空间（namespace）操作，管理块副本和位置，协调系统和进行 chunkservers 的负载均衡，以及进行垃圾回收工作</p>
+<h3 id="命名空间管理和锁">命名空间管理和锁</h3>
+<p>GFS 没有传统文件系统的目录结构，而是通过将全路径名进行前缀压缩映射来查找，在这棵命名空间树上，每个节点都有个读写锁</p>
+<p>每个节点在操作前，需要获取到根节点的所有锁，例如修改 /a/b/c，要获取 /a 和 /a/b 的读锁、/a/b/c 的写锁。这样的好处是允许同一目录下的并发操作，同一目录下多个文件创建操作可以同时进行，目录上的读锁防止目录被删除或重命名或快照。为避免死锁，加锁顺序是自顶向下按字典序进行的</p>
+<h3 id="副本布局">副本布局</h3>
+<p>块副本的布局策略有两大目标：最大化数据的可靠性和可用性，以及最大化带宽利用率</p>
+<p>所以块副本不单单只是分布在不同机器，它还应该分布到不同的机架上以避免整个机架的损坏和掉线，并且也更有利于利用多个机架的整合带宽</p>
+<h3 id="创建-重新复制和再平衡">创建、重新复制和再平衡</h3>
+<p>三个原因造成块的复制：块创建，重新复制和再平衡</p>
+<p>创建块时需要考虑：</p>
+<ul>
+<li>在空间使用率低于平均值的机器上放置新块，以平衡空间使用率</li>
+<li>限制每台服务器上最近创建块数量，创建块通常意味着随后的大量写入</li>
+<li>分布到不同机架（网络分区）上</li>
+</ul>
+<p>当副本可用数量低于指定值时（可能是 chunkservers 宕机或硬盘损坏或指定值被修改引起的），master 会进行块的重新复制，此时需要考虑一些优先级：</p>
+<ul>
+<li>副本缺少数量，缺失更多副本的块更重要</li>
+<li>活跃文件的块比不活跃文件的块更重要</li>
+<li>为了最小化对应用的影响，要尽快处理阻塞客户进程的块</li>
+</ul>
+<p>最后，master 会周期性的进行再平衡，检查当前副本分布并将副本移到更合理的硬盘空间上以达到负载均衡，通过这个过程逐步填充新的 chunkserver 而不是突然大量写入，策略和创建块与重新复制时一样</p>
+<h3 id="垃圾回收">垃圾回收</h3>
+<p>删除文件时，GFS 并不会立即删除文件和回收空间。master 只会将文件重命名为一个包含删除时间戳的隐藏名字，只有被隐藏超过三天（这个时间可配置）才会在定期的垃圾回收扫描中被真正删除（通过删除内存中的元数据）。在这个时间点之前还是可以正常读取，并重命名为正常名字来撤销删除</p>
+<p>文件元数据被删除后，其原来的块就成了孤立块。垃圾回收期扫描时会标记孤立块并清除其元数据，在与 master 的定期心跳时，chunkservers 会报告其拥有的块集合，master 回复哪些块没有在元数据中，chunkservers 随后会删除这些块副本</p>
+<p>这种惰性删除给 GFS 带来了几个优势：</p>
+<ol>
+<li>对于大规模分布式系统来说，操作通常在一些机器上成功，一些机器上失败。垃圾回收提供了一种可靠的机制来清除没用的副本</li>
+<li>在 master 后台定期执行，分摊了开销（特别是在一些大量删除文件的场景下）</li>
+<li>防止意外删除带来的影响，删除可以被回滚</li>
+</ol>
+<p>但其一个缺点是用户可能希望通过删除一些文件来缓解空间紧张，惰性删除使得空间无法被立刻复用。GFS 提供了一个解决方案，再次删除隐藏名字的文件，可以真正地立即删除</p>
+<h3 id="过期副本检测">过期副本检测</h3>
+<p>如果一个 chunkserver 宕机期间丢失了一些块的操作，块副本就会过期。master 对每个块维护了一个版本号来区分其是否最新</p>
+<p>master 每授予一个块新租约，就会增加它的版本号并通知最新的副本，master 和副本都会持久化版本号。如果有副本不可用，例如 chunkserver 宕机，在后续重启后通过心跳信息 master 会知道它是落后的。master 不会返回过期块的位置给客户端，直接认为它不存在，等垃圾回收将过期块删除</p>
+<p>master 如果发现一个版本号高于自身的记录，可能说明在授予租约时 master 宕机了，所以它会选择这个更高的版本号来更新自己的版本号</p>
+<p>最后，master 通知客户端块的租约 chunkserver 和位置时，以及通知 chunkservers 进行复制时也都会携带版本号，客户端和服务器在执行操作时总会检查版本号以确保数据最新</p>
+<br/>
+<h2 id="容错和诊断">容错和诊断</h2>
+<p>对分布式系统来说最大的挑战就是如何容错</p>
+<h3 id="高可用">高可用</h3>
+<p>GFS 通过两个策略确保整个系统的高可用：快速恢复和复制</p>
+<p>master 和 chunkservers 被设计为无论如何终止，都能在几秒内恢复自己的状态并重新启动。</p>
+<p>默认每个块拥有三个副本，用户也可以自己指定这个值，通过块副本的冗余来实现容错，一些块副本不可用时，就会用前面提到的重新复制机制来恢复它的副本数量</p>
+<p>同时，master 自身的状态也被复制，它的操作日志和检查点都被复制到多个机器上，这些信息只有在本地和远程都持久化后才算提交完成。当 primary master 宕机时，会在有其状态副本的机器上启动 shadow master，它只提供了对文件系统的只读操作，内部数据相比 primary master 可能有一定时间的延迟</p>
+<h3 id="数据完整性">数据完整性</h3>
+<p>在这个量级的系统上，硬盘故障也是常见的，这可能导致数据本身是一致的，但由于硬盘的原因数据被损坏。GFS 提供了一套机制让每个 chunkserver 能独立地检查数据完整性</p>
+<p>一个块还会被分为 64KB 的 block，每个 block 有一个 32bit 的检验和，检验和保存在内存中，通过操作日志持久化，与用户数据分开。</p>
+<p>读取数据时都会验证这些数据的 block 的校验和，如果数据损坏就不会被发送，并向 master 报告，master 会进行块的重新复制。读取时检验和不会造成什么性能影响，校验和的计算和文件 I/O 是同时进行的，客户端也通过将读操作对齐到检验和的 block 边界上减小了开销</p>
+<p>对于追加操作，有一个重要的优化：仅增量更新最后一个不完整块的检验和，并用追加的新校验和来计算 block 的新的校验和。这样就算发生错误，也会在下次读取时被检测出。对于覆写操作，会对覆盖范围内的第一个和最后一个 block 进行验证，否者可能会隐藏掉没有被覆盖区域的错误</p>
+<p>空闲时，chunkserver 会浏览和验证不活跃块的内容，以此发现很少被读取的块的数据损坏</p>
+<h3 id="诊断工具">诊断工具</h3>
+<p>日志是重要的，GFS 通过详细的日志来排除问题和进行性能分析</p>
+<p>通过对日志异步、顺序地写入来避免性能影响，最近的内容也会保存在内存中用以在线监控</p>
+<br/>
+<h2 id="测量">测量</h2>
+<p>主要是对 GFS 的性能测试的实验数据，略。看原论文就好了</p>
+<br/>
+<h2 id="经验">经验</h2>
+<p>在 GFS 的构建和部署过程中，Google 也遇到了很多问题</p>
+<p>例如硬盘和 Linux 驱动相关的问题，一些驱动和内核的错误导致数据损坏，迫使 Google 使用校验和检测数据完整性和修改 Linux 内核解决这些问题</p>
+<p>早期 Linux 内核的 fsync() 效率与文件大小成正比而不是修改部分的大小，这对 GFS 中海量的日志很不友好，后来通过移植到更新内核解决</p>
+<p>Linux 的一个读写锁设计使得系统在使用 mmap() 内存映射经常被阻塞在某些地方，后来通过 pread() 加上一些额外拷贝开销来绕过使用 mmap() 的这个问题</p>
+<br/>
+<h2 id="相关工作">相关工作</h2>
+<p>像 AFS 一样，GFS 提供了一个位置无关的命名空间，使数据可以为了容错或负载均衡透明地迁移，与 AFS 不同，GFS 将文件数据放到不同服务器上以提高性能和容错能力</p>
+<p>GFS 只使用了复制来提供冗余，这比 RAID 方法简单得多，但空间利用率也更低些</p>
+<p>一些分布式文件系统依赖分布式算法保证一致性和进行管理（没有 master），GFS 为了设计简单、可靠性和弹性，采用了中心化的方法（单 master），这极大地简化了设计和管理</p>
+<p>相比其它系统，GFS 更关注由一般组件组成的复杂分布式系统所需要的日常数据的处理（其它一些系统采用了专用机器），所以容错也是设计中的重要问题</p>
+<br/>
+<h2 id="结论">结论</h2>
+<p>GFS 展示了一个在一般硬件上支持大规模数据处理工作的核心性质，Google 根据它们的工作负载和场景重新审视了传统的技术选择，引出一个完全不同的设计思路：</p>
+<ul>
+<li>组件故障作为常态现象处理</li>
+<li>针对大文件、追加写、顺序读优化</li>
+<li>放松标准文件系统的限制和扩展其接口</li>
+<li>通过持续监控、复制和快速恢复来实现容错</li>
+<li>解耦控制流和数据流提供高吞吐量，通过租约机制减少 master 交互</li>
+</ul>
+]]></content>
+    </entry>
+</feed>

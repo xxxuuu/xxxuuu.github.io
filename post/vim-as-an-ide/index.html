@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Vim as an IDE | x³u³</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css">
+<link rel="shortcut icon" href="https://xxxuuu.me/favicon.ico?v=1723216798723">
+<link rel="stylesheet" href="https://xxxuuu.me/styles/main.css">
+
+
+
+<link href="https://cdn.jsdelivr.net/npm/animate.css@4.1.1/animate.min.css" rel="stylesheet">
+<style>
+:root {
+  --animate-duration: 800ms;
+}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.9/dist/vue.min.js"></script>
+
+
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-T8WGT1LJ6G"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-T8WGT1LJ6G');
+</script>
+
+
+    <meta name="description" content="记录 Vim 入教过程和折腾记录
+
+从 JetBrains 到 VSCode
+自己的开发工具在早期一直是 JetBrains IDE 为主，JetBrains 的产品自然不用多说，体验极佳，但仍然有几个痛点，促使我全面换到 VSCode 上..." />
+    <meta name="keywords" content="Vim" />
+    
+      <link href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css" rel="stylesheet">
+      <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.js"></script>
+    
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/@fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <header class="header">
+  <div class="banner animate__animated animate__fadeIn">
+    <div class="top-container">
+      <div class="site-title-container">
+        <img src="https://xxxuuu.me/images/avatar.png?v=1723216798723" class="site-logo">
+        <div class="site-text">
+          <h1 class="site-title">
+            x³u³
+          </h1>
+          <div class="site-description-social">
+            <div class="site-description">
+              🗒 碎碎念
+            </div>
+            <div class="site-social">
+              
+                
+                  <a class="social-link" href="https://github.com/xxxuuu" target="_blank">
+                    <i class="fa fa-github"></i>
+                  </a>
+                
+              
+                
+              
+                
+              
+                
+              
+                
+              
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="links">
+      
+        
+            <a href="/" class="site-nav">
+              🏠 首页
+            </a>
+          
+        
+        
+            <a href="/archives" class="site-nav">
+              📃 归档
+            </a>
+          
+        
+        
+            <a href="/tags" class="site-nav">
+              🏷 标签
+            </a>
+          
+        
+        
+            <a href="/post/about" class="site-nav">
+              👤 关于
+            </a>
+          
+        
+        
+            <a href="/post/friend-links/" class="site-nav">
+              👬 友链
+            </a>
+          
+        
+    </div>
+  </div>
+</header>
+
+      <div class="main-container">
+        <div class="content-container animate__animated animate__fadeInUp">
+          <div class="post-detail">
+            <h2 class="post-title">Vim as an IDE</h2>
+            <div class="post-date">2023-06-22&emsp;&emsp;2164 字 &emsp;阅读时间 8 分钟</div>
+            
+            <div class="post-content" v-pre>
+              <p>记录 Vim 入教过程和折腾记录</p>
+<!-- more -->
+<h2 id="从-jetbrains-到-vscode">从 JetBrains 到 VSCode</h2>
+<p>自己的开发工具在早期一直是 JetBrains IDE 为主，JetBrains 的产品自然不用多说，体验极佳，但仍然有几个痛点，促使我全面换到 VSCode 上进行开发工作：</p>
+<ol>
+<li><strong>资源占用高</strong>：这个问题在我之前的 Intel MacBook Pro 上还是比较明显的，每次一打开 IDE，风扇就会原地起飞，在图书馆里总能和隔壁的游戏本老哥竞争噪音冠军宝座。虽然之后换了 M1 Pro 的 MacBook Pro 14 后没再担心过噪音和性能问题，但 Activity Monitor 中的资源占用率还是看着难受</li>
+<li><strong>收费贵</strong>：学生时代一直用着学校邮箱白嫖教育 LICENSE，但临近毕业，这种方式也无法持续下去。公司提供的 LICENSE 服务器也只能在内网使用，无法用于个人电脑</li>
+<li><strong>Remote 功能羸弱</strong>：Remote Development 使用的 Gateway 问题很多，速度和稳定性都很差，体验一言难尽，几乎没法正常使用</li>
+<li><strong>单个产品功能单一</strong>：通常项目里会混杂着多种语言，但 JetBrains 的 IDE 被分为多个产品，单个产品对混合场景的支持不太理想</li>
+</ol>
+<p>其中一、二、四点都并非不可接受，还是有相对的解决方案。但第三点 Remote 功能的缺失就无法调和了，在 Tencent 实习时，做的是 SaaS 系统，还是比较应用层的后端开发，但项目本身具有一定规模，同时依赖许多内部组件，虽然在 macOS 上经过一些配置也能跑，但需要折腾一下，因此大家基本都是在开发机上 code，IDE/Editor 的 Remote 功能就必不可少了，也是在这时我切换到了 VSCode</p>
+<p>现在在公司内做虚拟化平台的开发，无论是开发还是调试，对 kernel 都有严重依赖，同时项目规模更进一步，跑全量的 unit tests 都要吃掉数十 G 内存，在 macOS 上开发就更不可能了</p>
+<p>VSCode 虽然一些分析的功能上比 JetBrains IDE 要弱不少，但 VSCode 开创的这类 Editor + LSP 的模式相比 JetBrains 的 specific 的模式要更具备扩展性和通用性，也大大降低了 Editor 开发的门槛。所以现在各类 Editor 如雨后春笋般冒出来，只要接入 LSP，就能直接提供现成的语言支持而不需要再花费大精力开发各个语言的支持功能，JetBrains 最新的 Fleet 也受此影响，采用了 LSP 的模式设计</p>
+<h2 id="vscode-vim">VSCode + Vim</h2>
+<p>VSCode 使用了很长时间，体验一直中规中矩，自身也比较习惯了各类快捷键和操作。让我有使用 Vim 想法的契机是入职现在这家公司一周后发现组内几个大佬都在用 Vim，有次 leader 在讲代码时噼里啪啦一通操作，给了我一点小小的震撼，实在太 cool 了</p>
+<p>因此我也决定开始使用 Vim，我选择的方式是 VSCode + Vim 插件，这样能在使用 Vim 的同时，如果某些操作不熟练，还可以用回熟悉的方式，不至于工作被 block。而且我将 Vim 当作一种编辑方式，或者说是一堆快捷键的组合，因此它是不和其它 IDE/Editor 相冲突的，IDE/Editor 本身的功能就交由它们自己去处理</p>
+<p>Vim 入门可以先使用 <code>vimtutor</code> 了解基本功能并能熟练使用，然后参考这两篇文章来逐步掌握更多技巧：</p>
+<ul>
+<li><a href="https://coolshell.cn/articles/5426.html">简明 Vim 练级攻略</a></li>
+<li><a href="https://github.com/wsdjeg/Learn-Vim_zh_cn">Learn-Vim_zh_cn</a></li>
+</ul>
+<p>一开始先从基本的操作做起，例如 <code>h</code>/<code>j</code>/<code>k</code>/<code>l</code>/<code>w</code>/<code>b</code>/<code>e</code>/<code>&lt;C-d&gt;</code>/<code>&lt;C-u&gt;</code>/<code>x</code> 等，完全习惯后再通过学习更多的命令和练习组合操作不断提高速度，例如 <code>#</code>/<code>*</code>/<code>%</code>/<code>&lt;C-o&gt;</code>/<code>&lt;C-i&gt;</code>/<code>c2i{</code>... 移动编辑都得心应手就可以尝试更多的高级功能了，例如搜索替换、多窗口、标记、折叠、宏等</p>
+<p>同时要注意和 IDE/Editor 的功能结合，例如 <code>gd</code>/<code>gh</code> 能够进行 LSP 相关的操作，某些不顺手的快捷键也可以自行定义，下面是我自己的一些配置：</p>
+<ul>
+<li><a href="https://gist.github.com/xxxuuu/a0e32e866b9d793dfac1625d9eff9635">vscode-vim.json</a></li>
+</ul>
+<p>在坚持了一个月之后，我使用 Vim 来阅读和编辑代码的速度已经远快于之前了，这个过程中为了避免自己的知识遗漏，如果遇到比较麻烦或者路径太长的操作，那说明肯定还有更高效的方式，我也会再翻文档或找 best practices 来优化自己的 flow。同时开始折腾一些如 easymontion 的插件来继续提高效率</p>
+<p>Vim 入门的难点在于全新概念和操作方式，学习路线陡峭。一开始做一个很简单的操作都要思考一会或者翻阅文档，但一旦坚持下来，经过阵痛期后形成肌肉记忆，就会感受到丝滑般的编辑体验，其组合式的交互也能轻松做到一些看起来很复杂的操作。手也不用在键盘和鼠标间反复移动，做到全键盘编辑/浏览，操作真正跟上思维速度，实现「人机合一」</p>
+<h2 id="lunarvim">LunarVim</h2>
+<p>虽然一开始想的是 Vim 和 IDE/Editor 是解耦的，但在使用 VSCode + Vim 的过程中还是发现，大部分 IDE/Editor 本身不是为 Vim 的编辑模式而设置的，一些与编辑无关的 IDE/Editor 自身的操作还是比较别扭，无法和 Vim 很好的结合在一起，这一点也不「Vim」。例如在 Explorer 中寻找文件时，或者 Terminal 和 Tab 间的跳转等都不太方便</p>
+<p>因此我开始寻找一种新的替代方案，或许应该用真正的 Vim as an IDE 方法，但都需要进行很多配置，对小白并不友好。直到后来我发现了 <a href="https://www.lunarvim.org/zh-Hans/">LunarVim</a> ，它基于 NeoVim，集成了众多常用 nvim 插件，结合各个语言的 LSP 和 DAP，能够提供一个开箱即用的解决方案，已经完全够用，试用了一下感觉非常满意，没有前面 VSCode + Vim 的几个不便之处，同时额外装了几个插件后，也有不弱于 VSCode 的 IDE/Editor 功能（况且 VSCode 的这些功能本身也是严重依赖插件提供），基本满足了我的需求</p>
+<img alt="lunarvim" src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/lunarvim-kubeadm.png?x-oss-process=style/compress" width=800 >
+<p>LunarVim 在 <a href="https://github.com/LunarVim/starter.lvim/tree/master">starter.lvim</a> 中提供了常见语言的全套配置，除此之外，个人还安装了以下插件：</p>
+<ol>
+<li><a href="https://github.com/chipsenkbeil/distant.nvim">distant</a>：实现类似 VSCode 中 Remote SSH 的功能，不过目前还不是特别稳定；直接在 Linux 开发机上安装 LunarVim 也是一种选择</li>
+<li><a href="https://github.com/sindrets/diffview.nvim">diffview</a>：显示 Git DiffView，效果比内置的那个插件好一些，直接使用内置的也可以</li>
+<li><a href="https://github.com/f-person/git-blame.nvim">git-blame</a>：在光标所在行后显示 Git Blame</li>
+<li><a href="https://github.com/folke/todo-comments.nvim">todo-comments</a>：对带有 TODO，FIX 的注释进行高亮，并提供搜索功能</li>
+<li><a href="https://github.com/phaazon/hop.nvim">hop</a>：类似 easymotion 的跳转插件</li>
+<li><a href="https://github.com/simrat39/symbols-outline.nvim">symbols-outline</a>：符号大纲</li>
+<li><a href="https://github.com/folke/trouble.nvim">trouble</a>：用于显示各种诊断信息和一些类 LSP 的操作</li>
+<li><a href="https://github.com/kylechui/nvim-surround">nvim-surround</a>：强大的 surround 操作</li>
+<li><a href="https://github.com/zbirenbaum/copilot-cmp">copilot-cmp</a>：Github Copilot 相关插件</li>
+</ol>
+<p>配置文件也丢在 Github Gist 中：<a href="https://gist.github.com/xxxuuu/268dd3d9248094ee189cc88518f7f88b">config.lua</a></p>
+<blockquote>
+<p>更新：<br>
+<span> </span><br>
+我又叛变了，开始改用 <a href="https://astronvim.com/">AstroNvim</a><br>
+<span> </span><br>
+因为已经脱离了小白阶段，有更多的自定义和修改需求，感觉 AstroNvim 的默认配置和设计比 LunarVim 更合理，修改起来更方便。所以 fork 了一份在自己仓库来自定义：<a href="https://github.com/xxxuuu/AstroNvim?tab=readme-ov-file">https://github.com/xxxuuu/AstroNvim</a><br>
+<span> </span><br>
+现在可以直接 <code>clone</code> 来开箱即用<br>
+<span> </span></p>
+<pre><code class="language-shell">git clone --depth 1 https://github.com/xxxuuu/AstroNvim ~/.config/nvim
+nvim
+</code></pre>
+</blockquote>
+<h2 id="浏览器也要-vim">浏览器也要 Vim！</h2>
+<p>从 VSCode 切换到 LunarVim 是为了 workflow 中 Vim 操作更加统一化，现在，已经可以完全享受 Vim Coding</p>
+<p>但，flow 中不只是 IDE/Editor，还有一大半时间是处于飞书等 IM 软件和浏览器中。在飞书中大多时间都是在输入，鼠标键盘切换不频繁，也可以容忍。但浏览器这侧，一个典型高频场景是一边在浏览器浏览文档，一边在 IDE/Editor 写代码，这就会导致鼠标键盘的切换非常频繁。上一秒还在用 Vim 愉快地 Coding，下一秒就要动鼠标在浏览器翻翻找找，破坏了良好的 Vim 体验。所以，浏览器也要 Vim！</p>
+<p>好在有同样想法的人不少，Chromium 上有非常成熟的 Vim 扩展 Vimium，可以将 Vim 操作带到浏览器上</p>
+<ul>
+<li><a href="https://chrome.google.com/webstore/detail/vimium/dbepggeogbaibhgnhhndojpepiihcmeb">Vimium</a></li>
+</ul>
+<p>现在，彻底 Vim！<br>
+<img alt="browser-vim" src="https://gridea-blog.oss-cn-shenzhen.aliyuncs.com/post-resource/browser-vim.png" width=800 ></p>
+
+            </div>
+
+            <div class="not-by-ai">
+              <img src="/media/images/not-by-ai-cn.svg"/>
+              <img src="/media/images/not-by-ai-jp.svg"/>
+              <img src="/media/images/not-by-ai-en.svg"/>
+            </div>
+
+            
+              <div class="tag-container">
+                
+                  <a href="https://xxxuuu.me/tag/YyKlOO1cM/" class="tag">
+                    Vim
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://xxxuuu.me/post/kubernetes-csi/">
+                  <h3 class="post-title">
+                    Kubernetes CSI
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+            
+              <div id="giscus" class="giscus">
+                <script src="https://giscus.app/client.js" data-repo="xxxuuu/xxxuuu.github.io" data-repo-id="MDEwOlJlcG9zaXRvcnkxODQ3Mjk3Mjg=" data-category="Announcements"  data-category-id="DIC_kwDOCwLAgM4ChgWc" data-mapping="title"  data-strict="0"  data-reactions-enabled="1" data-emit-metadata="0" data-input-position="bottom" data-theme="preferred_color_scheme" data-lang="zh-CN" data-loading="lazy" crossorigin="anonymous" async></script>
+              </div>
+            
+          </div>
+
+          
+
+<div class="post-toc animate__animated animate__fadeInUp">
+  <ul class="markdownIt-TOC">
+<li>
+<ul>
+<li><a href="#%E4%BB%8E-jetbrains-%E5%88%B0-vscode">从 JetBrains 到 VSCode</a></li>
+<li><a href="#vscode-vim">VSCode + Vim</a></li>
+<li><a href="#lunarvim">LunarVim</a></li>
+<li><a href="#%E6%B5%8F%E8%A7%88%E5%99%A8%E4%B9%9F%E8%A6%81-vim">浏览器也要 Vim！</a></li>
+</ul>
+</li>
+</ul>
+
+</div>
+
+
+<script>
+  let lastTop = 0, linkList = [], headList = [], postBody, lastIndex = -1;
+  let activeClass = 'active-toc';
+  let tocContent;
+
+  function addActiveClass(index) {
+    if (index >= 0 && index < linkList.length) {
+      linkList[index].parentElement.classList.add(activeClass);
+    }
+  }
+
+  function removeActiveClass(index) {
+    if (index >= 0 && index < linkList.length) {
+      linkList[index].parentElement.classList.remove(activeClass);
+    }
+  }
+
+  function getElementTop (el) {
+    let actualTop = el.offsetTop
+    let current = el.offsetParent
+    while (current !== null) {
+      actualTop += current.offsetTop
+      current = current.offsetParent
+    }
+    return actualTop
+  }
+
+  function syncActiveClass() {
+    if (linkList.length <= 0) {
+      return;
+    }
+    let scrollTop = document.scrollingElement.scrollTop;
+    let eps = window.innerHeight;
+
+    let current = 0, closestOffset = 0x3f3f3f3f, hasFind = false;
+    for (let i = 0; i < headList.length; i++) {
+      let offset = Math.abs(getElementTop(headList[i]) - scrollTop);
+      if (offset > eps) {
+        continue;
+      }
+      if (offset < closestOffset) {
+        current = i;
+        closestOffset = offset;
+        hasFind = true;
+      }
+    }
+    if(!hasFind) {
+      return;
+    }
+
+    removeActiveClass(lastIndex)
+    addActiveClass(current);
+    lastIndex = current;
+  }
+
+  document.addEventListener('scroll', syncActiveClass);
+  window.addEventListener('load', function () {
+    tocContent = document.querySelector('.markdownIt-TOC');
+    if (!tocContent) return;
+
+    postBody = document.querySelector('.post-content');
+    for (let i = 0; i < postBody.children.length; i++) {
+      if (postBody.children[i].__proto__ === HTMLHeadingElement.prototype) {
+        headList.push(postBody.children[i]);
+      }
+    }
+    linkList = document.querySelectorAll('.post-toc a');
+
+    setTimeout(function () {
+      if ("createEvent" in document) {
+        let evt = document.createEvent("HTMLEvents");
+        evt.initEvent("scroll", false, true);
+        document.dispatchEvent(evt);
+      }
+      else {
+        document.fireEvent("scroll");
+      }
+    }, 500)
+  })
+</script>
+
+        </div>
+      </div>
+
+      <footer class="footer animate__animated animate__flipInX">
+  <div class="site-footer">
+    <p></p>
+    <p>© x³u³ · Powered by <a href="https://gridea.dev/">Gridea</a> & <a href="https://github.com/xxxuuu/gridea-theme-autumn">Autumn</a> | <a class="rss" href="https://xxxuuu.me/atom.xml" target="_blank">RSS</a></p>
+  </div>
+</footer>
+
+
+    </div>
+
+    <script type="application/javascript">
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.4.0/build/highlight.min.js"></script>
+  <script>
+    window.onload = () => {
+        hljs.highlightAll()
+    }
+  </script>
+
+
+<script>
+  const images = document.querySelectorAll('.post-content img');
+
+  for (let i = 0; i < images.length; i++) {
+    const img = images[i];
+
+    const link = document.createElement('a');
+    link.href = img.src;
+    link.setAttribute("data-fancybox", "gallery");
+
+    img.parentNode.insertBefore(link, img);
+    link.appendChild(img);
+  }
+</script>
+
+
+
+
+  </body>
+</html>
