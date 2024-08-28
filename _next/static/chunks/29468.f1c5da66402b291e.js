@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[29468],{29468:function(e,r,c){c.r(r);var n=c(85893);r.default=e=>{let{children:r,headerSlot:c,className:s}=e;return(0,n.jsxs)("div",{className:"".concat(s||""," card border dark:border-gray-700 rounded-xl lg:p-6 p-4"),children:[(0,n.jsx)(n.Fragment,{children:c}),(0,n.jsx)("section",{children:r})]})}}}]);

@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[12214],{12214:function(e,n,r){r.r(n);var a=r(85893),t=r(41664),c=r.n(t);n.default=e=>{let{tag:n}=e;return(0,a.jsx)(c(),{href:"/tag/".concat(encodeURIComponent(n)),children:(0,a.jsx)("p",{className:"mr-1 rounded-full px-2 py-1 border leading-none text-sm dark:border-gray-600",children:n})})}}}]);

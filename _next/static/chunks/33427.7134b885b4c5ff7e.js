@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunk_N_E=self.webpackChunk_N_E||[]).push([[33427],{33427:function(s,t,a){a.r(t);var e=a(85893),r=a(27134);t.default=s=>{let{icon:t}=s;return t?t.startsWith("http")||t.startsWith("data:")?(0,e.jsx)(r.Z,{src:t,className:"w-10 h-10 inline"}):(0,e.jsx)("span",{className:"mr-1 text-4xl",children:t}):(0,e.jsx)(e.Fragment,{})}}}]);
