@@ -1,0 +1,397 @@
+<!DOCTYPE html><html data-astro-cid-pjvcz6dw lang=zh-CN><head><meta charset=UTF-8><meta content="width=device-width,initial-scale=1" name=viewport><link href="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F49b4570c-b2f0-457b-81b7-b68e2693a471%2Favatar.png?table=collection&id=0bb2e606-8d0c-4f7c-aca9-70986e90c055" rel=icon><link href=https://xxxuuu.me/post/kernel-rwlock/ rel=canonical><link href=/rss/feed.xml rel=alternate title=x³u³ type=application/rss+xml><link href=/sitemap-index.xml rel=sitemap><title>从 Linux 内核看读写锁设计 | x³u³</title><meta content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的" name=description><meta content=website property=og:type><meta content=https://xxxuuu.me/post/kernel-rwlock/ property=og:url><meta content="从 Linux 内核看读写锁设计 | x³u³" property=og:title><meta content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的" property=og:description><meta content="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa9af1d6b-f284-4734-ba06-990353cf3f84%2FElaina.jpg?table=collection&id=0bb2e606-8d0c-4f7c-aca9-70986e90c055" property=og:image><meta content=summary_large_image name=twitter:card><meta content=@xxuuu0 name=twitter:site><meta content="从 Linux 内核看读写锁设计 | x³u³" name=twitter:title><meta content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的" name=twitter:description><meta content="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa9af1d6b-f284-4734-ba06-990353cf3f84%2FElaina.jpg?table=collection&id=0bb2e606-8d0c-4f7c-aca9-70986e90c055" name=twitter:image><link href=https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe.css rel=preload as=style onload="this.onload=null,this.rel=&#34;stylesheet&#34;"><noscript><link href=https://cdn.jsdelivr.net/npm/photoswipe@5.4.3/dist/photoswipe.css rel=stylesheet></noscript><script>!function(){const e=localStorage.getItem("theme")||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.classList.add(e)}()</script><link href=/_astro/katex.CVb4srxQ.css rel=stylesheet><link href=/_astro/_slug_.CtQEHxK0.css rel=stylesheet><link href=/_astro/_slug_.DhuirupF.css rel=stylesheet><link href=/_astro/_slug_.DOIB7y8p.css rel=stylesheet><script src=/_astro/hoisted.B871fABB.js type=module></script></head><body data-astro-cid-pjvcz6dw><header class=notion-header data-astro-cid-4f4rmh32><div class=header-container data-astro-cid-4f4rmh32><div class=header-content data-astro-cid-4f4rmh32><div class=logo data-astro-cid-4f4rmh32><a href=/ class=logo-link data-astro-cid-4f4rmh32>x³u³</a></div><div class=header-actions data-astro-cid-4f4rmh32><nav class=nav data-astro-cid-4f4rmh32><a href=/ class=nav-link data-astro-cid-4f4rmh32>🏠 首页 </a><a href=/archive class=nav-link data-astro-cid-4f4rmh32>📃 归档 </a><a href=/links class=nav-link data-astro-cid-4f4rmh32>👬 友链 </a><a href=https://p.xxxuuu.me class=nav-link data-astro-cid-4f4rmh32 rel="noopener noreferrer" target=_blank>📷 摄影 <span class=external-icon data-astro-cid-4f4rmh32>↗</span> </a><a href=/about class=nav-link data-astro-cid-4f4rmh32>👤 关于</a></nav><button aria-label="Toggle theme" title=切换主题 data-astro-cid-44mn2ykx id=theme-toggle><svg fill=none viewBox="0 0 24 24" height=20 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=20 class=sun-icon data-astro-cid-44mn2ykx xmlns=http://www.w3.org/2000/svg><circle cx=12 cy=12 data-astro-cid-44mn2ykx r=5></circle><line data-astro-cid-44mn2ykx x1=12 x2=12 y1=1 y2=3></line><line data-astro-cid-44mn2ykx x1=12 x2=12 y1=21 y2=23></line><line data-astro-cid-44mn2ykx x1=4.22 x2=5.64 y1=4.22 y2=5.64></line><line data-astro-cid-44mn2ykx x1=18.36 x2=19.78 y1=18.36 y2=19.78></line><line data-astro-cid-44mn2ykx x1=1 x2=3 y1=12 y2=12></line><line data-astro-cid-44mn2ykx x1=21 x2=23 y1=12 y2=12></line><line data-astro-cid-44mn2ykx x1=4.22 x2=5.64 y1=19.78 y2=18.36></line><line data-astro-cid-44mn2ykx x1=18.36 x2=19.78 y1=5.64 y2=4.22></line></svg> <svg fill=none viewBox="0 0 24 24" height=20 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=20 class=moon-icon data-astro-cid-44mn2ykx xmlns=http://www.w3.org/2000/svg><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-astro-cid-44mn2ykx></path></svg></button></div></div></div></header><main class=notion-main data-astro-cid-pjvcz6dw><article class=content data-astro-cid-gbhzkc2y><div class=notion-page data-astro-cid-gbhzkc2y><div class=page-container data-astro-cid-gbhzkc2y><div class=page-main data-astro-cid-gbhzkc2y><header class=page-header data-astro-cid-gbhzkc2y><h1 class=page-title data-astro-cid-gbhzkc2y>从 Linux 内核看读写锁设计</h1></header><div class=page-meta data-astro-cid-gbhzkc2y><div class=meta-info data-astro-cid-gbhzkc2y><span class=meta-item data-astro-cid-gbhzkc2y><span class=meta-icon data-astro-cid-gbhzkc2y>📅</span> <time data-astro-cid-gbhzkc2y datetime=2024-01-04>2024年01月04日</time> </span><span class=meta-item data-astro-cid-gbhzkc2y><span class=meta-icon data-astro-cid-gbhzkc2y>⏱️</span> <span data-astro-cid-gbhzkc2y>11 分钟阅读</span></span></div><div class=meta-tags data-astro-cid-gbhzkc2y><span class=tags-icon data-astro-cid-gbhzkc2y>🏷️</span> <a href=/tag/linux class=tag-pill data-astro-cid-gbhzkc2y>Linux</a><a href=/tag/操作系统 class=tag-pill data-astro-cid-gbhzkc2y>操作系统</a></div><div class=meta-description data-astro-cid-gbhzkc2y>前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的</div></div><hr class=page-divider data-astro-cid-gbhzkc2y><div class=notion-content data-astro-cid-gbhzkc2y><p>前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的</p><h2 id="">读/写自旋锁</h2><p>内核代码中，要定义读/写自旋锁，通过下面的宏进行初始化：</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>DEFINE_RWLOCK(mr_rwlock);</code></pre></div><p>使用上读锁和写锁是分开加锁的</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>read_lock(&amp;mr_rwlock);
+// 只读临界区
+read_unlock(&amp;mr_rwlock);
+
+write_lock(&amp;mr_rwlock);
+// 读写临界区
+write_unlock(&amp;mr_rwlock);</code></pre></div><p><strong>不能</strong>像这样将一个读锁升级成写锁，这会导致死锁；并且写锁也是不可重入的：</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>read_lock(&amp;mr_rwlock);
+write_lock(&amp;mr_rwlock);</code></pre></div><p><br></p><p>读/写自旋锁的汇编级别实现比较类似信号量，都是在寄存器上对值做增减，但为了区分读锁和写锁，读锁是固定减 1，写锁则是固定减去一个很大的 magic number，通过结果值比较就能判断锁持有情况</p><p>代码分别位于 <a href=https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwlock.h rel="noopener noreferrer" target=_blank>include/asm-x86_64/rwlock.h</a> 和 <a href=https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/spinlock.h rel="noopener noreferrer" target=_blank>/include/asm-x86_64/spinlock.h</a> 中，这两块涉及的核心代码融合一下大致如下：</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>#define RW_LOCK_BIAS 0x01000000
+
+// 初始化时设置这个值为 magic number
+#define rwlock_init(x)	do { *(x) = RW_LOCK_UNLOCKED; } while(0)
+
+// 获取读锁
+// 将eax寄存器指向的地址，也就是变量rw的值减1（subl $1）
+// 根据结果是否小于0（js 2f）做跳转，小于0就去调用传入的helper做获取失败的处理
+// 没有写锁的情况下是不会小于0的，不可能有这么多读者能让它减到0，所以不小于0就是获取成功
+#define __build_read_lock_ptr(rw, helper)   \
+	asm volatile(LOCK &quot;subl $1,(%0)\n\t&quot; \ 
+		     &quot;js 2f\n&quot; \ 
+		     &quot;1:\n&quot; \
+		    LOCK_SECTION_START(&quot;&quot;) \
+		     &quot;2:\tcall &quot; helper &quot;\n\t&quot; \
+		     &quot;jmp 1b\n&quot; \
+		    LOCK_SECTION_END \
+		     ::&quot;a&quot; (rw) : &quot;memory&quot;)
+
+// 传入的helper位于arch/i386/kernel/semaphore.c
+// 这里就是一个自旋的逻辑，持续操作rw直到它是大于等于0的，相当于:
+// 
+// lock_failed:
+// rw++;
+// while(rw &lt; 1) {}
+// rw--;
+// if(rw &lt; 0) goto lock_failed;
+// 
+// 这里结尾还要判断一次，是因为前面的操作整体上不是原子或互斥的，所以decl后要再check一下
+asm(
+&quot;.text\n&quot;
+&quot;.align	4\n&quot;
+&quot;.globl	__read_lock_failed\n&quot;
+&quot;__read_lock_failed:\n\t&quot;
+	LOCK &quot;incl	(%eax)\n&quot;
+&quot;1:	rep; nop\n\t&quot;
+	&quot;cmpl	$1,(%eax)\n\t&quot;
+	&quot;js	1b\n\t&quot;
+	LOCK &quot;decl	(%eax)\n\t&quot;
+	&quot;js	__read_lock_failed\n\t&quot;
+	&quot;ret&quot;
+);
+
+// 获取写锁
+// eax寄存器指向的地址值，也就是rw减去magic number
+// 判断结果是否刚好为0（jnz 2f），不是则说明有读锁在占用，跳转到helper调用
+#define __build_write_lock_ptr(rw, helper) \
+	asm volatile(LOCK &quot;subl $&quot; RW_LOCK_BIAS_STR &quot;,(%0)\n\t&quot; \
+		     &quot;jnz 2f\n&quot; \
+		     &quot;1:\n&quot; \
+		     LOCK_SECTION_START(&quot;&quot;) \
+		     &quot;2:\tcall &quot; helper &quot;\n\t&quot; \
+		     &quot;jmp 1b\n&quot; \
+		     LOCK_SECTION_END \
+		     ::&quot;a&quot; (rw) : &quot;memory&quot;)
+
+// 写锁传入的helper同样位于arch/i386/kernel/semaphore.c
+// 逻辑和读锁的基本一样
+asm(
+&quot;.text\n&quot;
+&quot;.align	4\n&quot;
+&quot;.globl	__write_lock_failed\n&quot;
+&quot;__write_lock_failed:\n\t&quot;
+	LOCK &quot;addl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n&quot;
+&quot;1:	rep; nop\n\t&quot;
+	&quot;cmpl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n\t&quot;
+	&quot;jne	1b\n\t&quot;
+	LOCK &quot;subl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n\t&quot;
+	&quot;jnz	__write_lock_failed\n\t&quot;
+	&quot;ret&quot;
+);
+
+// 解锁时就是加上1或magic number
+#define _raw_read_unlock(rw) asm volatile(&quot;lock ; incl %0&quot; :&quot;=m&quot; ((rw)-&gt;lock) : : &quot;memory&quot;)
+#define _raw_write_unlock(rw)	asm volatile(&quot;lock ; addl $&quot; RW_LOCK_BIAS_STR &quot;,%0&quot;:&quot;=m&quot; ((rw)-&gt;lock) : : &quot;memory&quot;)</code></pre></div><p>可以看出，读/写自旋锁是<strong>读优先</strong>的，会导致写饥饿。当有一个或多个读者持有读锁时，写操作无法获取锁，如果此时读锁被长时间占有，写锁将一直自旋等待，此时自旋会导致一个核心上的高昂开销</p><p><br></p><p>这里有一个处理上的细节，在真正开始自旋获取到写锁之前，就已经互斥了（减去 magic number），这时候新的读锁是无法获取的，这避免了写锁和读锁的争抢，能稍微缓解下写饥饿问题，例如这样的情况：</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>Plain text</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class="language-plain text">                            TIME
+─────────────────────────────────────────────────────────►
+ ┌──────────────┐
+ │    reader    │
+ └──────────────┘
+     ┌──────────┬────────────────────┐
+     │   spin   │       writer       │
+     └──────────┴────────────────────┘
+           ┌─────────────────────────┬───────────────┐
+           │           spin          │     reader    │
+           └─────────────────────────┴───────────────┘
+                        ┌────────────┬───────────┐
+                        │    spin    │   reader  │
+                        └────────────┴───────────┘</code></pre></div><p><br></p><h2 id="">读/写信号量</h2><p>读/写信号量的使用上和读/写自旋锁是类似的，但功能上要强大一些，分别支持静态和动态的初始化方法</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>// 静态定义
+static DECLARE_RWSEM(name);
+// 动态定义
+init_rwsem(struct rw_semaphore *sem);</code></pre></div><p>读/写信号量支持 trylock 操作和动态地将写锁降级为读锁</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>static DECLARE_RWSEM(mr_rwsem);
+
+down_read(&amp;mr_rwsem);
+// 只读临界区
+up_read(&amp;mr_rwsem);
+
+down_write(&amp;mr_rwsem);
+// 读写临界区
+up_write(&amp;mr_rwsem);
+
+down_write(&amp;mr_rwsem);
+// 读写临界区
+downgrade_write(&amp;mr_rwsem); // 写锁降级读锁
+// 只读临界区
+up_read(&amp;mr_rwsem);</code></pre></div><p><br></p><p><a href=https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwsem.h#L99 rel="noopener noreferrer" target=_blank>include/asm-x86_64/rwsem.h</a> 中定义了汇编级别上的实现，和前面读/写自旋锁是类似的，但没有自旋，这里就不细说，内核源码这里也直接附带注释了：</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>#define RWSEM_UNLOCKED_VALUE		  0x00000000
+#define RWSEM_ACTIVE_BIAS		      0x00000001
+#define RWSEM_ACTIVE_MASK		      0x0000ffff
+#define RWSEM_WAITING_BIAS		    (-0x00010000)
+#define RWSEM_ACTIVE_READ_BIAS		RWSEM_ACTIVE_BIAS
+#define RWSEM_ACTIVE_WRITE_BIAS		(RWSEM_WAITING_BIAS + RWSEM_ACTIVE_BIAS)
+
+/*
+ * lock for reading
+ */
+static inline void __down_read(struct rw_semaphore *sem)
+{
+	__asm__ __volatile__(
+		&quot;# beginning down_read\n\t&quot;
+LOCK_PREFIX	&quot;  incl      (%%rdi)\n\t&quot; /* adds 0x00000001, returns the old value */
+		&quot;  js        2f\n\t&quot; /* jump if we weren&#039;t granted the lock */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;) \
+		&quot;2:\n\t&quot;
+		&quot;  call      rwsem_down_read_failed_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END \
+		&quot;# ending down_read\n\t&quot;
+		: &quot;+m&quot;(sem-&gt;count)
+		: &quot;D&quot;(sem)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * lock for writing
+ */
+static inline void __down_write(struct rw_semaphore *sem)
+{
+	int tmp;
+
+	tmp = RWSEM_ACTIVE_WRITE_BIAS;
+	__asm__ __volatile__(
+		&quot;# beginning down_write\n\t&quot;
+LOCK_PREFIX	&quot;  xaddl      %0,(%%rdi)\n\t&quot; /* subtract 0x0000ffff, returns the old value */
+		&quot;  testl     %0,%0\n\t&quot; /* was the count 0 before? */
+		&quot;  jnz       2f\n\t&quot; /* jump if we weren&#039;t granted the lock */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  call      rwsem_down_write_failed_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending down_write&quot;
+		: &quot;=&amp;r&quot; (tmp) 
+		: &quot;0&quot;(tmp), &quot;D&quot;(sem)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * unlock after reading
+ */
+static inline void __up_read(struct rw_semaphore *sem)
+{
+	__s32 tmp = -RWSEM_ACTIVE_READ_BIAS;
+	__asm__ __volatile__(
+		&quot;# beginning __up_read\n\t&quot;
+LOCK_PREFIX	&quot;  xaddl      %[tmp],(%%rdi)\n\t&quot; /* subtracts 1, returns the old value */
+		&quot;  js        2f\n\t&quot; /* jump if the lock is being waited upon */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  decw      %w[tmp]\n\t&quot; /* do nothing if still outstanding active readers */
+		&quot;  jnz       1b\n\t&quot;
+		&quot;  call      rwsem_wake_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending __up_read\n&quot;
+		: &quot;+m&quot;(sem-&gt;count), [tmp] &quot;+r&quot; (tmp)
+		: &quot;D&quot;(sem)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * unlock after writing
+ */
+static inline void __up_write(struct rw_semaphore *sem)
+{
+	unsigned tmp; 
+	__asm__ __volatile__(
+		&quot;# beginning __up_write\n\t&quot;
+		&quot;  movl     %[bias],%[tmp]\n\t&quot;
+LOCK_PREFIX	&quot;  xaddl     %[tmp],(%%rdi)\n\t&quot; /* tries to transition 0xffff0001 -&gt; 0x00000000 */
+		&quot;  jnz       2f\n\t&quot; /* jump if the lock is being waited upon */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  decw      %w[tmp]\n\t&quot; /* did the active count reduce to 0? */
+		&quot;  jnz       1b\n\t&quot; /* jump back if not */
+		&quot;  call      rwsem_wake_thunk\n\t&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending __up_write\n&quot;
+		: &quot;+m&quot;(sem-&gt;count), [tmp] &quot;=r&quot; (tmp)
+		: &quot;D&quot;(sem), [bias] &quot;i&quot;(-RWSEM_ACTIVE_WRITE_BIAS)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}</code></pre></div><p><br></p><p>信号量是睡眠锁，读锁和写锁在获取锁失败时最后都会进入到 <code>rwsem_down_failed_common</code>（位于 <a href=https://elixir.bootlin.com/linux/v2.6.0/source/lib/rwsem.c#L123 rel="noopener noreferrer" target=_blank>lib/rwsem.c</a>） 中，这里会将进程加入等待队列中，然后重新调度进程</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>static inline struct rw_semaphore *rwsem_down_failed_common(struct rw_semaphore *sem,
+								 struct rwsem_waiter *waiter,
+								 signed long adjustment)
+{
+	struct task_struct *tsk = current;
+	signed long count;
+
+	set_task_state(tsk,TASK_UNINTERRUPTIBLE);
+
+	/* set up my own style of waitqueue */
+	spin_lock(&amp;sem-&gt;wait_lock);
+	waiter-&gt;task = tsk;
+
+	list_add_tail(&amp;waiter-&gt;list,&amp;sem-&gt;wait_list);
+
+	/* note that we&#039;re now waiting on the lock, but no longer actively read-locking */
+	count = rwsem_atomic_update(adjustment,sem);
+
+	/* if there are no longer active locks, wake the front queued process(es) up
+	 * - it might even be this process, since the waker takes a more active part
+	 */
+	if (!(count &amp; RWSEM_ACTIVE_MASK))
+		sem = __rwsem_do_wake(sem,1);
+
+	spin_unlock(&amp;sem-&gt;wait_lock);
+
+	/* wait to be given the lock */
+	for (;;) {
+		if (!waiter-&gt;flags)
+			break;
+		schedule();
+		set_task_state(tsk, TASK_UNINTERRUPTIBLE);
+	}
+
+	tsk-&gt;state = TASK_RUNNING;
+
+	return sem;
+}</code></pre></div><p><br></p><p>值得一提的是 <code>trylock</code> 和 <code>downgrade_write</code> 操作，这两个操作是读/写自旋锁中没有的</p><p>两个 <code>trylock</code> 是类似的，都是用 <code>cmpxchg</code> 指令来做 CAS（compare-and-swap） 操作。写锁的 <code>trylock</code> 比较简单，因为是互斥的，所以只需要对初始值做 CAS 即可。而读锁可能被持有多个，所以它的 <code>trylock</code> 需要先将 <code>sem-&gt;count</code> 赋值给 <code>tmp</code>，再自增 <code>tmp</code> ，利用 <code>tmp</code> 的值进行 CAS</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>/*
+ * trylock for reading -- returns 1 if successful, 0 if contention
+ */
+static inline int __down_read_trylock(struct rw_semaphore *sem)
+{
+	__s32 result, tmp;
+	__asm__ __volatile__(
+		&quot;# beginning __down_read_trylock\n\t&quot;
+		&quot;  movl      %0,%1\n\t&quot;
+		&quot;1:\n\t&quot;
+		&quot;  movl	     %1,%2\n\t&quot;
+		&quot;  addl      %3,%2\n\t&quot;
+		&quot;  jle	     2f\n\t&quot;
+LOCK_PREFIX	&quot;  cmpxchgl  %2,%0\n\t&quot;
+		&quot;  jnz	     1b\n\t&quot;
+		&quot;2:\n\t&quot;
+		&quot;# ending __down_read_trylock\n\t&quot;
+		: &quot;+m&quot;(sem-&gt;count), &quot;=&amp;a&quot;(result), &quot;=&amp;r&quot;(tmp)
+		: &quot;i&quot;(RWSEM_ACTIVE_READ_BIAS)
+		: &quot;memory&quot;, &quot;cc&quot;);
+	return result&gt;=0 ? 1 : 0;
+}
+
+/*
+ * trylock for writing -- returns 1 if successful, 0 if contention
+ */
+static inline int __down_write_trylock(struct rw_semaphore *sem)
+{
+	signed long ret = cmpxchg(&amp;sem-&gt;count,
+				  RWSEM_UNLOCKED_VALUE, 
+				  RWSEM_ACTIVE_WRITE_BIAS);
+	if (ret == RWSEM_UNLOCKED_VALUE)
+		return 1;
+	return 0;
+}</code></pre></div><p>downgrade_write 的实现则类似写锁解锁，然后判断是否有必要唤醒等待队列中的项，这里其实和写锁解锁（<code>up_write</code>）的主要差别就是给 <code>sem-&gt;count</code> 加上的偏移量少了 1（可以回去看前面几个 <code>RWSEM_</code> 开头的宏定义），而这个 1 就是读锁占的值</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>/*
+ * downgrade write lock to read lock
+ */
+static inline void __downgrade_write(struct rw_semaphore *sem)
+{
+	__asm__ __volatile__(
+		&quot;# beginning __downgrade_write\n\t&quot;
+LOCK_PREFIX	&quot;  addl      %[bias],(%%rdi)\n\t&quot; /* transitions 0xZZZZ0001 -&gt; 0xYYYY0001 */
+		&quot;  js        2f\n\t&quot; /* jump if the lock is being waited upon */
+		&quot;1:\n\t&quot;
+		LOCK_SECTION_START(&quot;&quot;)
+		&quot;2:\n\t&quot;
+		&quot;  call	     rwsem_downgrade_thunk\n&quot;
+		&quot;  jmp       1b\n&quot;
+		LOCK_SECTION_END
+		&quot;# ending __downgrade_write\n&quot;
+		: &quot;=m&quot;(sem-&gt;count)
+		: &quot;D&quot;(sem), [bias] &quot;i&quot;(-RWSEM_WAITING_BIAS), &quot;m&quot;(sem-&gt;count)
+		: &quot;memory&quot;, &quot;cc&quot;);
+}
+
+/*
+ * downgrade a write lock into a read lock
+ * - caller incremented waiting part of count, and discovered it to be still negative
+ * - just wake up any readers at the front of the queue
+ */
+struct rw_semaphore *rwsem_downgrade_wake(struct rw_semaphore *sem)
+{
+	rwsemtrace(sem,&quot;Entering rwsem_downgrade_wake&quot;);
+
+	spin_lock(&amp;sem-&gt;wait_lock);
+
+	/* do nothing if list empty */
+	if (!list_empty(&amp;sem-&gt;wait_list))
+		sem = __rwsem_do_wake(sem,0);
+
+	spin_unlock(&amp;sem-&gt;wait_lock);
+
+	rwsemtrace(sem,&quot;Leaving rwsem_downgrade_wake&quot;);
+	return sem;
+}</code></pre></div><p>总结一下，读/写信号量和读/写自旋锁类似，两者语义上是相同的，也都是读优先的，只不过信号量是睡眠锁，当有长时间获取不到锁的情况时，不会导致过多的 CPU 开销</p><p><br></p><h2 id="">顺序锁</h2><p>顺序锁和前面两者有个重要的区别，顺序锁是<strong>写优先</strong>的，让我们来分析下它是如何实现的</p><p>首先还是使用方式上：</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>// 定义一个顺序锁
+seqlock_t mr_seq_lock = DEFINE_SEQLOCK(mr_seq_lock);
+
+write_seqlock(&amp;mr_seq_lock);
+// 读写临界区
+write_sequnlock(&amp;mr_seq_lock);
+
+// 读锁的使用有较大区别
+unsigned long seq;
+do {
+	seq = read_seqbegin(&amp;mr_seq_lock);
+  // 读取数据...
+} while (read_seqretry(&amp;mr_seq_lock, seq));</code></pre></div><p>一个使用例子是内核的 jiffies，它存储了机器启动到当前的时钟节拍，每次时钟中断时都会更新这个值，所以是一个高频写入的场景，<code>get_jiffies_64()</code> 函数用来获取这个值，它的实现是这样的</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>u64 get_jiffies_64(void)
+{
+	unsigned long seq;
+	u64 ret;
+
+	do {
+		seq = read_seqbegin(&amp;xtime_lock);
+		ret = jiffies_64;
+	} while (read_seqretry(&amp;xtime_lock, seq));
+	return ret;
+}</code></pre></div><p>顺序锁在读取时需要一个循环，这是为了判断在这个过程中是否有发生写入，如果没有，那么读取就是安全的，否则需要重试</p><p>实现上，代码位于 <a href=https://elixir.bootlin.com/linux/v2.6.0/source/include/linux/seqlock.h#L50 rel="noopener noreferrer" target=_blank>/include/linux/seqlock.h</a>，有比较清晰的注释：</p><div class=notion-code-block><div class=notion-code-header><span class=notion-code-language>C</span> <button aria-label=复制代码 title=复制代码 class=notion-code-copy><svg fill=none viewBox="0 0 24 24" height=16 stroke=currentColor stroke-linecap=round stroke-linejoin=round stroke-width=2 width=16><rect height=13 rx=2 ry=2 width=13 x=9 y=9></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class=copy-text>COPY</span></button></div><pre class=notion-code><code class=language-c>#define SEQLOCK_UNLOCKED { 0, SPIN_LOCK_UNLOCKED }
+#define seqlock_init(x)	do { *(x) = (seqlock_t) SEQLOCK_UNLOCKED; } while (0)
+
+/* Lock out other writers and update the count.
+ * Acts like a normal spin_lock/unlock.
+ * Don&#039;t need preempt_disable() because that is in the spin_lock already.
+ */
+static inline void write_seqlock(seqlock_t *sl)
+{
+	spin_lock(&amp;sl-&gt;lock);
+	++sl-&gt;sequence;
+	smp_wmb();			
+}	
+
+static inline void write_sequnlock(seqlock_t *sl) 
+{
+	smp_wmb();
+	sl-&gt;sequence++;
+	spin_unlock(&amp;sl-&gt;lock);
+}
+
+static inline int write_tryseqlock(seqlock_t *sl)
+{
+	int ret = spin_trylock(&amp;sl-&gt;lock);
+
+	if (ret) {
+		++sl-&gt;sequence;
+		smp_wmb();			
+	}
+	return ret;
+}
+
+/* Start of read calculation -- fetch last complete writer token */
+static inline unsigned read_seqbegin(const seqlock_t *sl)
+{
+	unsigned ret = sl-&gt;sequence;
+	smp_rmb();
+	return ret;
+}
+
+/* Test if reader processed invalid data.
+ * If initial values is odd, 
+ *	then writer had already started when section was entered
+ * If sequence value changed
+ *	then writer changed data while in section
+ *    
+ * Using xor saves one conditional branch.
+ */
+static inline int read_seqretry(const seqlock_t *sl, unsigned iv)
+{
+	smp_rmb();
+	return (iv &amp; 1) | (sl-&gt;sequence ^ iv);
+}</code></pre></div><p>可以看到，顺序锁是基于一个自旋锁实现的。但额外依赖一个序列计数器，当获取写锁时，这个序列值会增加。读取数据时要先调用 <code>read_seqbegin</code>，它会返回这个序列值，读取完成后通过 <code>read_seqretry</code> 检查传入的值 <code>iv</code>，满足以下两个条件则说明读是安全的：</p><ul><li>如果 <code>iv</code> 是偶数（初始值为 0，写锁会加 1）则说明不是处在一个写操作进行的过程中</li><li><code>iv</code> 和序列值相同（相同值异或结果为 0）说明没有写操作发生过</li></ul><p>这两者都满足，读取的值就是有效的</p><p><br></p><p>所以，顺序锁是一种<strong>乐观锁</strong>，是不存在「读锁」的，而是通过类似版本号的机制来读，因此只要没有其他写者，随时都可以获取到写锁，以此实现写优先</p></div><nav class=post-navigation data-astro-cid-gbhzkc2y><a href=/post/2023summary class="nav-link nav-prev" data-astro-cid-gbhzkc2y><span class=nav-label data-astro-cid-gbhzkc2y>← 上一篇</span> <span class=nav-title data-astro-cid-gbhzkc2y>2023 年度总结</span> </a><a href=/post/longhorn class="nav-link nav-next" data-astro-cid-gbhzkc2y><span class=nav-label data-astro-cid-gbhzkc2y>下一篇 →</span> <span class=nav-title data-astro-cid-gbhzkc2y>Longhorn 浅析</span></a></nav><footer class=page-footer data-astro-cid-gbhzkc2y><a href=/ class=back-link data-astro-cid-gbhzkc2y>← 返回首页</a></footer><section class=comments-section data-astro-cid-gbhzkc2y><div class=comments-container data-astro-cid-te6ksoa6 data-giscus-config="{&#34;slug&#34;:&#34;kernel-rwlock&#34;,&#34;title&#34;:&#34;从 Linux 内核看读写锁设计&#34;,&#34;config&#34;:{&#34;repo&#34;:&#34;xxxuuu/xxxuuu.github.io&#34;,&#34;repoId&#34;:&#34;MDEwOlJlcG9zaXRvcnkxODQ3Mjk3Mjg&#34;,&#34;category&#34;:&#34;Announcements&#34;,&#34;categoryId&#34;:&#34;DIC_kwDOCwLAgM4ChgWc&#34;,&#34;mapping&#34;:&#34;title&#34;,&#34;strict&#34;:&#34;0&#34;,&#34;reactionsEnabled&#34;:&#34;1&#34;,&#34;emitMetadata&#34;:&#34;0&#34;,&#34;inputPosition&#34;:&#34;bottom&#34;,&#34;lang&#34;:&#34;zh-CN&#34;,&#34;lazy&#34;:true}}" data-provider=giscus id=comments><div class=comments-loading data-astro-cid-te6ksoa6>加载评论中...</div></div></section></div><aside class=toc-container data-astro-cid-gbhzkc2y><div class=toc-wrapper data-astro-cid-gbhzkc2y><div class=toc-title data-astro-cid-gbhzkc2y>目录</div><nav class=toc-nav data-astro-cid-gbhzkc2y></nav></div></aside></div></div></article></main><footer data-astro-cid-aoh3bln3><div class=container data-astro-cid-aoh3bln3><div class=footer-content data-astro-cid-aoh3bln3><div class=copyright data-astro-cid-aoh3bln3><p data-astro-cid-aoh3bln3>&copy; 2026 x³u³. All rights reserved.</p><p data-astro-cid-aoh3bln3 class=powered-by>Powered by <a href=https://github.com/xxxuuu/nopress rel="noopener noreferrer" target=_blank data-astro-cid-aoh3bln3>Nopress</a></p></div><div class=social-links data-astro-cid-aoh3bln3><a href=https://github.com/xxxuuu class=social-icon aria-label=github data-astro-cid-aoh3bln3 rel="noopener noreferrer" target=_blank><span class=icon-wrapper data-astro-cid-aoh3bln3><svg fill=currentColor viewBox="0 0 24 24" aria-hidden=true><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></span></a><a href=https://x.com/xxuuu0 class=social-icon aria-label=twitter data-astro-cid-aoh3bln3 rel="noopener noreferrer" target=_blank><span class=icon-wrapper data-astro-cid-aoh3bln3><svg fill=currentColor viewBox="0 0 24 24" aria-hidden=true><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span></a><a href=mailto:xxuuu0@outlook.com class=social-icon aria-label=email data-astro-cid-aoh3bln3 rel="noopener noreferrer" target=_blank><span class=icon-wrapper data-astro-cid-aoh3bln3><svg fill=currentColor viewBox="0 0 24 24" aria-hidden=true><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg></span></a><a href=/rss/feed.xml class="social-icon rss" aria-label=RSS订阅 data-astro-cid-aoh3bln3><span class=icon-wrapper data-astro-cid-aoh3bln3><svg fill=currentColor viewBox="0 0 24 24" aria-hidden=true><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg></span></a></div></div></div></footer></body></html>

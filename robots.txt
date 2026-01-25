@@ -1,12 +1,4 @@
+User-agent: *
+Allow: /
 
-    # *
-    User-agent: *
-    Allow: /
-  
-    # Host
-    Host: https://xxxuuu.me
-  
-    # Sitemaps
-    Sitemap: https://xxxuuu.me/sitemap.xml
-  
-    
+Sitemap: https://xxxuuu.me/sitemap-index.xml
