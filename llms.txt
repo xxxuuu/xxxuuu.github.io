@@ -1,0 +1,40 @@
+# x³u³
+
+> 🗒 碎碎念
+
+## Posts
+
+- [2026 年夏入 大阪大学情報科学 博士前期/修士课程 合格记](https://xxxuuu.me/post/uosaka-master-exam.md)
+- [DDIA 第二版读后感](https://xxxuuu.me/post/ddia-2nd.md)
+- [2025 年度总结](https://xxxuuu.me/post/2025summary.md)
+- [Summer Pockets 圣地巡礼记](https://xxxuuu.me/post/summer-pockets-junrei.md): 眩しさだけは、忘れなかった
+- [2024 年度总结](https://xxxuuu.me/post/2024summary.md)
+- [确定性模拟器](https://xxxuuu.me/post/deterministic-simulator.md): 最初接触到确定性模拟的概念是在 2022 年 Rust China Conf 上听的一场演讲，后续一直持续关注着这个领域，也在腾讯组内分享过相关议题
+- [浅谈协程](https://xxxuuu.me/post/coroutine.md): 最近经常被各种人问到一些关于协程的事情，例如 xx 语言的 xx 是不是协程，xx 语言和 xx 语言的协程有什么区别，我不得不一次次 share 出我的文章，索性直接发到 blog 上吧
+- [MemoryDB: Redis + Remote Log](https://xxxuuu.me/post/memorydb.md): MemoryDB 是 Amazon 的一个 Redis 兼容的 KV 数据库，论文发表在 SIGMOD 2024 上
+- [应该在 DBMS 中使用 MMAP 吗？](https://xxxuuu.me/post/db-mmap.md)
+- [日本游记](https://xxxuuu.me/post/japan-travel.md): 次の駅は、東京です
+- [PVE 迁移翻车自救](https://xxxuuu.me/post/pve-migration-rescue.md)
+- [译：使 Rust library 兼容 no_std](https://xxxuuu.me/post/rust-no-std.md): Effective Rust Item 33
+- [Infra 窘境](https://xxxuuu.me/post/infra-dilemma.md): 前段时间秋招也陆续开始了，偶尔有师弟问我不想写业务，怎么才能做 infra，其实我是劝退的。算下来我毕业正式工作也一年多了，趁机从个人角度发表点暴论
+- [迁移博客到 Notion](https://xxxuuu.me/post/migrate-blog-to-notion.md): Make Notion Great Again！
+- [Longhorn 浅析](https://xxxuuu.me/post/longhorn.md): Longhorn 是一个 Go 实现的 Cloud Native Storage，比较好奇作为一个提供块存储的分布式存储系统，使用 Go 实现，会面临哪些挑战，性能方面要又要如何优化
+- [从 Linux 内核看读写锁设计](https://xxxuuu.me/post/kernel-rwlock.md): 前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的
+- [2023 年度总结](https://xxxuuu.me/post/2023summary.md)
+- [混乱的软中断概念](https://xxxuuu.me/post/softirq-and-software-interrupt.md): 软中断（softirq）和软件中断（software interrupt）
+- [PVE8 上启用 12 代 Intel CPU 核显 SR-IOV](https://xxxuuu.me/post/pve8-intel-sr-iov.md): 拯救我的 Galgame 和追番体验～
+- [容器标准和生态](https://xxxuuu.me/post/container-spec-ecosystem.md)
+- [Vim as an IDE](https://xxxuuu.me/post/vim-as-an-ide.md): 记录 Vim 入教过程和折腾记录
+- [Kubernetes CSI](https://xxxuuu.me/post/kubernetes-csi.md)
+- [2022 年度总结](https://xxxuuu.me/post/2022summary.md)
+- [The Google File System 论文概览](https://xxxuuu.me/post/gfs-paper.md)
+- [MIT6.824 Lab1 MapReduce](https://xxxuuu.me/post/mit6824-lab1-mapreduce.md)
+- [蒟蒻的 2021 年度总结](https://xxxuuu.me/post/2021summary.md): 落落落落的一年
+- [蒟蒻的 2020 年度总结](https://xxxuuu.me/post/2020summary.md): 转眼三年已经过去，我也迎来了毕业
+- [蒟蒻的 2019 年度总结](https://xxxuuu.me/post/2019summary.md): 随着2019年最后一晚的落幕，21世纪的10年代也结束了，今年的我无论是在技术上还是别的方面，都成长了许多。以本文记录我的技术路程，迎接新的一年
+- [蒟蒻的 2018 年度总结](https://xxxuuu.me/post/2018summary.md): 又是一年过去了，2018算是人生中最重要的转折点之一，总结一下今年的经历和感想，也算是记录我的技术路程
+
+## Pages
+
+- [关于](https://xxxuuu.me/about.md)
+- [友链](https://xxxuuu.me/links.md)

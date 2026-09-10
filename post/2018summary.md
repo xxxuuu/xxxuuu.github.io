@@ -1,0 +1,53 @@
+---
+title: "蒟蒻的 2018 年度总结"
+description: "又是一年过去了，2018算是人生中最重要的转折点之一，总结一下今年的经历和感想，也算是记录我的技术路程"
+date: "2018-12-31"
+image: "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff362b439-342f-451a-b70e-41ec07d86ab3%2F2018summary.jpeg%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466UKYQGIXW%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075554Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQDBdSZ8VVc8gR62ixvcbbHplny2BNnZJlI%252FmR6ymVrizgIgQetH2ZP5WQZqG%252Fmt2pkiGVefDswdRGGY17kUIBpx3kcqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDLN%252BCx9l5qibTOALiCrcAyMrlim2leJa%252FRdIEcTKY0A4QD7PWRGGD9TfosaoqXtnOzA1Qgh4UWheJ7%252FVmDJFD0UXTmtBRrd1h55Bv8vs77O0iSTnrghNjKfAvv2dk4xHFccm2h3hW4tRKFrepXKfJATUjiPOUHB8i9sYBFh1jWC8InLxJZIvxMeFTDzSEmMYzMcNJ1sBZssmpVy9AkzNPP0PHp9YsB7h7OTKryHNWvujc6EG%252Fs7DdCDB4hkcioV7E5pjX7z8gCPU0mLWyCWSecO9zlV%252B6kUfPTJGgn4frJlYIYjvmuUqCFS62T0hfNahoMl8Mq8OaCvF%252FhMLc6t4BJWhZEMh2JOIan8cJv4rmtBmAoasnY825SYvPDH%252Bf7H9e0nGKOT26GW3kNnKMbqVj%252BX3HCkV4A1Nl5lNAsszuZ9hDlSIHqMkzN3dmO3fAnq0v%252Bcc2uvh5KxqE1%252FlzXosoqGcQsdAzTXGaMAdL3O2iTscLVxJo3tDwpCe4YF8OFf58heJBAH29MOSrrqxyQna8vrrZWqFx9XtsRZMpBlh8qOVVusP1irSlbxotHsaxgo7BpZmqS7psSEr79nDPZF96Ozy4cqX8hpn%252F0y4Ctjy%252FcO2gYuY12Lp%252BBz%252B%252FSVwdrCpQXFoWNB4cJ44cWjOMK2sidUGOqUB%252BSscZkcMAQOyJeDCPKuPQm8z4YtTr4srL3s2mvKjel8RAAcSiUf5R3M7Suh0iUt4FempfJ0s6un4IYPD4PzDs09p4h7%252BJU%252FOzpMkzza7Qdk9r6VM7fZfI%252FXy26YhYS14FUn5WuukKyoNSE%252B5HXSifobx8bCnSezXYNOutnTweBz6ng1G7QqVng02R2IgTIcCcyNtxpZrpVj8OXT%252F8PTQ8pJoukeG%26X-Amz-Signature%3D8f64332180d5a93374270e6c95c3fdcdfb842e76427be65975d8b0870f4a544e%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=806f9f46-c738-4c87-9957-e73d11ec44bd"
+tags:
+  - "碎碎念"
+canonical: "https://xxxuuu.me/post/2018summary"
+---
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F38421d6d-cff7-4e85-964e-a1dfad7b7ffa%2F2018summary.jpeg%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB4662IEJS43I%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075615Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJIMEYCIQDUZ9%252BbKogpN1csWBrIFWMVUKLLRYTt59Hp%252FugdSk3O7AIhAPrqf9rz70EAPmsMTxZswgu99GRONrNedZSjzkbFmm2WKogECID%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEQABoMNjM3NDIzMTgzODA1IgyHdOH0nVhdi87TY9Aq3AODB9hVWVSvQaifsJd003jSN%252FEzZo5RjpLF0oX6l7oFQ3KigZnVK3qJ7LF16Ue2B8qFCT7zgaOc4S%252FbNaGgjaGrZfTIZqUHNhAVzPHbNUZR9EZQNYjE1RqBnTnHgb8wk8PX3OW8D5%252FqpowNA8f2KfaN3ez23LXrXGFbLsuhJvAcmKqya6%252BJfiVw5n0cYD%252FDCKLkrXCBp2Q8KPKTZ1sBAzKsUZKNa2FmFZKFGAujFFr6d4jMSF3UlgtPaIISwBtz%252FiclWqh7Nn1ZYRatXSfYBGkHUvzfS%252BokqL7WNLBCGheb8O1U1cHqTZ3KPAc1q0ns56WecnHUm%252BGSwb0KtDhYnaZhxBgtZswRMjcnvCauecQj3gd2wkb3BBq3GH9r9xWcAPDOaoLwyT9z8H3X%252BNOLCM%252FfStSAAOxbiF0jldD4w80DVP3GAIbWFQpHVXGtlmTwXTmOeyDqZ5u1oXYCmQzpOuJ2UutMrX4Km9ed2bzzXioWtnIh0PFe3EHq%252FyxCBbf6F3%252FL%252B3cYKaYbPD%252Fi%252FgZYSvCwj0qBS1YF%252FQ%252FMNH8XfUeJww%252BfNKUTQMzrnkDIzxp8orPCdC9zA4Lz7rk432zfSdgmSKp1W9e8maarlx%252F%252FNmJS90MD9qbk2cweYOCzoDD7qonVBjqkAf7%252FmPd9L6kUXC3JhhD6xkaWrgvUFBxe55lpzhlR8ZEy675MMmxh32Jz4SCM%252Brk1%252FvGf7mSa1LaG1mzmDK3CWQixZawuxq7QaFOVddltTAnk%252B14OsvSfZb8PT2Puu4sKcHuQH%252BcOICuP8KGNyNQ9EPY8vV0XOdrYv8yv2TdQ8Y5e7vRFPz0WE%252BQ9h%252FHCBek6gUK94%252FzDOQVp3lU8R25Rb6BwP3rn%26X-Amz-Signature%3D7248d7c157a31fb9c0361da092da1966ed6e8c3afdaec304125cf74db08b7e9a%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=20ea3ab4-d477-45a6-a5ac-2ef06ed905da)
+
+又是一年过去了，2018算是人生中最重要的转折点之一，总结一下今年的经历和感想，也算是记录我的技术路程
+
+
+
+## 0x00
+
+很幸运地，3、4月自招免试录取后后，就提前离开了学校，摆脱了高考班的生活。
+
+
+
+接近半年的暑假，一直在接私活，赚了点生活费。
+
+这段时间做的工作都很简单，无非就是写写界面画画View，然后就是些CRUD。除了让我对开发中大型项目（其实也就几万行的玩具）和设计模式方面稍微熟悉了一点外，别的方面完全没有进步。这也让我思考起未来的方向。
+
+
+
+由于以往竞赛的关系，一直接触的是Android开发，但其实并不太感兴趣。于是乎决定转向Web开发。
+
+刚好在这段时间也认识了胡神，在他的指导下，我的数据结构与算法水平有了极大的提高
+
+于是乎就在刷题和咸鱼的叠加态中度过了剩下的暑假。
+
+
+
+## 0x01
+
+开学之后，各种活动和事情铺面而来，一直没有时间做自己的事。ACM网络赛也接连翻车，学校里的dalao比比皆是。迷茫地过了两个月后习惯下来，感觉还是很满意的。老师很负责，同学宿友很nice。还能和dalao们谈笑风生。以前觉得总开些乱七八糟的课没什么卵用，但现在觉得大学的确是个锻炼人的地⽅，无论是课堂还是环境，总能提升各⽅面的综合素质与思维方式。
+
+
+
+在学校平常时间很多，但比较碎片化，所以感觉时间过得很快，一下子就到期末了。总觉得咸鱼了一个学期，虽然具体技术没什么进步，但知识体系扩充了一大圈，学习也更加系统化了。
+
+
+
+## 0x02
+
+接下来的计划，会把更多时间花在基础理论与通识学科上，考虑插本/考研；毕竟框架这些能给快速淘汰的玩意儿都只是表面技术，不能只知其然而不知其所以然。
+
+未来，对技术的追求永远不会停下脚步。
+
+以上。

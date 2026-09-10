@@ -1,0 +1,99 @@
+---
+title: "混乱的软中断概念"
+description: "软中断（softirq）和软件中断（software interrupt）"
+date: "2023-08-16"
+tags:
+  - "Linux"
+  - "操作系统"
+canonical: "https://xxxuuu.me/post/softirq-and-software-interrupt"
+---
+
+## 背景
+
+最近在看 *Linux Kernel Development*（中译《Linux 内核设计与实现》）， 在中断这一章的注释让我犯了迷糊：
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F0b89c7c3-ed1c-46ee-aeb2-fa1a94abd4ab%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466ZYO4TV3T%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075608Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFmA163TYAoh1UG4fmNnItWnw7nUgxAFysHuMXu2aCoKAiAHEsrhDdoxPOykqrGbCZqwVL0Km2GQ0ozmeutl7Wg1iyqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMQtKTOoPG4Apgh0MUKtwDMKR8fe24P5BYpYjaD%252F4SOIkx4KI8Y%252BuzVN91edAA9I38PrfX0YNMKJMpDDUjHEeWA1kziAy%252BxaND0RLrjSCYOFIbc4wYSbYJJj%252FnWwG5%252Bo5KIaBOgsRJsraT0cZCm6beiu1GZVu5miDcJc7vfIVNrsemrAPWP5KqxCbIhe6ZYn0ld09ih%252BGPmygdsDLTVpmKggAzuk7prTOSyLgDPcwR3rEklCpNfbyWuYU97kDKzBCaeiKWxsDA7GnnHPm5YIIoIDIwKLeWmWoP7lyJ163ymS186CsWOg5IEuFW%252FdOIpavwGiWoMyIj5raeF4oqOEjZsR4h897J7qI2TjzMMyqTHlV%252BYRP23OYOmqsl7zCzA9bEd%252BITkB8M3FW3p175KOGT%252B972n7WuZrrTWja2JK88IDrYsXsI64zAGOZ9f7YbjmRRLUoTUJ0GXdjmm%252FcTWBotCvhwWc6bzQffRiv3t%252BHmND1btnDPymlah2EW3F6QCgzBc%252BnMOdu386qW85XuWpy5EugWRlVRHlHHkELXYO6uo1ycurvBtv2s1eNybdZCnCDlX6WVM%252FRY0SagB9iXNbArWa432wbPwhQmYQVgJQV8u1a9u0jhFNT2bjgLdoXGmrG14E8rmRmA%252BdsUXegwwqqJ1QY6pgEJWsPRlmd8Ha5Jr0nngIKOMzaFhPaQbCLEzF6QeMgRpp9rxNfIIXNx8tN%252F1LSErsXZsvNnmiwV2TSiA3X3le6ESeoCGuAFIVbj%252FhAl%252B6l3MDe2iLbobVHV2kgGb2FLtsZqsPlTGNZxkc7eVi2J5pl6htqQ7K80ieArlS6M%252Fk7%252FxWEenNxkWAUH4IOhBeqA5OuQnDOG8YH2k5hp0cLiuSDltlVLiuwS%26X-Amz-Signature%3D5668aaa9a3dad4a5f71703489f3757871c8709f536c561cda2c0035879e52161%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=88a2dfcc-03db-4350-aefe-752bcfea1a22)
+
+原来还有两种软中断？而且还是不同的概念？在理清后我才发现，原来自己之前一直将这这两者混为一谈
+
+
+
+首先，概念混淆很大程度上是名词翻译的问题（这也是为什么技术书籍最好看英文原版），让我们列出两者的原名并重新命名（翻译）：
+
+-   softirq：软中断
+-   software interrupt： 软件中断
+
+接着，再从中断开始讲起
+
+
+
+## 中断和异常
+
+中断是一种操作系统的异步处理机制，可以说就是一种硬件的 callback。当硬件设备（例如键盘）发出一个中断（本质上就是一种电信号），操作系统内核会感知 CPU 受到中断信号，执行中断处理程序
+
+
+
+内核在执行中断处理程序时，运行在中断上下文中，这意味着中断处理程序不可阻塞，它必须执行完成，不能被打断。硬件设备生成中断的时候并不考虑与处理器的时钟同步，换句话说就是中断随时可以产生。因此，内核随时可能因为新到来的中断而被打断
+
+中断可能随时发生，中断处理程序又必须执行完成才能恢复其它程序的执行。这就要求中断处理程序必须要快，但它又必须得响应硬件的事件完成工作，为此 Linux 内核将中断处理程序划分为两个部分：**上半部（top half）和下半部（bottom half）**， 上半部在收到中断后就马上执行，负责快速响应，不允许被打断；下半部则会推迟执行，处理一些实时性要求不高、耗时较长的工作，下半部的执行允许被打断。例如对于网卡，上半部通常只是拷贝网卡数据到内存中，下半部才会进入协议栈进行处理。
+
+
+
+说到中断，也必须得提到异常。异常是一种类似与中断的机制，但不同之处在于，异常由软件主动触发，因此它是和处理器时钟同步的，也被称为 **「同步中断」**，相对应的前面硬件触发的中断就是 **「异步中断」**。在处理器和操作系统内核中这两者的处理方式是几乎一致的，所以常常被一起讨论
+
+
+
+## 下半部和软中断（softirq）
+
+对于中断下半部的实现，内核提供了多种机制和方法，其中一种就是「软中断（softirq）」
+
+内核代码中，`softirq_action` 表示一个软中断，`softirq_vec` 则数组存放了被注册的软中断：
+
+```c
+// <linux/interrupt.h>
+struct softirq_action {
+    void (*action)(struct softirq_action *);
+};
+
+// kernel/softirq.c
+statis struct softirq_action softirq_vec[NR_SOFTIRQS];
+```
+
+软中断本身的注册是在编译期静态分配的（即 `softirq_vec` 数组本身的项），软中断处理程序则可以在运行时通过 `open_softirq()` 注册（相当于 `softirq_vec[ITEM].action = action`）
+
+
+
+例如下面的代码为 `NET_TX_SOFTIRQ` 和 `NET_RX_SOFTIRQ` 两个软中断注册了处理程序：
+
+```c
+open_softirq(NET_TX_SOFTIRQ, net_tx_action);
+open_softirq(NET_RX_SOFTIRQ, net_rx_action);
+```
+
+当内核运行时在某些特殊的时刻和位置，例如从硬件中断中返回，或 `ksoftirqd` 内核线程中，软中断就会被触发执行，也可以使用 `raise_softirq()` 主动触发。
+
+
+
+通过这一系列机制，就实现了中断的下半部。所以，软中断到底和中断有什么关系呢？软中断只是实现中断下半部的一种机制而已。除此之外，在我看来，软中断就只是软件的 callback，对应中断是硬件的 callback，有这么一层名称上的对应。
+
+
+
+## 软件中断（software interrupt）
+
+另一个概念是软件中断，软件中断实际上在上面已经提到过了。没错，它就是「异常」，或者说同步中断，下文统一称中断
+
+严格地说，软件中断特指的是指令 `int`，它的作用就是触发一个中断。例如在执行系统调用时，实际上就会执行 `int 0x80`，触发 128 号中断，在 Linux 内核中，128 号中断处理程序正是系统调用处理程序 `system_call()`。通过软件中断，用户态的程序就实现了控制权的转移，能切换到内核特权模式下执行危险的代码，这就是系统调用
+
+
+
+> PS：所有系统调用都是用同一个中断号触发，如何区分不同的系统调用？根据体系结构的不同，在执行 `int 0x80` 前会在约定的寄存器中存储一个系统调用号，通过该系统调用号来判断执行哪一个系统调用
+
+> PPS：实际上，现在的 Linux 已经不使用 `int 0x80` 执行系统调用了，这种方式还是需要走一遍完整的中断流程，性能不够好。现在的 Linux 能够在受支持的处理器上通过 `sysenter` 指令执行系统调用，它可以直接跳转到指定函数执行并完成特权和堆栈切换，而不需要绕一大圈触发中断
+
+> PPPS：额外提一嘴，异常实际上还可以分为陷阱（trap）、故障（fault）和终止（abort）。`int` 就是陷阱，是有意的异常。故障也十分常见，例如缺页异常，当执行某个访存操作时，如果该虚拟地址对应的页面不在内存中，就会触发缺页异常，内核从硬盘上将这个页面换回内存，然后重新执行访存指令。可以发现故障和陷阱的区别是，故障在返回后，会重新执行触发故障的指令，而陷阱则从下一条开始执行
+
+
+
+## 总结
+
+现在可以盖棺定论了，软中断（softirqs）只是实现下半部的机制**之一**，并没有产生中断；而软件中断（software interrupt）是会产生同步中断（异常）的，可以说它是真正的中断，只是由软件产生的

@@ -1,0 +1,693 @@
+---
+title: "确定性模拟器"
+description: "最初接触到确定性模拟的概念是在 2022 年 Rust China Conf 上听的一场演讲，后续一直持续关注着这个领域，也在腾讯组内分享过相关议题"
+date: "2024-12-21"
+tags:
+  - "分布式系统"
+canonical: "https://xxxuuu.me/post/deterministic-simulator"
+---
+
+最初接触到确定性模拟的概念是在 2022 年 Rust China Conf 上听的一场演讲，后续一直持续关注着这个领域，也在腾讯组内分享过相关议题
+
+
+
+## 背景
+
+分布式系统面临的问题：
+
+1.  通信不可靠：丢包，超时，乱序，重复
+
+    ![无法区分通信失败的原因](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F2f213fe1-0bc3-44f8-b28d-487ee51299bb%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB46636B76GA5%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075600Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQC9MoA3mebJ8KKS8w2lkZDkS8IRVxoL15bZBn0oiK9AAAIgVubkDAi%252B6nE3FhaZeVA2qh0oFSBMelEKdMukMz59Dd8qiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDEt24S8z0M5VKX%252B2%252FircA4VujAQP48EkpVQ2X90mEL9BAMChcZ8j5fAHVyh8%252Fq8VVyNBH92MK%252B8ey9qSwb8heDyBlKDFeaHDfvifpVYDoJvNk%252BP9fKYzQfH0fu0ItLU%252BbNdRqauJACF0D%252Fj7GmYEf4KQQIvdd6%252BBg1hV7N8UXXrOShyNXQ8r220v9mKth65SOprauKw4owaXoZVd3EeoJVV4QA%252Fl8cN0sH07fJwKXhHNUc03BppcXvcP1MdD5I0n3R7tnbw3ciLDvb1DZwa%252F0zSzCXNEzFUBRjyg6xM0CnVwvIIIKm2BgXNCf48Qp%252Fm77fHTAN6HbxEcJ1Ism9nRmEAtLz1wRo%252BAPnOpFkXHUVtMcwtV9pee1kqEPsuN8VWPTt%252FwbcAigMB4D7dKYQ8VWYmjg0NoKBSBUK3ItC57ppxNbJJKWrtQ2RT%252B6gA7xm4rYVl9quPxkOYYLZPLSAmu2c4rD5MoqWEMzIa3YbRKY2qPmV6d0Hc2%252F%252FRGp%252FurAa1oWPhLhR12C1K3x%252B5PHjta13B6DbHs0GX1yKVoWSIS8sTAXgw4SH5KV8%252FPjgzbtB2enimhi6sxBw9dtrMMS92knCbzI336TkZNOHjpyJr9MGvm6NZwWuf4JCCOUjiFLuUQhNIhCkvK4jEkrA8rMNiqidUGOqUBW%252Bzpd6lxNtPZb2v9DX3PQMRUxSxH%252FIOKuPdVd38LUZ3vwIgQ7F2VKZG8xvGURw0BH7u1jndAd%252Fz423QG%252Fbkh3e%252BYvU%252BhA4rW6pguI1tuCqqbAgr%252BnGz91mtg0uYngmmxfyhUcxn28Y67%252Fxo0rsLYi4%252BHolm2OFbR7Sm6KTMIKlsdmCDOeLzRlk%252F2VHGKlX5Ak5OidVYq4S1JKmXueAk1e40j71b%252B%26X-Amz-Signature%3Dd86bb3dceed4a46037acdc7c890931b813dc3e15f0f898667715b817118eaf84%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=49688360-6eeb-480f-9284-f81070003083)
+    *无法区分通信失败的原因*
+
+2.  时钟不可靠：时钟漂移，拖尾，回退
+
+    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F8674fe3b-771b-43f4-860a-10847162d1f5%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466QPHIJH5V%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075600Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQDzpgFisOh7e3Zv6gqDfHdagKqbfSH5L%252F9hK0CkjYmJKQIga3wqX7hv8gsO8Tzm%252BYH9j8TdNjMjPfG3515%252Bzf5e5kAqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDCj60wMDIAi1SllqvSrcA2O4hAH%252BJUin2ZaTxQJzOxgWeiVddcIo6qCul%252FJSCMFjaQvtjnkEdqQRgxzUkt1YeXOaG21XA5C4rIHLiId1%252BoYR6NVyACxZ4LHeMr7P0wWbOOCAn2T3tFRYWZbYtqzRxMtv6PObdZinD0a7Mx6xiv9Wud7uIN5ZcysFLZEJqEUWSavF2JhXgvWcBH2smNxHhQpavapJnJv3PcrfvPc0n9UR%252BCmZTQypDNIZcrVdSKTZqBDv3povFW9fVD5YYUf0aD6kJa9JiLj5QB9IvgUtdwYa%252Bhm15HL5M3os64dTxmyV1jTbHprn6jdzqObX0SyrZPQNC37d1ysAWAMusqkis88ZNJjgBUnlz7gjGULw1zmT9eB%252F%252BqWgq9VNMac45fH8GO34ZNUU7yiUlYmK74i9837FIkqmCULIESK4n2ggMo5JgFZM1DbXUypDu00P4%252Bgm0jsYOV%252F%252FR51D7yrbBzZ%252FkpJ9M%252FekxJ9HVunAWXvEF72S1Kn%252ByTe9wl2eqASHdMKjarwPPl7G7mTEv3PniLsAadNhyONGRvmZv0A7I8cyTEBcPzCl%252B47UGe3a99K9xOq3fFauKAsUNKFNC0RqPSX2fxbFoOnZjly%252Fs9LuucTihRQcxtIntA14tlBnRlFBMKysidUGOqUBJwzPud90wqD4l680Ay18%252FKF%252BmKW74mKqc1MuoUdpZ5xKU71P%252BXeoYQL1IzA8ubj6%252F0aqCwHt44MXEtYP21O1H84JzhWDwB0iLoIK3BGbDavETMfdxubvZ4yMx1CBzuqvjx%252BPOK33sxw4QWjEtdEXk%252BOiQT2F3x510N7JNWMLrYNZdqPRN38P5pY3SKyOl7sTopyJ%252BwVFhH%252BMrjrMqXRX4bZyqJ2Y%26X-Amz-Signature%3D58c8fe30b0f187db8243a9cebb5fa215282903d9e9579ad3c12c3e694f795ce5%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=7f92640c-e8eb-42cf-a384-8d18a5089a04)
+
+    ![时钟使得事件排序不可靠](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F03aedc4e-a2cf-4b3a-b645-d32d76a5b468%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466QPHIJH5V%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075600Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQDzpgFisOh7e3Zv6gqDfHdagKqbfSH5L%252F9hK0CkjYmJKQIga3wqX7hv8gsO8Tzm%252BYH9j8TdNjMjPfG3515%252Bzf5e5kAqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDCj60wMDIAi1SllqvSrcA2O4hAH%252BJUin2ZaTxQJzOxgWeiVddcIo6qCul%252FJSCMFjaQvtjnkEdqQRgxzUkt1YeXOaG21XA5C4rIHLiId1%252BoYR6NVyACxZ4LHeMr7P0wWbOOCAn2T3tFRYWZbYtqzRxMtv6PObdZinD0a7Mx6xiv9Wud7uIN5ZcysFLZEJqEUWSavF2JhXgvWcBH2smNxHhQpavapJnJv3PcrfvPc0n9UR%252BCmZTQypDNIZcrVdSKTZqBDv3povFW9fVD5YYUf0aD6kJa9JiLj5QB9IvgUtdwYa%252Bhm15HL5M3os64dTxmyV1jTbHprn6jdzqObX0SyrZPQNC37d1ysAWAMusqkis88ZNJjgBUnlz7gjGULw1zmT9eB%252F%252BqWgq9VNMac45fH8GO34ZNUU7yiUlYmK74i9837FIkqmCULIESK4n2ggMo5JgFZM1DbXUypDu00P4%252Bgm0jsYOV%252F%252FR51D7yrbBzZ%252FkpJ9M%252FekxJ9HVunAWXvEF72S1Kn%252ByTe9wl2eqASHdMKjarwPPl7G7mTEv3PniLsAadNhyONGRvmZv0A7I8cyTEBcPzCl%252B47UGe3a99K9xOq3fFauKAsUNKFNC0RqPSX2fxbFoOnZjly%252Fs9LuucTihRQcxtIntA14tlBnRlFBMKysidUGOqUBJwzPud90wqD4l680Ay18%252FKF%252BmKW74mKqc1MuoUdpZ5xKU71P%252BXeoYQL1IzA8ubj6%252F0aqCwHt44MXEtYP21O1H84JzhWDwB0iLoIK3BGbDavETMfdxubvZ4yMx1CBzuqvjx%252BPOK33sxw4QWjEtdEXk%252BOiQT2F3x510N7JNWMLrYNZdqPRN38P5pY3SKyOl7sTopyJ%252BwVFhH%252BMrjrMqXRX4bZyqJ2Y%26X-Amz-Signature%3D05abe5310ab89383153c88d92243adad594e7b7fb48af2602243df2e35ec0a1b%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=84ea3146-11e8-488a-93cc-61dfd64e986d)
+    *时钟使得事件排序不可靠*
+
+3.  节点不可靠：阻塞，宕机，掉线，停顿
+
+    ![GC 停顿期间，世界已经变天了](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fe0b2eeac-ad50-478a-857f-36ceec223c72%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466XGCFULOR%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075601Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIBZaIBmsJuQ6VaaZ0%252BdD4eY0m3E%252Bzo9oe4%252BPwYRp4yJaAiEAnLB9MsmKxwWyrUSxMuzfA7Lw5%252BJ29%252FomrBXL1abmAVcqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDM%252FhQ6vVFUwoxnDCXyrcA0BEohn9cldeVnuac2kPIwTUft768TFoX0cM0X1GQXfp1j27yZgstSViSFBZEHxD73e%252Bd7XQmxjk0ZPiYbsrmLOdLL%252F%252FNQ8dDpJJXsTbfiNDBy25EKBCdw3NsfQhklHUt%252FE1YgYkbR4TqnBl1yrLPTeBtCEQWr2KOAaZq2QCBfX4tIDnP7v9vIT14D6rkADjbWZt1VRYqZK4r0YtIIOoeLEGQjIodgSHkVxNMDH8wdwbY9%252BZILUBzhTtaN3e6nXLyU%252BlR3RvAOw%252FZIM2AX7H3yglffGrdc6Dv57wnCgKXKF6S69e19aKtVYavP6CaDNZI5FG%252B9bJw6rj5trg1cn%252BwpQc8zdEtWMsHhg9b6jTjowBVBUtu3IG92xr%252FiRrPSWDaa3%252BHKBM2ldElXjva1TkT%252BIbazDWQ6hsFaT4DbONqXDpTFq%252BMrA74M7N3Vs2zSFq86bPpHZriMIwHUfeDuBB6o9dVBLM6UzXG3C5A%252FQNJmR4uu5NnUxynNNJFSqVN3FRVEECLhbRapfkd1nj63WlM7fv6tv%252FFDSEMrFoZTIoAH%252FB%252FA%252FpDT7FLa0XqpWb086Fm3f%252FC6h%252BUxkXqxW2BiQrJ2sSGAVvgTkvxkdlIWoaaS4msIu8BCvahjr4cZYgMNGridUGOqUB6nqNczt5wCpVvHd5MVO6NVVf%252B%252BE8OhLfNyteLBkw3GnBDxnVWR78XJdGcjapJc9FG2vv%252FyAZyHED1f%252FIKmFeKn6mmN02jzUItZe5vIwMdFXEhxuh25TwAnXX9OvFG7OtgaHwUKFLEkcRKAEY5xOLmUd4zHR0YKwQcVkUt7V9MWo8VrgZHoe4Plpckqq%252Fd1jL7esQcMq5%252BRm2wT5ad57L7JE%252B08vM%26X-Amz-Signature%3Df83594e85321418264db42a6c8098273d53559054ae4fee9a9b279227cab7bda%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=d7e394de-d11c-48cb-8e0c-460e69085362)
+    *GC 停顿期间，世界已经变天了*
+
+
+分布式软件/算法的目标：容忍不可靠的环境，实现容错，同时保证安全性
+
+节点不可能只依赖自身状态来对整个系统进行判断，需要达成共识：Paxos、ZAB、Raft….
+
+![Raft logo](https://raft.github.io/logo/solo.svg)
+*Raft logo*
+
+通常共识算法都是实现了全序广播，能够保证一系列消息以相同的顺序被应用到每个节点上，以此实现共识
+
+
+
+共识算法的作者都声称他们的算法简单、易于理解，算法本身的正确性也通过形式化验证进行保证
+
+![Raft 论文的标题的定语就是 Understandable](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F93c5caed-f667-49b7-8ba3-8b3cf803c63d%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3D40a812cdfb82d63f7658847ff3408bcaf252ddb2ebec0f04afbe32c604174c58%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=14d88756-3979-8078-87c5-e2f310cf37a2)
+*Raft 论文的标题的定语就是 Understandable*
+
+![Lamport 的第二篇 ](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F765fda1c-1475-4ca9-ba0e-7b1b8870060c%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3D22509ac5039ec17113287b994b36a57decd28937e763baf2a40440697eb60be9%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=14d88756-3979-8086-b923-dfa7249c270a)
+*Lamport 的第二篇*
+
+共识算法看起来没有那么复杂，但具体落地时，正确实现非常困难，分布式系统的环境非常复杂，不确定因素和扰动过多，要在任何一种情况下都能正常工作是一个很大的挑战
+
+一些 bug 可能需要运行数千次，才会发生一次，且几乎无法复现
+
+![MIT 6.824 指南通常打着「数千次都不出错」的 slogan，也进一步说明了测试的困难](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff9fa10f4-1198-4a2f-b546-aed8998940c7%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3D0b90dfd2f39bd51ad3032cbc0ab5494f023dc89000c362ac8935c1402bb7316a%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=14688756-3979-8040-a39f-f7a4e9444f67)
+*MIT 6.824 指南通常打着「数千次都不出错」的 slogan，也进一步说明了测试的困难*
+
+如何解决在分布式系统上进行测试的问题？
+
+
+
+## 确定性测试 & 模拟
+
+安全性的一些业界方案：
+
+-   混沌测试：ChaosMesh
+
+    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fce9ced73-aa89-44bf-aa5f-7bc067eeaf13%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466QZOFBD2I%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075601Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIENNbAiJMutnaMfQH1C6HU7Frmp%252Byk24ccZb04fBUceFAiBpKB4wnYGZwI8XlerR9k4al83QXOQfs5es4e1oLg4E3SqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMu7zNpkduCj0Q28doKtwDmB60OoWjlUasSggoXsMQ9jCsZk7FlzttDBky62gyo7r5tKkeRc1Nth94uq2Bw1NaGyeJEHHHKAIyj2%252FBFtGNCPXE0F8ZGjmFOqnRjikRAW4gIbwJ0ffH4B5nXeV3uQ%252F8y%252BePkccpEw6vGbJ9pWD2WZd2iCG5O59JYORkdaqNULI50ktXo6F4fjDKQ0D7Ygv0LrwOLS9HcDI7qIeavS3jlhxo2nN4PMLX7oYYVwE2NoDrVMQqOul3b55NymyOGUlRhf2dTMapl85%252BG4VhU0gVTOgqdJ89rAiRj7bi3HGeBPNrajrznm7To7bz9St5iZ7d3%252FvWR4MqADMWZGNrNWQKVA9yfPcv13%252B6nkdRQ0WkfjwOl4EgM%252BDlodCe3BLm%252FlUhFCbeJJhm4PZM0MqfpyRe6P5hFXKJY%252Bl6JHPeFO0ekNoI5aTZw4kGpv6FBC70G4Dl8VULIfuERhlqZNNmGtrQ8brolxl2TSbOgagD%252BUvgdCSyyHcEEdTfxjveXeX%252BMhWZMKI4kSjMiHb8s69cg%252FLMCdK%252Fe4NxKHSbQG0i%252FdDa2X%252BEdjERchpBq1YmZJTCLWGfmznuXpSc9E%252FBLp%252FdKKiegg48BJy1ScbW%252FnmuSCL1jRXOD%252FR3a8gJAUb8kicw2ayJ1QY6pgFLgFpEp%252Fym%252BTCKS2HS7hHsVgY%252Fjrwx2AAtbnrBI1UqZTy1%252FK7DmRxGXjjNmMH5zo7v4lnQQGcRF%252BLMV8GCIKSwmsTUMoMB%252FMrwneBfAPJv%252FTXhaDjQ5BFl0BfYESRRt3YJZu%252FjTwg2cgN3MMVRGjlCGYhNn1jUNj%252BYIXGKUywiP0hAVvtg1bUKPR%252B28eHbYo%252BdgmLOTLUWOYLSFr1LPq26qyEAhy%252BQ%26X-Amz-Signature%3D44ee26f568c6fe4b493e9cfbbc2087ce524a0e9642c7bc41392c3df5453850be%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=14d88756-3979-8036-95ba-c8201bde96f0)
+
+-   验证框架：Jepsen
+
+    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fdfc75047-5a34-4cc6-91a0-c2a82f4e4cf8%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB4667HA2QQYB%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075601Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIE8USIUCKfaq4mvxic6yJhFOVRokuMgMJmxOBLwuxXeBAiEAonHKF9jgLY0mRAVCMBZMW%252BFlS5havseKhe3fk5p1GlQqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDF8nJSG6%252FOX5EbiWpCrcA8Iqu6xvqaFoIIFSYG%252Fyjw5ONTTn11t3KySexgJLjTjYi%252FxV7hvBn6EJ2OxEzfICxyD2eaqnOx4BM3QcE%252FQlhstOHx3w5xsLHaaZRWrzHys%252BX8nIGlqd1N%252FAJDGiFN%252BTcRcUqXmY0XS8vhJJ23OezU2ZTB0XvPC9VOq7AO96PfztPH9u%252BhYX1RUtoW6fTTVft8jkBhQjsCMNy3IAL3mnHPzEGUM66SzeID%252Fz0iEy6%252FHx0Xb%252FRmF%252FJ2uLjPfSKMqrwOLcCyHODV6FaU25MsC7zjlZVP3%252BhltDYj1VuCLaQ95jkiPleTkWjAiJtGiowMreN5DEghy%252FBnx%252B%252FwbbdDDYp6mzPKSDTp89hSt%252BXubslPhRfMKnAyAql1cBe%252F37VHHy3ofB3SBBcdKD1aPWqo2LpXyzu0gTYBANje4O0kRsfwRDs2UW7vdq%252By5V2lX8C6TjsT3RC%252BijuzFs2S%252BKOWV%252BAFBmR90zWVY70Gpu1%252FvD1RceqmGNCjCqf5b9Eo%252FGZTsNND%252Bn9XrRMwFf3d%252F3Bo8XknFFxR%252F0raGHAiMG6oTJBTA5nu6p5AscEGDZcldDFpM7ubBQccdSTPWtZOID1oEzG9h6tXijWLNEtAmztMgjUvgG5cUEIXnyyQAx%252B8TYMJatidUGOqUBTlQEy%252BX3QsreZjc6OqATVtkXx5NMNyTlx2ZgTRDsN6gXNIJV6gBQgb7DFGWuMB1al3T99Fhk9mhF9QQ7pHeE5NchWGdnazfnNSXFsSq8iIQejmLA8XH%252B4AqEYxFajUMq2qfczfJshTEW6XFM3%252BdW1laM9yY7tu10uaDWNDZ%252BXacXcWnPhOxvWYdwQkF6k3skDxUAb47pBb90WadwBQ6zZ0PV9mnK%26X-Amz-Signature%3D485ce15e6aef555b0fad8d1381aa2e6051ed0a1a84424bdb47d8035a7921e082%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=87659099-a29a-423f-b646-11284eb2ffeb)
+
+
+主动向系统注入故障并验证，这能提高错误发生概率，暴露问题。但无法复现的根本问题还是没有解决：
+
+-   修复后如何验证真的解决了？还是需要精确复现这个问题
+-   更多时候还因为日志和信息不足无法定位，要给程序添加日志后等待再次复现
+
+
+
+可以发现，无法复现的原因是系统有很多因素每次运行时都是不确定的，bug 可能只有在程序的某些执行历史下才会复现。而网络延迟、进程调度的波动，最终都会导致执行历史变化，使系统走向无法预测
+
+甚至有可能因为「修复」行为导致问题更难复现，例如为了复现问题，在性能敏感区域加了一长串日志输出，结果因为输出的开销导致的蝴蝶效应更难踩中 bug 触发的时间窗口
+
+
+
+如果系统像纯函数一样是确定性的，测试就能简单得多。那能不能将不确定性的事件，通过某种参数关联为确定性的事件？典型例子是伪随机数生成器，看起来是不确定性的，实际上是与 seed 关联，结果是确定的。是否可能通过一个 seed，去 hook 系统中的不确定性因素？
+
+
+
+Sled（一个类似 RocksDB 的嵌入式存储引擎） 的作者在[一篇文章](https://sled.rs/simulation.html)中提到他是如何在系统中进行测试的：
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff0ceda69-c45c-4992-bc66-37c150805e04%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3D5d7be3496be0dd4eb76795d593c67020e2cf3ea3ab3fc6f282ff11ffd569328a%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=14688756-3979-8004-b4bf-eb00d0243e23)
+
+> Jepsen 的出现成功击溃了几乎所有它测试的分布式系统，这表明我们在根本上以一种错误的方式构建分布式系统，这种方式无法避免 bug 的出现
+
+
+
+那我们要怎么做才是正确的？
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F973a1bbf-337b-4131-91f6-446e7fe51205%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3Da66fed5291c0b0972029bef61dc6b5893bc9edab215bc71e0a9ba7809173e2c5%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=14688756-3979-8016-b156-d447217c8c99)
+
+> 1\. 将代码写成能在模拟器上被确定性运行的形式 
+> 2\. 写一个模拟器去模拟真实世界的行为
+
+
+
+这就是确定性模拟器
+
+
+
+## 业界实现和落地
+
+### FoundationDB
+
+FoundationDB 是 Apple 开源的分布式 KV 数据库，FoundationDB 在开发之初花了两年实现模拟器，在后期取得了非常大的回报，是业界最早全面落地确定性测试的工程之一，也是为数不多能够通过 Jepsen 的系统
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F976d433c-4a1f-4a57-8512-3d3a96b455f1%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3Dffe7c27e20b99ac615d6c2ae976cdd9bc7c0460f3e6ffae79aa3cd2c961ee94d%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=14688756-3979-807f-b5ed-f38e8d6f9f4e)
+
+FoundationDB 基于 C++ 扩展出了一个名为 Flow 的语言（与其说是语言，更像一种扩展的宏功能，只进行了预编译处理）
+
+Flow 采用 Actor 单线程异步模型（async/await），由 runtime 负责所有调度，以此控制执行顺序，确保不会因为内核的线程调度导致不确定性。再通过接口接管了网络、存储、时间等其他外部调用，实现所有不确定性事件的受控
+
+
+
+在这些改造后，Flow 看起来也和 C++ 没什么区别，使用 `ACTOR` 即可定义一个异步任务：
+
+```c++
+ACTOR Future<float> asyncAdd(Futur<float> f, float offset) {
+    float value = wait(f);
+    return value + offset;
+}
+```
+
+模拟器中每个测试由一段配置文件定义，这里包括了测试的行为，以及注入的故障，例如向网络注入延迟、关闭连接、杀死节点、变更配置等。只要用相同的配置文件作为输入，模拟器就会产生相同的执行历史，问题就能被复现
+
+```plain
+testTitle=SwizzledCycleTest
+    testName=Cycle
+    transactionsPerSecond=1000.0
+    testDuration=30.0
+    expectedRate=0.01
+
+    testName=RandomClogging
+    testDuration=30.0
+    swizzle = 1
+
+    testName=Attrition
+    machinesToKill=10
+    machinesToLeave=3
+    reboot=true
+    testDuration=30.0
+
+    testName=ChangeConfig
+    maxDelayBeforeChange=30.0
+    coordinators=auto
+```
+
+FoundationDB 本身是开源的，但可惜模拟器部分没有开源，论文和演讲中也只进行了简单介绍
+
+[Embedded Video](https://www.youtube.com/embed/4fFDFbi3toc)
+
+*“Don’t debug your system, debug a simulation instead.”*
+
+
+
+最终，他们声称确定性模拟让他们发现了数据库**所有** bug：
+
+> Anyway, we did this for a while and found all of the bugs in the database. I know, I know, that’s an insane thing to say. It’s kind of true though. In the entire history of the company, I think we only ever had one or two bugs reported by a customer. *Ever*. Kyle Kingsbury aka “aphyr” didn’t even bother testing it with Jepsen, because he didn’t think he’d find anything.
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ffb249a39-9fb3-4972-8d23-40a0631b0304%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3D89d9060df93c0206aff3f944291fa903b06d49c9233d48ab20ec0c2cc04c94e5%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=16388756-3979-809a-a586-f2403bc1a49b)
+
+无论如何，FoundationDB 开创了确定性模拟的先河。所有后来者都无法绕过 FoundationDB 的影响
+
+
+
+### RisingWave & MadSim
+
+[RisingWave](https://github.com/risingwavelabs/risingwave) 是一个分布式流数据库，受到 FoundationDB 的启发，他们开发了一个名为 [MadSim](https://github.com/madsim-rs/madsim) 的确定性测试框架，两者都是开源项目
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F683e1fa8-10b4-46f1-8e56-dc5a6fe7630a%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3Ded097a30277c909784634e723a98db6e5c44d4dd931bd4b2cdfa8eebf8da5713%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15588756-3979-80d5-a9c9-d84116744b96)
+
+
+
+RisingWave 和 MadSim 都基于 Rust 开发。Rust 原生支持异步，但特殊的是，Rust 只提供了异步需要的语言特性、关键字和相关类型等；如异步任务如何执行、管理和调度等具体实现则不在语言内提供，因此社区有各种不同的 runtime
+
+在这种设计下，MadSim 就可以作为一个异步 runtime 呈现，使用单线程运行异步任务，不需要对语言做侵入性改动即可轻松控制调度，并且能和工具链（如调试器）结合得更好
+
+
+
+MadSim 的基本架构如下，这里也参考了 FoundationDB，包括一个全局的随机数生成器，以及基于这之上的定时器，任务调度器和环境模拟（网络、存储）
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fee0cf179-f3de-4b34-aed2-fe0ce16b7108%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3D27aa23587bc5fc9ac1711c46a0b4ec449ded21e3bdb435f54ae215c93f22beb0%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15588756-3979-8060-9138-d8bae2d3e272)
+
+除此之外，MadSim 还提供了对 Rust 异步 runtime 事实标准 tokio 的 API 兼容，这使得使用 tokio 的项目无需修改一行代码，就可以无缝接入 MadSim
+
+还有一些异步 API 之外的部分，例如获取系统时间和配置等（`gettimeofday`,`get_random`,`sysconf` 等 API），可能会被部分标准库和依赖库不知不觉地调用而破坏确定性，Madsim 通过重载 libc 函数完成 hook
+
+最后一些常见的外部系统网络交互的 client 库，也提供了有确定性模拟的包装实现
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7cd5f1fb-c836-4b1a-bace-c3f094b8e3cb%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3Dc9f413dd6aeb325ba9f80b8881fdec24bc10524b75b0fc92fab313bac9c6b273%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15588756-3979-80e9-a241-c485214a3f3a)
+
+
+
+MadSim 中，系统中每一个节点被抽象成状态机。输入会触发节点的状态转移，输入通常有两类：消息和定时器。而节点的输出就是对另一个节点发送的消息，定时器通常是节点自身在某一时刻做的一件事情
+
+在系统的一开始，存在一个初始状态，接着一些节点的定时器可能被激活（例如心跳或注册等），触发状态转移，发送消息给其它节点，进一步触发其它节点的转移
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd758bf6b-a683-4d6d-af43-3d498791c1e7%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3De9edc837557fc9f1499871b942b2abfec21d9bc7ccb6789ea3d16e8f5ebd82ec%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=93733ab2-0e61-4462-b5bf-01440b2c8d59)
+
+从更高的维度将「整个系统」看作一个大的状态机，唯一的外部输入就只有时间，整个系统就是一个随着时间不断变化状态的状态机，可以看作只有状态转移的时候，时间才被推进了
+
+将这些状态的转移在时间轴上排列，状态转移之间的时间对状态机是没意义的，模拟器就可以通过离散事件模拟的方式在一个转移结束后直接跳到下一个转移的时间节点，实现时间加速
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F71dc8c92-485e-4049-ac85-ed203598b1ce%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466RJIRYKVU%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075601Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJIMEYCIQCLRv%252FxVOZC24gjaE4otlxP0lVsJHyVpelVMNGZK2D1pgIhALM%252BLfh5h4adMmU9LGWWNi%252F4V5J%252FXVdSMAOvxPb5w8ugKogECID%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEQABoMNjM3NDIzMTgzODA1Igz63N%252Fq5X9LuT%252B235Qq3AOtCNYh%252F44BGa5fXLQHlqZi%252BeArEznROe8h9vR5yfAKAibIDTeeXP%252B%252FtpMaLy7vZbAPkZByebwuC2nDyyb0oJWLC2B64v7DW61cJ89iIQQWV8TI0iE6rOpiink9HuUQeNtZyj56%252FtvFO3sEj3julNfg4%252FbhqdzRbiBJk5b6ojtvovr7oOrhf6u6LOorvfKy1cuyncKTrxysgTmqKraE%252FfHevVSGi%252F785nHgTZIgff7DVQZOe7%252BQ%252BgSC%252BpIFBH1Ek6xEry3qwLNMLrnCpLWdySFyrbTxpJAKekoOoqiFsJnqbYbhw%252FO52yEceqj9YlXkzYxPG0se0tYBmCVX%252Bdc3V%252FORld6RGL276zt7fqFfOE0iMCRrqHjYA%252B0siM8SDPE1kHuNXLx4LjZouKbaqQTiSqMuTPNIvxyk298teGj00wQPq4v24nB6uOSEBkSuFtkwVJQpU1xTky8QpOiMu74gZDKQ4tXSLgFNpfMADhBy8CPFHskynYihZEeeFFogSqbjckAHZAvAm282u84LOvbRNs67brZ0zoy0VOPBLAdsFFGEBrM3KgVbUWRWQFebE5GTJMYK4aPBSNqF07rzAxwl%252FjJ1N%252F1lr5UQDlTh%252FzTmpQVr4pp4D%252Fv9QFBS6KWo3zCuq4nVBjqkAe20eaFPqweo%252FJNfpHkOYKU5w3vUZeBwReaA13uRiSege2lqbMFMvMKX%252B%252Fof7XEhDxta2toJaYDH72RkxMTP5kTJLUtLC8vLEoUlf7O0MvpXpkr0QTFlfqE3BtmgaJCN8TvUYT1A9uPFPlkO8VUFJNAFe0eeJb%252FWrYm8OldUbvDm9Staj5CVDyOZsan8p6HaoAmctvY4ll6P3Nge7aFuQFxnHLrG%26X-Amz-Signature%3D21ae3379029cbe96921082d90736bf4a2bb943cbd5c4353479cba7990c87e10a%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=f4b66a13-e0af-4e59-b631-8320d65ea25b)
+
+这也是 FoundationDB 中提过的模拟器的另一个好处
+
+
+
+既然是开源的，简单看一下关键实现
+
+-   runtime 初始化时，使用传入的 seed 构造随机数生成器，之后所有事件的模拟都能被这个 seed 确定
+
+    ```rust
+    /// Create a new runtime instance with given seed and config.
+    pub fn with_seed_and_config(seed: u64, config: Config) -> Self {
+        let rand = rand::GlobalRng::new_with_seed(seed);
+        let sims = Arc::new(Mutex::new(HashMap::new()));
+        let task = task::Executor::new(rand.clone(), sims.clone());
+        let handle = Handle {
+            rand: rand.clone(),
+            time: task.time_handle().clone(),
+            task: task.handle().clone(),
+            sims,
+            config,
+            allow_system_thread: false,
+        };
+        let rt = Runtime { rand, task, handle };
+        rt.add_simulator::<fs::FsSim>();
+        rt.add_simulator::<net::NetSim>();
+        rt
+    }
+    ```
+
+    *madsim/src/sim/runtime/mod.rs*
+
+-   定时器，实质上是在时间堆中加入了一个带定时器回调的输入
+
+    ```rust
+    pub(crate) fn add_timer_at(
+        &self,
+        deadline: Instant,
+        callback: impl FnOnce() + Send + Sync + 'static,
+    ) {
+        let mut timer = self.timer.lock();
+        timer.add(deadline - self.clock.base_instant(), |_| callback());
+    }
+
+    pub(crate) fn add_timer(&self, dur: Duration, callback: impl FnOnce() + Send + Sync + 'static) {
+        self.add_timer_at(self.clock.now_instant() + dur, callback);
+    }
+    ```
+
+    *madsim/src/sim/time/mod.rs*
+
+-   调度器：通过 event-loop 来进行调度，从就绪队列里随机取任务执行，这里的「随机」也是基于全局的随机数生成器，调度顺序都是被 seed 确定的。然后直接跳转到下一个事件的时间点
+
+    ```rust
+    pub fn block_on<F: Future>(&self, future: F) -> F::Output {
+        // ...
+
+        loop {
+            self.run_all_ready();
+            if task.is_finished() {
+                return task.now_or_never().unwrap();
+            }
+            let going = self.time.advance_to_next_event();
+
+            // ...
+        }
+    }
+
+    /// Drain all tasks from ready queue and run them.
+    fn run_all_ready(&self) {
+        while let Ok(runnable) = self.queue.try_recv_random(&self.rand) {
+            // ...
+
+            // run the task
+            let res = {
+                let _guard = crate::context::enter_task(info.clone());
+                std::panic::catch_unwind(move || work(runnable))
+            };
+            if let Err(e) = res {
+                // ...
+            }
+
+            // advance time: 50-100ns
+            let dur = Duration::from_nanos(self.rand.with(|rng| rng.gen_range(50..100)));
+            self.time.handle().advance(dur);
+        }
+    }
+    ```
+
+    *madsim/src/sim/task/mod.rs*
+
+-   网络接口的语义比较复杂，这部分有不小工作量，最底下是维护链接的实现，这里存储了所有节点的信息，使用 channel 进行通信，并且可以根据配置的丢包率和延迟来注入故障。再往上提供 socket 语义的接口，感觉都是体力活
+
+    ```rust
+    /// Opens a new connection to destination.
+    pub(crate) async fn connect1(
+        self: &Arc<Self>,
+        node: NodeId,
+        port: u16,
+        mut dst: SocketAddr,
+        protocol: IpProtocol,
+    ) -> io::Result<(PayloadSender, PayloadReceiver, SocketAddr)> {
+        self.rand_delay().await?;
+        if let Some(addr) = self
+            .ipvs
+            .get_server(ServiceAddr::from_addr_proto(dst, protocol))
+        {
+            dst = addr.parse().expect("invalid socket address");
+        }
+        let (ip, dst_node, socket, latency) = (self.network.lock().try_send(node, dst, protocol))
+            .ok_or_else(|| {
+            io::Error::new(io::ErrorKind::ConnectionRefused, "connection refused")
+        })?;
+        let src = (ip, port).into();
+        let (tx1, rx1) = self.channel(node, dst, protocol);
+        let (tx2, rx2) = self.channel(dst_node, src, protocol);
+        trace!(?latency, "delay");
+        // FIXME: delay
+        // self.time.add_timer(latency, move || {
+        socket.new_connection(src, dst, tx2, rx1);
+        // });
+        Ok((tx1, rx2, src))
+    }
+
+    /// Try sending a message to the destination.
+    ///
+    /// If destination is not found or packet loss, returns `None`.
+    /// Otherwise returns the source IP, socket and latency.
+    pub fn try_send(
+        &mut self,
+        node: NodeId,
+        dst: SocketAddr,
+        protocol: IpProtocol,
+    ) -> Option<(IpAddr, NodeId, Arc<dyn Socket>, Duration)> {
+        let dst_node = self.resolve_dest_node(node, dst, protocol)?;
+        let latency = self.test_link(node, dst_node)?;
+        let sockets = &self.nodes.get(&dst_node)?.sockets;
+        let ep = (sockets.get(&(dst, protocol)))
+            .or_else(|| sockets.get(&((Ipv4Addr::UNSPECIFIED, dst.port()).into(), protocol)))?;
+        let src_ip = if dst.ip().is_loopback() {
+            IpAddr::V4(Ipv4Addr::LOCALHOST)
+        } else {
+            self.nodes.get(&node).expect("node not found").ip.unwrap()
+        };
+        Some((src_ip, dst_node, ep.clone(), latency))
+    }
+
+    /// Returns the latency of sending a packet. If packet loss, returns `None`.
+    fn test_link(&mut self, src: NodeId, dst: NodeId) -> Option<Duration> {
+        if self.link_clogged(src, dst) || self.rand.gen_bool(self.config.packet_loss_rate) {
+            None
+        } else {
+            self.stat.msg_count += 1;
+            // TODO: special value for loopback
+            Some(self.rand.gen_range(self.config.send_latency.clone()))
+        }
+    }
+    ```
+
+    *madsim/src/sim/net/mod.rs & madsim/src/sim/net/network.rs*
+
+
+
+
+作者提供了一个基于 MadSim 的 MIT 6.824 课程 Raft 实验的重写版 [MadRaft](https://github.com/madsim-rs/madraft)，这里模拟器中的 Raft 测试比真实运行快上近百倍：
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F20011529-118d-4555-a03e-fa8e8c527556%2FUntitled.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SMEOQAZ7%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075559Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIFXMNqBx1LJtgjmOBlQ1poqCAdyj5L64lmZetHPkT5T%252BAiB0QrvWSMiapCtcZLG6qpn3oDoUu8YJPgl7YZC5OcghAiqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMqlkaTqEQ%252B2a6IkvXKtwD365YREHoFEa7NROiM2eRNKVVIbvC5vDnZq4uRAkxhZYIuvvzCylwJb%252F0kCZmVZ87BygLMJX2mUg4HAwNryMp0pJJaLf1zQjG%252B%252FwHeVOvsP6UI3K0t26cuVJ%252FoEuI7bXRBflx96ZZF6jcFhCpEbaa9uJ5NdjqCuNcfiVooHUOk0r8hxfII%252FInhjNdS4%252FlmqZ41j4NxhDaQHQS1lykHtHOqlv%252FjrdyYCFyvU3I8R3M8VYm4Ox6aUPx36zEQVmeVLj%252FgmzI55q9xRvtWTn3tNzilmBoZW%252BTSqIp8i5jsUR3vTiKDFF12ovmUySzZCglLHiZ7Wi%252FkxbBzDjXrQVeouUAjLwJOCul0rjxdOWxw2gcgXcUR3USBCSmP%252FSlkO0VE7asNmHJsrK9vVV%252BvYSqSNTiXwrF0K06J6SAPSE7ajyio9k6YYIEjWFmi4%252B5i2LOWaQLcZXmKNyEh%252FWPttpVFvefAEMYuMkvUfu0IvTFabVt9AnyjOlGYO06L8QKKRk6ZuWWvbEV0PMaWdQh7f5SLwd7ErplkDx7ndZRHkVD5H2JFYF2iNSWZmTjjOIxQYBenitC9OP1xkrOgTq2snEyd11sy%252F%252FuwxxWFo0see%252BRNvLp9bl5qgfTtoyEnRDfvREwha2J1QY6pgGlpXuAfiw5%252BY2cJegJ9trT0qtYp3nLv1E69QpsTjjORi9KI0wPsMFkPF59qPA5lxTAEq1KJAAyLEl5mKFOrRMgu%252FtNyVrOftylaR%252BFl9wjQAsVlamzsQNddKUN1AK3C%252BGk5fVDDViOUHsgoEeH0RsmIUPokfD21gtkef8Ir2I7H1M8%252BL2MY%252FAmCcNkqdeJwBmEzCeuWS%252Br3MB58OhaOQhfEIQ3sTsU%26X-Amz-Signature%3D3392c218ab78905084e88860969d985f7b567cd6761a1d819cc8ee799d01e742%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=14688756-3979-805d-aab6-ee285a94362b)
+
+对于未通过的测试，模拟器返回一个 seed，下次使用同样的 seed 运行，就能得到相同的结果
+
+
+
+在 RisingWave 中，Madsim 被应用在四种不同的测试中：
+
+1.  单元测试：单元测试关注面比较小，难以发现复杂的问题，所以不是确定性测试主要作用的目标，但确定性模拟器在这里还是起了不少作用，比如测试有关超时的逻辑能瞬间完成。另外单元测试也能反过来验证一些外部系统包装（如 etcd 模拟器）的实现正确与否
+2.  E2E 测试：E2E 测试中涵盖了系统的各个模块，更容易出现错误。RisingWave 架构复杂，涉及各种服务
+
+    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff109c7a4-9022-4d0b-b944-41c93e5d7180%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB4662WKK3RPY%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075602Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIHLofEA4mIfNae06fq6RDWw37rHnZZyPBeE6vmuNbr7MAiEAlMXVP5GeDS35R3L5HqYCc9SYnUkt8urUZ3UR6xJBKEIqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDFZFBHdFPgGqSA00HCrcA8u7bLTaWL%252BvY6pLXNaWTmeZJBTaxDyHRU9Voy4u%252ByHHlcCUktaPVC3Hd6I%252B7kxQrTl7XKqz58c46%252BpaAvaETzjT5v5VZL6fZLPeq0en1kxz5RwGM6s9CizdPWuzgQaAQgG5JlVDkxqqjDLU8VRVJrbklfaN88ns4pyKVOx2%252F2BEgdovoZc8%252FlNPUJfQpAxllQMoN7yANfx7%252BxCnx4VTFjIvUB6CpxD5y3Y98km6k36XCnaw35jE5IAL1AsJcMEy42iv0L%252BbRPWsuSoXw3W3Kaj%252BHn0tbBGLqliPfkwn%252FNy9bIrBGjijZMrvFo0g2pfEHsTBbJ5O3twTF0vDqtrpb3y2oZ4CHSVKDrmxUWkc4OfdqmSTSeYXfcgM%252Fucab6aqopteMF32u%252F3IyxUcfuLL7k62wgpx96RwTHOONvnH%252FooyxEWpCH%252BxNB3HF%252FROJKyIWUkxBCRCoxTgzQYFIKjkRRwqYkD2aXedFxGEMf6Mpd1KNhToETzlfxsuPoMAofEpjvM4g69M5lYPjQz78up8%252BQlPNZ%252BAoegWhLtqj%252BNJ2L4%252FZHA6aT4Sq%252Byp112y%252B133DJZJwHOPN6lcu4Al9IIMFzCw4zvpZNFXT%252BJ%252ByV3FGEtTbX915cFsVp39kbyCMPasidUGOqUBCR%252F9IYvMrUcpdIf7tT0vCBMwM5CPp80qG247E8RDZCw0%252BgUP2WWdxEaGIcipOW5QNR731Irg9fUgVcOwIx3mMJXuQr6QnUQcd%252Fc0oulpXBbemLwSjXQbKIWFo%252F3aoulgYaFTa0xJERMNBgPd7PREw5u4liFsaFHMYMZCH%252B9iH8n1nAy3JCz%252F2yEHgMHsbOLUnP59ObUzhNUUIV5wd6VKfiAIGB8i%26X-Amz-Signature%3D9bf315a6763410e46a3e37f263df7e3e0b48c6b6547e45da1340beeeb70e8b5c%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15588756-3979-80e9-b9b3-d1a2b78dfed3)
+
+    通过 MadSim，可以将上述所有服务运行在模拟器的单线程环境中，使环境构建简单得多，并且基于模拟器时间加速的特性，一轮完整测试只用耗时两分钟，是原先的四分之一
+
+    并且能轻松地并行执行测试，如果发生了错误，使用同样的 seed 就可以轻易复现结果，包括修改代码添加日志，也不会影响可复现性
+
+3.  异常测试：E2E 测试主要还是在测试正常情况下的行为，没法完全发挥 MadSim 的作用。在异常测试中，会刻意构造各种故障并验证系统是否仍然能保持正确。在这个过程中发现了很多 bug，得益于模拟器的可复现性，这些问题都能被很快定位和修复
+
+    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F68419cd1-0ecb-4e97-99dd-1a2adbb04406%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466SPDPOJ52%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075602Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCIAnpxsex615HlNekvX6hrR5%252Fa0cjEX1BXDymo0qHWZ4tAiBcLsELwATB4iTrwg25%252F6kNmBDvJnMAbumYRSF7nP5MQyqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMznF2baAd7D5w00wdKtwD6HV3ePcg3hjpeaO95ubg1Qr%252FKO4lv0NLMcYmlyWub8SIN0U9%252FJ62wB53l1wqJ2xQ4D3L0DfEkaXbzjWVY8%252F6loLqAbukKoHA0ORyt7F6ovo3PovmKohzqukrlwQd1Kjiziebvl0WnuA%252BXmFsFX8azNxtP1e6JCN%252BEtMChH4%252Bx6flPkod5%252BAvLh5ayr5GDqQeUi%252FhddsyUgQQHSlv3jMW88lMhUlrSYnkbiU%252FMtvNRifY8M8HqnEN9cyOuuhwIgW0zQY0IB6L1usUcKlv2q60no9CQZ3bUczB1tN3DHZ60eZUDpGNeaMlPAlQ4jw6dTK0x0CZx4kiXvjnCK2tTi%252BZxV2adyiwbGat0o8fo6rSGpVjBACCSZkNz88ZOMKcfcw4vikCe4CVFwYbZ18yfuui0kBv%252BYdGeJQuvS%252BzfD9paypeMfs9V2TsFTfShTfMoSJk69xDwKAJWF1VzErFHkMutSJYrYfoNeWALhqTgSkGmLFK2EB9ymOS3fTSpo5YZX0kONAbnFkb%252FdwCIJxNhC5k3mdOMoltkQY%252F%252FqqqSznb6lCwKUWhmZugYNa5ho%252BgCuN48Uyo2UIVlT1Cgv%252BnY8A9K0aT5WzbOua4JuRTu6JAF16SxxaI5yc0lw1VcH0wx62J1QY6pgGfuflTGKaiL%252BVUlmbgqzNad8cOQQBDET2%252BXVt147GfBF7ipcFYfGxQqt6WmD6xUUsd1QJihyAcwNMl7jV0uriZN9OG01ios9Xaj1MwCxme06ohchTTS21GjCD8Hahu4uoUQVs0YkqTuUssPp5%252Fw84Y7NIaQs02w%252BqlSZdSDPJ5DEeANbA%252BBrVbm57LpDJSD2sFWLE%252BKyXmNm8caONia1SGnOlvyZbX%26X-Amz-Signature%3Dd50f4f562e3315b2a5cda1cf45ce64f4a4c770caac8a34590ed0d4a72dbed996%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15588756-3979-80c2-a428-e4466ebf8748)
+
+4.  扩容测试：集群配置发生变化时，需要进行重平衡，这个过程也很容易发生错误，特别是叠加异常情况时
+
+    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fdb6930a8-b915-4f9f-833c-16b133ea15f6%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466Y4RENWM5%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075602Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCID1h2tIZ05OUPHxDtmV3dik1Qda2R7pUM7D31pEoQUikAiBQvKyLd32hjqvh5GsHgZ5hQwavgWeEWvH4on86%252BGYngCqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMEXxCpyJK4ZKqilFWKtwDNeSo7eX6x%252Bqzr5EkrS64FFYGfCTXJApHZ7TGxPpgGgDwFzEzO3prr4NnEuMbWdc%252FBGv2oN1DgG8ncWDW49d1e%252FFKwDsdCZKhepSm0RyCjhqAiZa5eh95ntUyx0qd7GwoVWvO2VupBsSSf82n3eq2Zjwm0BPG%252Fo9Ko1zj8hzxF92t4Ov%252FIJqJbHP6NEIDuAMfaAwAJei%252FVI5SYMAOp%252FsE0XUjGEzMK1n1fo%252Fp13s3rdZqmywZGAsPk3px%252FIyIUDKwEmhKi5BIs8u8x%252BMJYrnssKTusP%252BhX19BIKS3KxV89JrmxnpVDX%252F7EYedVC8qtAEKVjoK%252FxMbtKUaQ6fyuYo9h7LZVvJ7xZuODtRPGu1%252FPnQ0giJEFfmoKGYdPf2tHg%252BJJkBDpyrUcSw3OrHmwfEAkFn7vor%252BrTicauMhzz3DkUumrzV94cC0zu7gHYo6gfzot9iy7MQ%252B%252FdNvZSRpPSy0uaifNM27eyvcQYAVuvyTe1QgMvrQAd2EwdMVu7WGRYHU20x3wQ6W4gNOf8%252FiwRwd40h5x7tnynqdAKpW%252Fj6W1SgWLT2sXgw3k2m%252BSRB1YYOBtJyGjNFz%252Fm0khuf5DPRfAvCby5vbLLVo3jyILMGB43RwB%252Bmlo234I2C3pc0wrquJ1QY6pgFdTMidZZoCYqI8gR7X3M8MY9iKRvsZzebMePOIaJCynPGiWcxaMUNZUmvxmjtwJporMuai5fWqyJekVUI%252BhlWpP%252BC7DlX5m8jqQ1NNonSmdOyyn9zZOkf9uJpBxTBrxOdDYX1w4AP6rmFmZh15nrRvNZbiBiB3C0zG%252BXn8rPTFv0krOrmhfvv2iz2VcIzIyMeSPhuIZqqzSoiAtpE70gP8w3JQ%252FSe3%26X-Amz-Signature%3D54906b1c850b3962dc3f06ecd8d2a3e42821cf40627f6b69eb04c0e76e63488c%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15588756-3979-803c-a4eb-fa1b93eb2234)
+
+    在正常测试中，受限于集群和数据规模的问题，测试覆盖面不足。但在模拟器中可以轻松构造较大规模和极端情况下的 case，帮助发现并修复了大量问题
+
+
+在 CI 中，每一项确定性测试都会用不同的 seed 并行执行 16 次（16 核 CI 机器），以尽可能提高覆盖率
+
+
+
+### Dropbox **Trinity**
+
+Dropbox 中 Sync Engine 是一个核心功能，负责在客户端和服务器之间进行文件同步
+
+2016 年，Dropbox 开始使用 Rust 重写它们的 Sync Engine，并引入了确定性模拟技术来测试，该部分称为 Trinity
+
+动机就像我们一开始提到的那样，问题复现困难，也没有足够日志定位：
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F70b000f9-def1-4452-ba16-29d7a0af0188%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466T4OBVVXQ%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075600Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQCU0RMCx%252BGM58hMMuAqfhMeUmNBYbgigIYBBjI5d7jyfgIgNgQ8bUYo7VQxSIyEyqQofRRUpsq26XOcA1%252F%252BxvBVs7cqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDOdUzu4j8drzZl3oKircA0R%252F2oSq3n6pz3CXdYZut8I5LTVjpLOXrj22P3TAiXRzozFH%252FPzuAlCbh0CkjWf6Snmwkg2NeWm5NE0FsO8mPDAdtEqshI0yA2B4FbiAMW10VQ8xHDgN1IhCG31MYBBT3w6yrcPgHNyZUIrQGBHLaxJVytWO%252BfZ5Klyzl6K0414PXdRQ5Qaxu3poi0f4WxY%252FZyhkyvW6jI08Avy92O5mzhwGsPe0iNEWVLbXGfbnYmj8V3awO4s2V502wLDrw3JjVRdbGo5%252BeMjCMCj8SHuLJ0rKdj%252Bie%252FXaGBAey8rH0LVnjEAntvD1XGwqkNsQI3qwBX0XVfn%252B%252FR5DiHo1Td9HQQ5W9k8vzy9ofLZ0r0Eb8r2JmBFwtVh%252FZ7RNFBMkWwt3X02wAx2LRIM890VDNrlaQaKXR0J%252B7kP0C0TcJxjAUFuRIibIODn0t6UMyVxVEAUSwgAupA2f%252F0iYFXBmtS6usyqTqFQSr6zWp8MusletgSnKvq0QMnm28MZBg4caWUkocKoRJ2HwqnDCxQCs1H2al6o5lyD2NqUyDhtJf8BuJrEM%252B75eM4CmEf4Q5ITjzNSnhgxgHfJrqBEW%252F9QzQ2TomhGIE0DiNK02g%252BXD2%252FosFO9Otkl4PRJZ55%252B0eakpMNSridUGOqUBioYdE6XoZQ16DxQMpqz9V%252FkxJSt0XuuJjiqifRJGhZ0BuEF%252BI5j%252B9ouKU9lorA7rfEfbcGlcZzt9vXWvJh8B%252BVLKqrV%252FNFVy7nTFLlefrHfUwZW%252BG8Ne3nE2lWZYg2uZvjzlgGm9eq9TRKBnjTCO7EONnPdN%252Byn03I57I4f40kiN21yTae4Ix6T8MTfp5XR%252FEz%252Bvl6Js2E6P2WDnoImwT0NKTUuJ%26X-Amz-Signature%3D4729f1ac7062c0f9e3ae8550ef41a66c16ad2832c5018580bb07359f65e1af83%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15688756-3979-8002-812b-c1bfb8bb916e)
+
+整个测试流程也是类似的，通过 seed 构造全局随机数生成器来生成之后的所有随机决策，如果测试失败则输出 seed
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F5cf0904e-be75-4d15-a553-96685049fef7%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466T4OBVVXQ%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075600Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQCU0RMCx%252BGM58hMMuAqfhMeUmNBYbgigIYBBjI5d7jyfgIgNgQ8bUYo7VQxSIyEyqQofRRUpsq26XOcA1%252F%252BxvBVs7cqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDOdUzu4j8drzZl3oKircA0R%252F2oSq3n6pz3CXdYZut8I5LTVjpLOXrj22P3TAiXRzozFH%252FPzuAlCbh0CkjWf6Snmwkg2NeWm5NE0FsO8mPDAdtEqshI0yA2B4FbiAMW10VQ8xHDgN1IhCG31MYBBT3w6yrcPgHNyZUIrQGBHLaxJVytWO%252BfZ5Klyzl6K0414PXdRQ5Qaxu3poi0f4WxY%252FZyhkyvW6jI08Avy92O5mzhwGsPe0iNEWVLbXGfbnYmj8V3awO4s2V502wLDrw3JjVRdbGo5%252BeMjCMCj8SHuLJ0rKdj%252Bie%252FXaGBAey8rH0LVnjEAntvD1XGwqkNsQI3qwBX0XVfn%252B%252FR5DiHo1Td9HQQ5W9k8vzy9ofLZ0r0Eb8r2JmBFwtVh%252FZ7RNFBMkWwt3X02wAx2LRIM890VDNrlaQaKXR0J%252B7kP0C0TcJxjAUFuRIibIODn0t6UMyVxVEAUSwgAupA2f%252F0iYFXBmtS6usyqTqFQSr6zWp8MusletgSnKvq0QMnm28MZBg4caWUkocKoRJ2HwqnDCxQCs1H2al6o5lyD2NqUyDhtJf8BuJrEM%252B75eM4CmEf4Q5ITjzNSnhgxgHfJrqBEW%252F9QzQ2TomhGIE0DiNK02g%252BXD2%252FosFO9Otkl4PRJZ55%252B0eakpMNSridUGOqUBioYdE6XoZQ16DxQMpqz9V%252FkxJSt0XuuJjiqifRJGhZ0BuEF%252BI5j%252B9ouKU9lorA7rfEfbcGlcZzt9vXWvJh8B%252BVLKqrV%252FNFVy7nTFLlefrHfUwZW%252BG8Ne3nE2lWZYg2uZvjzlgGm9eq9TRKBnjTCO7EONnPdN%252Byn03I57I4f40kiN21yTae4Ix6T8MTfp5XR%252FEz%252Bvl6Js2E6P2WDnoImwT0NKTUuJ%26X-Amz-Signature%3D8ebfd7ff5b3a3deced65388070bf75cd5612eb1795bc2b97b37b7c59fa4d7fbb%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15688756-3979-8098-ad64-f1f378d9ea14)
+
+由于也是 Rust 开发，Trinity 也是作为一个异步 runtime 执行，其他方面也都类似，包括文件系统、网络和时间模拟
+
+Rust 生态中异步 runtime 的事实标准 tokio 也宣布了其官方的确定性测试项目 [turmoil](https://github.com/tokio-rs/turmoil)，在这方面 Rust 还是走在了前列
+
+
+
+### TigerBeetle & VOPR
+
+[TigerBeetle](https://github.com/tigerbeetle/tigerbeetle) 是一个专为金融事务场景设计的数据库，使用 Zig 开发，在首页就着重强调了它们使用确定性模拟来构建数据库以体现可靠性
+
+![「历经数个世纪的测试」](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F8f427043-fb74-48df-9093-53384be92349%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466T4OBVVXQ%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075600Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQCU0RMCx%252BGM58hMMuAqfhMeUmNBYbgigIYBBjI5d7jyfgIgNgQ8bUYo7VQxSIyEyqQofRRUpsq26XOcA1%252F%252BxvBVs7cqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDOdUzu4j8drzZl3oKircA0R%252F2oSq3n6pz3CXdYZut8I5LTVjpLOXrj22P3TAiXRzozFH%252FPzuAlCbh0CkjWf6Snmwkg2NeWm5NE0FsO8mPDAdtEqshI0yA2B4FbiAMW10VQ8xHDgN1IhCG31MYBBT3w6yrcPgHNyZUIrQGBHLaxJVytWO%252BfZ5Klyzl6K0414PXdRQ5Qaxu3poi0f4WxY%252FZyhkyvW6jI08Avy92O5mzhwGsPe0iNEWVLbXGfbnYmj8V3awO4s2V502wLDrw3JjVRdbGo5%252BeMjCMCj8SHuLJ0rKdj%252Bie%252FXaGBAey8rH0LVnjEAntvD1XGwqkNsQI3qwBX0XVfn%252B%252FR5DiHo1Td9HQQ5W9k8vzy9ofLZ0r0Eb8r2JmBFwtVh%252FZ7RNFBMkWwt3X02wAx2LRIM890VDNrlaQaKXR0J%252B7kP0C0TcJxjAUFuRIibIODn0t6UMyVxVEAUSwgAupA2f%252F0iYFXBmtS6usyqTqFQSr6zWp8MusletgSnKvq0QMnm28MZBg4caWUkocKoRJ2HwqnDCxQCs1H2al6o5lyD2NqUyDhtJf8BuJrEM%252B75eM4CmEf4Q5ITjzNSnhgxgHfJrqBEW%252F9QzQ2TomhGIE0DiNK02g%252BXD2%252FosFO9Otkl4PRJZ55%252B0eakpMNSridUGOqUBioYdE6XoZQ16DxQMpqz9V%252FkxJSt0XuuJjiqifRJGhZ0BuEF%252BI5j%252B9ouKU9lorA7rfEfbcGlcZzt9vXWvJh8B%252BVLKqrV%252FNFVy7nTFLlefrHfUwZW%252BG8Ne3nE2lWZYg2uZvjzlgGm9eq9TRKBnjTCO7EONnPdN%252Byn03I57I4f40kiN21yTae4Ix6T8MTfp5XR%252FEz%252Bvl6Js2E6P2WDnoImwT0NKTUuJ%26X-Amz-Signature%3D20ec221cf95315393b647867c68d01106144ef048c87f2ab0c094901ff88eaa7%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15688756-3979-8099-8ab3-d69c8b466640)
+*「历经数个世纪的测试」*
+
+并且这个模拟版本 [SimTigerBeetle](https://sim.tigerbeetle.com/) 是可以运行在浏览器中的，还包装成了一个游戏的形式，能够折磨这些 beetle（注入故障）
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff577125b-a82f-4bc4-9273-af63ba3158d2%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466T4OBVVXQ%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075600Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQCU0RMCx%252BGM58hMMuAqfhMeUmNBYbgigIYBBjI5d7jyfgIgNgQ8bUYo7VQxSIyEyqQofRRUpsq26XOcA1%252F%252BxvBVs7cqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDOdUzu4j8drzZl3oKircA0R%252F2oSq3n6pz3CXdYZut8I5LTVjpLOXrj22P3TAiXRzozFH%252FPzuAlCbh0CkjWf6Snmwkg2NeWm5NE0FsO8mPDAdtEqshI0yA2B4FbiAMW10VQ8xHDgN1IhCG31MYBBT3w6yrcPgHNyZUIrQGBHLaxJVytWO%252BfZ5Klyzl6K0414PXdRQ5Qaxu3poi0f4WxY%252FZyhkyvW6jI08Avy92O5mzhwGsPe0iNEWVLbXGfbnYmj8V3awO4s2V502wLDrw3JjVRdbGo5%252BeMjCMCj8SHuLJ0rKdj%252Bie%252FXaGBAey8rH0LVnjEAntvD1XGwqkNsQI3qwBX0XVfn%252B%252FR5DiHo1Td9HQQ5W9k8vzy9ofLZ0r0Eb8r2JmBFwtVh%252FZ7RNFBMkWwt3X02wAx2LRIM890VDNrlaQaKXR0J%252B7kP0C0TcJxjAUFuRIibIODn0t6UMyVxVEAUSwgAupA2f%252F0iYFXBmtS6usyqTqFQSr6zWp8MusletgSnKvq0QMnm28MZBg4caWUkocKoRJ2HwqnDCxQCs1H2al6o5lyD2NqUyDhtJf8BuJrEM%252B75eM4CmEf4Q5ITjzNSnhgxgHfJrqBEW%252F9QzQ2TomhGIE0DiNK02g%252BXD2%252FosFO9Otkl4PRJZ55%252B0eakpMNSridUGOqUBioYdE6XoZQ16DxQMpqz9V%252FkxJSt0XuuJjiqifRJGhZ0BuEF%252BI5j%252B9ouKU9lorA7rfEfbcGlcZzt9vXWvJh8B%252BVLKqrV%252FNFVy7nTFLlefrHfUwZW%252BG8Ne3nE2lWZYg2uZvjzlgGm9eq9TRKBnjTCO7EONnPdN%252Byn03I57I4f40kiN21yTae4Ix6T8MTfp5XR%252FEz%252Bvl6Js2E6P2WDnoImwT0NKTUuJ%26X-Amz-Signature%3Dde7e2a5b4d9d686d1c79817a988b613e653a7681f9694093c1f48829a08cb710%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=15688756-3979-8040-9b67-fbf1dc7c01f3)
+
+他们开发了称为 Viewstamped Operation Replicator (VOPR) 的模拟器，并将系统编译为 WebAssembly 运行，和前面的模拟器一样，这里也都包含网络、存储、时钟的模拟，并支持故障注入
+
+
+
+Zig 不像 Rust 那样可以自定义异步 runtime，那这里是如何控制调度的呢？一开始认为这里编译为 WASM 的目的除了支持浏览器外，也是为了能在模拟器上单线程执行。但看了文档才发现，TigerBeetle 从一开始就是单线程的设计，那也不需要什么控制调度一说了：
+
+-   [https://docs.tigerbeetle.com/about/performance#single-core-by-design](https://docs.tigerbeetle.com/about/performance#single-core-by-design)
+
+但并发是必须的，不利用多线程或其他语言的异步机制，如何实现并发？
+
+从[代码](https://github.com/tigerbeetle/tigerbeetle/blob/main/src/vopr.zig)上来看，模拟器会每次通过一个 `tick` 推进进度，下面每一层，节点、网络、存储和时间都有对应的 `tick` 实现
+
+```plain
+pub fn main() !void {
+    // ...
+
+    while (tick < cli_args.ticks_max_convergence) : (tick += 1) {
+        simulator.tick();
+        tick_total += 1;
+        if (simulator.pending() == null) {
+            break;
+        }
+    }
+
+    // ...
+}
+
+pub fn tick(simulator: *Simulator) void {
+    simulator.cluster.context = simulator;
+
+    simulator.cluster.tick();
+    simulator.tick_requests();
+    simulator.tick_crash();
+}
+```
+
+*tigerbeetle/src/vopr.zig*
+
+真实运行的部分，也是通过 `tick` 不停推进。相当于手动在代码结构上设计了任务的时间片切分，每 `tick` 一次就执行这个任务的一个时间片，调度顺序就是代码中 `tick` 调用的顺序，本身就是被确定的。这是完全贯彻了把系统作为状态机实现的想法，从一开始就是为确定性模拟而设计的：
+
+```plain
+while (true) {
+    replica.tick();
+    if (multiversion != null) multiversion.?.tick();
+    try command.io.run_for_ns(constants.tick_ms * std.time.ns_per_ms);
+}
+```
+
+*tigerbeetle/src/tigerbeetle/main.zig*
+
+这对代码设计要求会比较高，在很多场景是反范式的，例如 TigerBeetle 内 LSM-Tree 的实现，有点难想象如何通过一堆 tick 来推进整个 LSM-Tree 的 Compaction 流程：
+
+-   [https://docs.tigerbeetle.com/about/internals/lsm](https://docs.tigerbeetle.com/about/internals/lsm)
+
+以及他们如何设计这样的 I/O 库：
+
+-   [A Programmer-Friendly I/O Abstraction Over io\_uring and kqueue](https://tigerbeetle.com/blog/a-friendly-abstraction-over-iouring-and-kqueue)
+
+除此之外，TigerBeetle 还有些很独特的设计哲学，例如 0 依赖、0 动态内存分配。包括确定性模拟，这些思想都很前卫，值得一看：
+
+-   [Tiger Style](https://github.com/tigerbeetle/tigerbeetle/blob/main/docs/TIGER_STYLE.md)
+
+
+
+### FrostDB & Resonate
+
+从前面的方案中可以发现，大部分外部调用都可以通过接口 mock 的方式来实现确定性，最麻烦的是如何让整个分布式系统运行在一个节点的一个线程上，消除调度的不确定性
+
+上文提到的系统中除了 Rust 能比较好地实现外，其他语言都有些限制，但从头自己造一套任务和调度机制，还是能做到的
+
+而另外一些语言在设计之处就是完全透明多线程的，在这些语言上会困难得多。例如 Go，很难去避免使用 goroutine，而一旦有多个 goroutine，调度就完全不可控了
+
+
+
+虽然可以将 Go 程序编译为 WASM 来单线程执行并禁用抢占（`GOMAXPROCS=1` 是不行的，碰到阻塞调用时还是会创建线程），但 runtime 仍然会[故意随机调度 goroutine](https://github.com/golang/go/blob/35ef4a9f330fdff870ff637558ec2fd03a93fd9c/src/runtime/proc.go#L6655)，以及 Go 的 map 遍历顺序也是故意随机的，还有[其他很多不确定性来源](https://blog.merovius.de/posts/2018-01-15-generating_entropy_without_imports_in_go/)
+
+不过 Go runtime 中这些不确定性来源都是通过启动时的一个 seed 来确定的（就像确定性模拟器做的那样），如果能自定义这个 seed 那就能解决这些问题。但只差这一步，Go 的 runtime 开放和自定义程度很低。要想突破这最后一个限制，只能 fork 一份 runtime 来修改。这几乎就是 [FrostDB](https://github.com/polarsignals/frostdb) 所做的事，他们 fork 了 Go runtime [修改了几行代码](https://github.com/polarsignals/go/commit/ea083ca4892a62eb229c1886517e1cdb575ee19a#diff-99a8f74dc3dbef74ab6a6792a8e36e17d2196486ef16e9b8199ce9a9e7512183R44-R52) 来实现这一切：
+
+[
+
+![](https://opengraph.githubassets.com/87e8c262666f4289280b098950624d382352a13bc2ff2d18524c0bc9859b943b/polarsignals/go/commit/ea083ca4892a62eb229c1886517e1cdb575ee19a)
+
+runtime: add GORANDSEED to seed go runtime’s randomness · polarsignals/go@ea083ca
+
+This helps with deterministic execution. This commit additionally enables randomized scheduling. The runtime needs to be run with GOOS=wasip1 GOARCH=wasm for deterministic executions given an initi…
+
+github.com
+
+
+
+](https://github.com/polarsignals/go/commit/ea083ca4892a62eb229c1886517e1cdb575ee19a#diff-99a8f74dc3dbef74ab6a6792a8e36e17d2196486ef16e9b8199ce9a9e7512183R44-R52)
+
+
+
+另一条路线是 [Resonate](https://github.com/resonatehq/resonate)，他们则是确实避免使用 goroutine，自己造了一套 coroutine：
+
+[
+
+![](https://opengraph.githubassets.com/e27898785217bb0c5b7e17020d7300d70deed139ddbe6cc55a402fde68405021/resonatehq/resonate)
+
+resonate/internal/kernel/scheduler/coroutine.go at 268c588e302f13187309e4b37636d19595d42fa1 · resonatehq/resonate
+
+Distributed Async Await — Durable Executions, Dead Simple - resonatehq/resonate
+
+github.com
+
+
+
+](https://github.com/resonatehq/resonate/blob/268c588e302f13187309e4b37636d19595d42fa1/internal/kernel/scheduler/coroutine.go)
+
+Resonate 给出了一个使用模拟器发现 bug 的例子，包括 seed，用这个 seed 我们也能在本地复现出一样的结果：
+
+-   [The One Where DST Finds a Real Bug | Resonate](https://blog.resonatehq.io/dst-finds-a-bug)
+
+
+
+总得来说，在 Rust 这样比较开放的语言上实现确定性模拟是比较简单且兼容程度较高的。其次是其他相对底层的语言，虽然大多数时候需要实现一套自己的机制导致代码不具备普适性，但至少它们不会偷偷做额外的事把一切变得更糟。最麻烦的是 Go 这样隐藏了很多细节且不可控的语言，各种层面上限制都太大
+
+恰好最近 [Go 1.24 发布](https://tip.golang.org/doc/go1.24)，新增了 `synctest` 包，可以在测试代码中实现作用域内的模拟时钟：
+
+```go
+import (
+	"testing"
+	"testing/synctest"
+	"time"
+)
+
+func Test(t *testing.T) {
+	synctest.Run(func() {
+		before := time.Now()
+		time.Sleep(time.Second)
+		after := time.Now()
+		if d := after.Sub(before); d != time.Second {
+			t.Fatalf("took %v", d)
+		}
+	})
+}
+```
+
+这也是确定性模拟中所需的一个重要机制，希望随着 Go 自身的进一步开发，未来能有更 native 的方式在 Go 上实现确定性模拟
+
+
+
+### Antithesis
+
+模拟器都是单线程运行的，是因为我们默认无法干涉内核层面的调度，才有这样的限制。但真的不能吗？如果将模拟器实现在更底层的级别中呢？
+
+
+
+[Antithesis](https://antithesis.com/) 是 FoundationDB 前成员（CEO 就是前面 FoundationDB 的演讲者）创立的一家公司，他们的平台能为任意系统提供确定性模拟：
+
+> Antithesis is a **continuous reliability platform** that **autonomously searches** for problems in your software within a **simulated environment**. Every problem we find can be **perfectly reproduced**, allowing for **efficient debugging** of even the most complex problems.
+
+作为商业化解决方案，面对各种客户的不同系统。不可能要求客户对系统做大量修改和适配甚至重新设计，确定性模拟必须是透明的
+
+因此，Antithesis 开发了一个**确定性模拟计算机**的 hypervisor。这很疯狂，但确实可行，只要整个虚拟机都是确定性的，那对被测试的软件就是完全透明的
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9b66cf7a-d962-4958-83cf-d796d9aa08ad%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466T4OBVVXQ%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075600Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQCU0RMCx%252BGM58hMMuAqfhMeUmNBYbgigIYBBjI5d7jyfgIgNgQ8bUYo7VQxSIyEyqQofRRUpsq26XOcA1%252F%252BxvBVs7cqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDOdUzu4j8drzZl3oKircA0R%252F2oSq3n6pz3CXdYZut8I5LTVjpLOXrj22P3TAiXRzozFH%252FPzuAlCbh0CkjWf6Snmwkg2NeWm5NE0FsO8mPDAdtEqshI0yA2B4FbiAMW10VQ8xHDgN1IhCG31MYBBT3w6yrcPgHNyZUIrQGBHLaxJVytWO%252BfZ5Klyzl6K0414PXdRQ5Qaxu3poi0f4WxY%252FZyhkyvW6jI08Avy92O5mzhwGsPe0iNEWVLbXGfbnYmj8V3awO4s2V502wLDrw3JjVRdbGo5%252BeMjCMCj8SHuLJ0rKdj%252Bie%252FXaGBAey8rH0LVnjEAntvD1XGwqkNsQI3qwBX0XVfn%252B%252FR5DiHo1Td9HQQ5W9k8vzy9ofLZ0r0Eb8r2JmBFwtVh%252FZ7RNFBMkWwt3X02wAx2LRIM890VDNrlaQaKXR0J%252B7kP0C0TcJxjAUFuRIibIODn0t6UMyVxVEAUSwgAupA2f%252F0iYFXBmtS6usyqTqFQSr6zWp8MusletgSnKvq0QMnm28MZBg4caWUkocKoRJ2HwqnDCxQCs1H2al6o5lyD2NqUyDhtJf8BuJrEM%252B75eM4CmEf4Q5ITjzNSnhgxgHfJrqBEW%252F9QzQ2TomhGIE0DiNK02g%252BXD2%252FosFO9Otkl4PRJZ55%252B0eakpMNSridUGOqUBioYdE6XoZQ16DxQMpqz9V%252FkxJSt0XuuJjiqifRJGhZ0BuEF%252BI5j%252B9ouKU9lorA7rfEfbcGlcZzt9vXWvJh8B%252BVLKqrV%252FNFVy7nTFLlefrHfUwZW%252BG8Ne3nE2lWZYg2uZvjzlgGm9eq9TRKBnjTCO7EONnPdN%252Byn03I57I4f40kiN21yTae4Ix6T8MTfp5XR%252FEz%252Bvl6Js2E6P2WDnoImwT0NKTUuJ%26X-Amz-Signature%3Dfe200be1a11c1a0f225274e85f861d0247ac3f7bdb5797538fb958868c80a494%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=16388756-3979-8053-89c7-c17c592b3b22)
+
+脱离语言的另一个好处是，可以真正运行「整个系统」。例如 FoundationDB 没法在模拟器中使用 RocksDB，因为它有后台线程。RisingWave 也给 etcd 和 Kafka 编写了单独的模拟器。但在 Antithesis 中都不需要为这些依赖的库和组件操心
+
+
+
+实现一个确定性的 hypervisor，这会比想象中更难，因为 CPU 也不是所有的情况都能保证确定性，而它非常复杂
+
+为了模拟时间流逝，Antithesis 根据执行指令数来推进模拟时钟。但 PMC 中记录的执行指令数并不总是正确，这会破坏确定性。只有对 CPU 的细节足够了解，才可能解决这些问题
+
+在并发上，虽然被测系统是多线程的，但还是必须让它们运行在一个物理核上。因为有时间加速，这并不会对被测系统的性能造成多大影响。反而从 Antithesis 的角度来说，可以不需要关注核间同步，在不同核上运行更多单独的虚拟机实例提高效率。并且由于工作在更底层的级别上，使得 Antithesis 还能构造像线程饥饿这样的问题
+
+[Embedded Video](https://www.youtube.com/embed/0E6GBg13P60)
+
+
+
+Antithesis 还实现了一些很奇妙的技术，例如能智能判断系统执行历史、探索分支路径和状态空间，并且能保存状态。这意味着 Antithesis 的测试是完全自主的，你不需要编写任何测试用例，系统会自动生成用例挖掘可能的分支，进行比人工更可靠的测试，类似于一种更加智能的 fuzzing
+
+Antithesis 可以提供每个 checkpoint 的快照，并且和走向其他分支的执行历史进行对比，他们称为 Multiverse（多重宇宙），你能在这些不同宇宙中进行「时间旅行」式的调试。随时回退到过去和继续走向未来看看发生了什么，甚至可以在时间旅行中执行命令或者使用调试器调试进程，捕获网络数据包，跑火焰图… 当你改变了过去之后，一个新的宇宙就会诞生
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F39ec0609-297d-47f6-85d4-65c2c1b801c6%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB466T4OBVVXQ%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075600Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJHMEUCIQCU0RMCx%252BGM58hMMuAqfhMeUmNBYbgigIYBBjI5d7jyfgIgNgQ8bUYo7VQxSIyEyqQofRRUpsq26XOcA1%252F%252BxvBVs7cqiAQIgP%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FARAAGgw2Mzc0MjMxODM4MDUiDOdUzu4j8drzZl3oKircA0R%252F2oSq3n6pz3CXdYZut8I5LTVjpLOXrj22P3TAiXRzozFH%252FPzuAlCbh0CkjWf6Snmwkg2NeWm5NE0FsO8mPDAdtEqshI0yA2B4FbiAMW10VQ8xHDgN1IhCG31MYBBT3w6yrcPgHNyZUIrQGBHLaxJVytWO%252BfZ5Klyzl6K0414PXdRQ5Qaxu3poi0f4WxY%252FZyhkyvW6jI08Avy92O5mzhwGsPe0iNEWVLbXGfbnYmj8V3awO4s2V502wLDrw3JjVRdbGo5%252BeMjCMCj8SHuLJ0rKdj%252Bie%252FXaGBAey8rH0LVnjEAntvD1XGwqkNsQI3qwBX0XVfn%252B%252FR5DiHo1Td9HQQ5W9k8vzy9ofLZ0r0Eb8r2JmBFwtVh%252FZ7RNFBMkWwt3X02wAx2LRIM890VDNrlaQaKXR0J%252B7kP0C0TcJxjAUFuRIibIODn0t6UMyVxVEAUSwgAupA2f%252F0iYFXBmtS6usyqTqFQSr6zWp8MusletgSnKvq0QMnm28MZBg4caWUkocKoRJ2HwqnDCxQCs1H2al6o5lyD2NqUyDhtJf8BuJrEM%252B75eM4CmEf4Q5ITjzNSnhgxgHfJrqBEW%252F9QzQ2TomhGIE0DiNK02g%252BXD2%252FosFO9Otkl4PRJZ55%252B0eakpMNSridUGOqUBioYdE6XoZQ16DxQMpqz9V%252FkxJSt0XuuJjiqifRJGhZ0BuEF%252BI5j%252B9ouKU9lorA7rfEfbcGlcZzt9vXWvJh8B%252BVLKqrV%252FNFVy7nTFLlefrHfUwZW%252BG8Ne3nE2lWZYg2uZvjzlgGm9eq9TRKBnjTCO7EONnPdN%252Byn03I57I4f40kiN21yTae4Ix6T8MTfp5XR%252FEz%252Bvl6Js2E6P2WDnoImwT0NKTUuJ%26X-Amz-Signature%3D18929f0edb5e5062d09c78bb96f9f3d1ae5e785d517aa2870fcd611f3d7228f4%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=16388756-3979-80a7-8de2-ea3d83691037)
+
+这一切都非常黑魔法，更多内容可以浏览他们的 Blog，都很有趣。也许 Antithesis 真的能定义未来的测试方法
+
+-   [https://antithesis.com/blog/](https://antithesis.com/blog/)
+
+
+
+Antithesis 的定价不便宜，但在客户侧都有不错的评价，包括一些知名基础设施系统：
+
+-   MongoDB 使用 Antithesis 测试存储引擎，核心服务器，同步和升降级功能。发现了一个严重的数据丢失问题：
+    -   [Accelerating developers at MongoDB](https://antithesis.com/case_studies/mongodb_productivity/)
+    -   [Working with Antithesis at MongoDB](https://antithesis.com/blog/mongo_bug/)
+-   Ethereum 在从 PoW（工作量证明）转向 PoS（权益证明）时使用 Antithesis 进行测试
+    -   [Testing the Ethereum merge](https://antithesis.com/case_studies/ethereum_merge/)
+-   WarpStream 端到端测试了整个 SaaS 系统，而不是局限在单个组件或进程
+    -   [Deterministic Simulation Testing for Our Entire SaaS](https://www.warpstream.com/blog/deterministic-simulation-testing-for-our-entire-saas)
+-   CockroachDB 在 Antithesis 上重现并定位了之前被搁置数年的事务并行提交 bug
+    -   [Antithesis of a One-in-a-Million Bug: Taming Demonic Nondeterminism](https://www.cockroachlabs.com/blog/demonic-nondeterminism/)
+
+
+
+除了 Antithesis 之外，还有一些项目也试图在更底层的级别上进行确定性探索。例如 [rr](https://rr-project.org/) 和 [dettrace](https://github.com/dettrace/dettrace) 都是通过 ptrace 替换系统调用的想法来实现的确定性调试器，它们都诞生得更早一些。Facebook 也曾发起过 [hermit](https://github.com/facebookexperimental/hermit) 项目，虽然现在已经没有在积极开发
+
+-   [Hermit: Deterministic Linux for Controlled Testing and Software Bug-finding](https://developers.facebook.com/blog/post/2022/11/22/hermit-deterministic-linux-testing/)
+
+
+
+## 总结
+
+确定性模拟器提供了一个非常美好的、仿佛触手可及的设想。这里调试不再困难，系统更加可靠
+
+但软件工程没有银弹，确定性模拟器仍然有很多问题。既然是模拟，前提是我们了解被模拟物的所有行为，但这是不可能的。所有模拟疏漏或失真的细节，最终也会在真实系统中遇见，例如错误理解的网络协议，意想不到的 system call 行为，依赖外部系统本身的 bug。都可能让系统再次在真实环境中故障
+
+更重要的是不确定性的消除十分困难，模拟器本身来说，很难 cover 各种场景，而任何一点遗漏，都会把不确定性引入系统，最终走向混沌
+
+另一种情况是被测程序的修改会破坏可复现性，被测程序本身就是模拟器输入的一部分，如果修改被测程序，虽然不会破坏「确定性」，但可能会无法复现期望的问题。例如在程序启动时新运行一个线程，那模拟器的调度序列可能会因为这个新的输入而改变，它仍然是确定性的（相同的输入有相同的输出），只是没能再触发之前的问题。这实际上某种程度违背了模拟器提供的承诺，确定性和可复现性并不总是能完全划等号
+
+
+
+从工程角度来说，语言上实现的模拟器大多会有比较强的侵入性，会限制并发模型和依赖库。除了新项目以外难以引入。而 Antithesis 方案技术壁垒过高，大部分人没有能力实现，如果没有开源方案共建，无法广泛普及
+
+不过这也只是模拟器实现中的困难，从方向上来说，高度的可复现性和极高的测试效率就足以成为任何追求可靠性的系统尝试和探索它的理由。我始终相信这项技术的巨大潜力，一定会是未来的方向
+
+
+
+## Ref
+
+1.  [What's the big deal about Deterministic Simulation Testing?](https://notes.eatonphil.com/2024-08-20-deterministic-simulation-testing.html)
+2.  [sled simulation guide (jepsen-proof engineering)](https://sled.rs/simulation.html)
+3.  [Deterministic Simulation: A New Era of Distributed System Testing (Part 1 of 2)](https://risingwave.com/blog/deterministic-simulation-a-new-era-of-distributed-system-testing/)
+4.  [Applying Deterministic Simulation: The RisingWave Story (Part 2 of 2)](https://risingwave.com/blog/applying-deterministic-simulation-the-risingwave-story-part-2-of-2/)
+5.  [确定性模拟的背景、原理、框架及应用实例 - RisingWave中文开源社区](https://juejin.cn/post/7262172937511518267)
+6.  [Testing sync at Dropbox](https://dropbox.tech/infrastructure/-testing-our-new-sync-engine)
+7.  [We Put a Distributed Database In the Browser – And Made a Game of It!](https://tigerbeetle.com/blog/2023-07-11-we-put-a-distributed-database-in-the-browser)
+8.  [A Programmer-Friendly I/O Abstraction Over io\_uring and kqueue](https://tigerbeetle.com/blog/a-friendly-abstraction-over-iouring-and-kqueue)
+9.  [(Mostly) Deterministic Simulation Testing in Go](https://www.polarsignals.com/blog/posts/2024/05/28/mostly-dst-in-go)
+10.  [Deterministic Simulation Testing | Resonate](https://blog.resonatehq.io/deterministic-simulation-testing)
+11.  [Is something bugging you? | Antithesis](https://antithesis.com/blog/is_something_bugging_you/)
+12.  [So you think you want to write a deterministic hypervisor? | Antithesis](https://antithesis.com/blog/deterministic_hypervisor/)
+13.  [Your computer can test better than you (and that's a good thing) | Antithesis](https://antithesis.com/blog/autonomous_testing/)
+14.  [Debugging in the Multiverse | Ahtithesis](https://antithesis.com/blog/multiverse_debugging/)
+15.  [Accelerating developers at MongoDB](https://antithesis.com/case_studies/mongodb_productivity/)
+16.  [Working with Antithesis at MongoDB](https://antithesis.com/blog/mongo_bug/)
+17.  [Deterministic Simulation Testing for Our Entire SaaS](https://www.warpstream.com/blog/deterministic-simulation-testing-for-our-entire-saas)
+18.  [Antithesis of a One-in-a-Million Bug: Taming Demonic Nondeterminism](https://www.cockroachlabs.com/blog/demonic-nondeterminism/)
+19.  [Hermit: Deterministic Linux for Controlled Testing and Software Bug-finding](https://developers.facebook.com/blog/post/2022/11/22/hermit-deterministic-linux-testing/)

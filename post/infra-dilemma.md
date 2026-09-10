@@ -1,0 +1,48 @@
+---
+title: "Infra 窘境"
+description: "前段时间秋招也陆续开始了，偶尔有师弟问我不想写业务，怎么才能做 infra，其实我是劝退的。算下来我毕业正式工作也一年多了，趁机从个人角度发表点暴论"
+date: "2024-09-03"
+tags:
+  - "碎碎念"
+canonical: "https://xxxuuu.me/post/infra-dilemma"
+---
+
+前段时间秋招也陆续开始了，偶尔有师弟问我不想写业务，怎么才能做 infra，其实我是劝退的。算下来我毕业正式工作也一年多了，趁机从个人角度发表点暴论（这里的 infra 实际上特指数据库/存储）
+
+
+
+毕业以来就一直在一家存储公司里打杂。这一年好像学了很多，但又感觉都是些细枝末节的无用知识，个人并没有什么实际性的提升
+
+首先，infra 并没有想象中那么「酷」，对于成熟系统来说架构和功能都趋向稳定，需要自己设计的新地方已经很少，没有太多能发挥的空间，很多时候都是在修 bug，当客服，排查奇奇怪怪的问题或是优化某处实现。新人不可避免地要做很多 dirty work，比如数据库的 MySQL/Oracle 兼容，存储的协议语义等，这些工作都是枯燥无聊的
+
+
+
+而且新人也很难在短时间内能 own 一个模块，这主要有两个原因，一个是技术层面的，系统过于复杂，涉及的组件众多。很长一段时间里只能自底向上地看待系统，只关注部分细节，缺乏自顶向下的全局性的视角和思考，这却是在系统设计来说更重要的东西。最后就会变成：能知道系统「是这么做的」，但不知道「为什么要这么做」，所以也无法回答「应该怎么做」
+
+但设计时必须全面地看待和考虑系统，各部分如何组合出最佳实践？就像最近刷到的一篇[文章](https://youjiali1995.github.io/essay/2021-summary/)中提到的，没有工程经验，这导致我们并不清楚最佳实践是怎么样的。这种情况下，为产品添加的每一行代码都是「债务」而不是「产出」，久而久之就会腐化产品，这对 infra 项目来说是致命的
+
+
+
+另一个是产品层面，什么是用户真正需要的？举个例子，很多数据库内核的校招新人，即使对存储引擎、查询优化、事务管理等技术如数家珍，但实际上作为数据库用户还是小白，甚至并没有怎么实际用过数据库。这种情况下写出的很多东西是和需求脱节的，没有意义。而大部分 infra 工作由于技术门槛的存在，没有像互联网业务中那样正式的「产品经理」角色，大都是研发一人分饰两角，自己写 PRD，你能想象让几乎没有用过数据库的人去给用户设计数据库功能吗
+
+这种对「系统如何被使用」不够了解有时候还会反过来导致错误的设计，例如 OLTP 和 OLAP 场景的数据库需要专门优化的点肯定不一样，设计错误就会带来高昂的技术债
+
+
+
+很多东西不是看一遍 DDIA 或刷完 MIT6.824，CMU 15-445 就能做好的。需要对系统有足够的认知，接触足够多的系统，了解不同的设计场景和思路。这些都是很多新人包括我面临的问题，为了摆脱这种闭门造车的情况，自己之后也需要做更多的案例研究和论文阅读。看看别人是怎么做的，为什么要这么做，如何一步步演进，进行了哪些取舍。这部分也算是我今年的任务了，起码得再~水~输出四五篇文章
+
+
+
+最后，再谈谈行业。从钱来说，infra 并不代表更高的薪资水平，也不代表更高的稳定性。相反，在很多互联网公司里，infra 部门是无法赚钱的，只会被视为「成本」。这意味着当存在盈利压力时，infra 部门被裁员的风险只会更高，并不会有想象中技术护城河带来的稳定和不可替代性
+
+infra 产品本身就是业务的公司，日子也不好过。国内这类公司大部分还是吃信创饭的，有信创需求的都是政府、国企、事业单位和学校，在这个连体制内都降本增效都经济环境下，旧系统能跑就行，新的采购、升级和维护都越来越少。不少公司寄希望于疫情结束后的收入回升，但疫情后反而进一步下降的收入也成了最后一根稻草
+
+行业另一个特点是又难又卷，很多东西做到如今早已满足市场需求，再继续做下去已经没有太多意义，无法为用户创造更多价值，比如几个 benchmark 榜单上的数字。但各家仍然在不断消耗大量人力物力刷榜，让投入产出完全不成正比，某种程度上甚至把这变成了一个劳动密集行业。这也说明已经很难有创新了，没太多可做的东西，但这也不只是工业界的问题，VLDB，FAST 上的论文相比二十年前也并没有太多理论创新
+
+前几年如日中天的 PingCAP 去年进行了大规模裁员，让业内哀鸿遍野。要是连 PingCAP 都不行的话，其他公司又该怎么办呢？我们公司也一样，虽然侥幸逃过去年的裁员，但那天办公室里死一般的寂静仍令人印象深刻（题外话，裁员当天友商 HR 就加上脉脉了，风声传得真快）
+
+
+
+但纵使有这么多缺点，在如今看来不是一个「聪明」的选择，也仍然想做 infra 的话，只能有一个原因：Just for fun。就像 saka 老师在这张图里说的一样：
+
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff4b09812-f6f6-4838-8c70-349046b1faef%2Fimage.png%3FX-Amz-Algorithm%3DAWS4-HMAC-SHA256%26X-Amz-Content-Sha256%3DUNSIGNED-PAYLOAD%26X-Amz-Credential%3DASIAZI2LB4664S5GONTS%252F20260910%252Fus-west-2%252Fs3%252Faws4_request%26X-Amz-Date%3D20260910T075605Z%26X-Amz-Expires%3D3600%26X-Amz-Security-Token%3DIQoJb3JpZ2luX2VjELf%252F%252F%252F%252F%252F%252F%252F%252F%252F%252FwEaCXVzLXdlc3QtMiJGMEQCICRWOG8KEfBHMVdMKhB9hxhYckX1J9c%252F8bTc3JnvTOZZAiAJQvPS%252FpVC30L7UNe31PwSxavS0kE8miFnFIC2cXsnjSqIBAiA%252F%252F%252F%252F%252F%252F%252F%252F%252F%252F8BEAAaDDYzNzQyMzE4MzgwNSIMABEdlp4%252BjdxiCtdQKtwDx3DPj%252BY4P6QMtoHQI8yO3NR3SuF5%252FAtsaeBA%252Bv1oNSG857eYZovZtLXy8Jp0cyE7NfcpLeJg0IKSBABFpmzt1UDjJYLWJEK9fyuYWMqJIluBmnhAeoYkXCDRowR1vQqU65xByKWLnL7gvxQr1T7k5BzhxokK9ErRMbHCNxsb3YBTEhpuEfJP1%252F%252FtFhx8OmURTKswMx7EczEjnywR2zL80Pvc9ylLJXRRQFSBcSjOXAjnl56z5Ern%252BZvKxcnjn6ySR6mhMsbN93lDTuUlJ9NqdApH7Z5UH3dzWDE%252FX%252Fng7tJ9FHBHDFlNJzrm2%252FUmywG%252BKNZ4pM2Zn8iEUw7mxG%252ByEqpcZrzOTiIP2IpgvZCukiLFE553uMaEzAN9CQo06xyu%252Fs5Ycrnz3GfJILFKbne0G%252Bt1BrRSeihm9dWdt92bJQucby2xBFa8JXFmAjwXHRP5tf%252FrdF15jF%252BhvgGJUA%252Bz1EGNJElrUlsVf5DkaGI2PzfJuS3hjpt4xfxEQOVFyn0xrek1ATuGzwlgnwgNxTA4FdMh3t6w2zplU0U1yMaFTgCItCH4CE6ejNgYow7kz0c81HbWDcZxWtG%252BzOgmMRpygzeAdnMdUKL5CDPXD6uxPpQ0oaR3koJMdK3WTtsw9qyJ1QY6pgGrMhHaMU%252F0o%252FTRJFx7Rxg0VOzXEi03kMghZhynhiceT6ZuPMsnsazStco7dUE3uhqAx%252Bg2Scj4PIj%252B5TS1WJ0UqRFKZGjw4Wi%252BorO84CcHlKjerRBcib6qFh4KhzP7qjP6wP75CdimQgGSxMufQ2Cwwfi4A6MUKOAz9bgMGb8neT9JMtTg05IVHjSxgYE7rSa%252F9cDiZdlxUSVNR6TBxCpvwZxvREcG%26X-Amz-Signature%3D250ec983b8e4a57d81b19430f165731ad23e4f9a1ec189ffd25b236c7e1f4cf2%26X-Amz-SignedHeaders%3Dhost%26x-amz-checksum-mode%3DENABLED%26x-id%3DGetObject?table=block&id=2e2d110f-ab39-4244-a1d3-db33fab12b4b)
