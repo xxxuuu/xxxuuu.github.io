@@ -1,0 +1,1 @@
+function e(e){return"object"==typeof e&&"length"in e?e:Array.from(e)}Array.prototype.slice;export{e as t};

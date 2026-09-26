@@ -1,1 +1,0 @@
-import{_ as i}from"./mermaid.core.BqzEFbTi.js";var r=class{constructor(i){this.init=i,this.records=this.init()}static{i(this,"ImperativeState")}reset(){this.records=this.init()}};export{r as I};
