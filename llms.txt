@@ -1,6 +1,6 @@
 # x³u³
 
-> 🗒 碎碎念
+> Life is an append-only log
 
 ## Posts
 
