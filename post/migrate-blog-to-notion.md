@@ -305,7 +305,7 @@ bookmark
 
 [
 
-![](https://www.google.com.hk/images/branding/googleg/1x/googleg_standard_color_128dp.png)
+![](https://www.gstatic.com/images/branding/searchlogo/ico/favicon.ico)
 
 Google
 
@@ -316,8 +316,6 @@ google.com.hk
 ](https://www.google.com.hk/)
 
 
-
-> 没有特殊处理的普通站点的 mention 会显示异常，比如 https://google.com
 
 mention：
 
@@ -334,6 +332,8 @@ block
 [
 
 ![](https://opengraph.githubassets.com/8eb37df151177377ee85af1d6ec2bad7342f4054fa7170ae626d3f654bb063fc/NotionX/react-notion-x)
+
+![](https://github.githubassets.com/favicons/favicon.svg)
 
 GitHub - NotionX/react-notion-x: Fast and accurate React renderer for Notion. TS batteries included. ⚡️
 
@@ -422,6 +422,8 @@ $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$
 ## Embed
 
 PDF
+
+[📄 下载PDF附件.pdf](https://file.notion.so/f/f/4cc04375-345a-4a1e-bdf0-3a7c88ef0425/ded5d0f7-74e1-464b-b9af-ce10adc8b59f/%E4%B8%8B%E8%BD%BDPDF%E9%99%84%E4%BB%B6.pdf?table=block&id=a29b4207-aacf-4513-b7fd-b877a3b38e20&spaceId=4cc04375-345a-4a1e-bdf0-3a7c88ef0425&expirationTimestamp=1790546400000&signature=5hJmt5pE737aNf_82Sx3-QpzxnqFJrGmPwlvglGBvlk)
 
 
 

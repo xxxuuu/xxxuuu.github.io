@@ -138,7 +138,7 @@ fn main() {
 
 [
 
-![](https://jyywiki.cn/OS/img/vscode.svg)
+![](https://www.google.com/s2/favicons?domain=jyywiki.cn&sz=32)
 
 M2: 协程库 (libco)
 
@@ -241,6 +241,8 @@ struct co {
 
 [
 
+![](https://mthli.xyz/icons/icon-48x48.png?v=f165042f9f334601a4ff4a1f1b0b0de2)
+
 使用 C 语言实现协程
 
 一种基于达夫设备的思想实现的协程。
@@ -253,6 +255,8 @@ mthli.xyz
 
 [
 
+![](https://www.google.com/s2/favicons?domain=www.bilibili.com&sz=32)
+
 bilibili.com
 
 bilibili.com
@@ -262,6 +266,8 @@ bilibili.com
 ](https://www.bilibili.com/video/BV1dv4y127YT/)
 
 [
+
+![](https://www.google.com/s2/favicons?domain=zhuanlan.zhihu.com&sz=32)
 
 zhuanlan.zhihu.com
 
@@ -273,6 +279,8 @@ zhuanlan.zhihu.com
 
 [
 
+![](https://www.google.com/s2/favicons?domain=www.zhihu.com&sz=32)
+
 zhihu.com
 
 zhihu.com
@@ -282,6 +290,8 @@ zhihu.com
 ](https://www.zhihu.com/question/50185085/answer/1342613525)
 
 [
+
+![](https://www.google.com/s2/favicons?domain=zhuanlan.zhihu.com&sz=32)
 
 zhuanlan.zhihu.com
 

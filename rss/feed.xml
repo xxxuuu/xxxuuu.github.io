@@ -440,7 +440,7 @@
 &lt;p&gt;技术细节更丰富，存储章节里关于 LSM-Tree 和 B-Tree 的对比有了更多维度；单机事务和分布式事务章节合并，插入的解决方案刚好填补了落地鸿沟；part 3 里批和流计算的内容也多了不少。另外比较惊喜的是像 TiDB 和 JuiceFS 这样的国产系统也在书中频繁出现&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;p&gt;系统验证方面，第一版只介绍了分布式系统的挑战和将面临的问题，以及处理这些问题的算法和协议。但如何验证最终系统是可靠的，没有说明。第二版补齐了这一点，如何对分布式系统进行验证，包括形式化方法、混沌工程和确定性模拟测试。确定性模拟测试这一块的内容和我之前写的文章差不多 &lt;a href=&quot;https://xxxuuu.me/post/deterministic-simulator&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; class=&quot;notion-mention&quot;&gt;
-      &lt;span class=&quot;notion-mention-icon&quot;&gt;&lt;img src=&quot;https://www.google.com/s2/favicons?domain=xxxuuu.me&amp;sz=16&quot; alt=&quot;&quot; class=&quot;notion-mention-favicon&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;&lt;/span&gt;
+      &lt;span class=&quot;notion-mention-icon&quot;&gt;&lt;img src=&quot;https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F49b4570c-b2f0-457b-81b7-b68e2693a471%2Favatar.png?table=collection&amp;amp;id=0bb2e606-8d0c-4f7c-aca9-70986e90c055&quot; alt=&quot;&quot; class=&quot;notion-mention-favicon&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;&lt;/span&gt;
       &lt;span class=&quot;notion-mention-text&quot;&gt;确定性模拟器 | x³u³&lt;/span&gt;
     &lt;/a&gt;&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
@@ -2109,6 +2109,7 @@ pub fn tick(simulator: *Simulator) void {
       &lt;a href=&quot;https://github.com/polarsignals/go/commit/ea083ca4892a62eb229c1886517e1cdb575ee19a#diff-99a8f74dc3dbef74ab6a6792a8e36e17d2196486ef16e9b8199ce9a9e7512183R44-R52&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
         &lt;div class=&quot;notion-bookmark-cover&quot;&gt;&lt;img src=&quot;https://opengraph.githubassets.com/87e8c262666f4289280b098950624d382352a13bc2ff2d18524c0bc9859b943b/polarsignals/go/commit/ea083ca4892a62eb229c1886517e1cdb575ee19a&quot; alt=&quot;&quot; loading=&quot;lazy&quot; /&gt;&lt;/div&gt;
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
+          &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://github.githubassets.com/favicons/favicon.svg&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;runtime: add GORANDSEED to seed go runtime’s randomness · polarsignals/go@ea083ca&lt;/div&gt;
           &lt;div class=&quot;notion-bookmark-description&quot;&gt;This helps with deterministic execution. This commit additionally enables
 randomized scheduling. The runtime needs to be run with GOOS=wasip1 GOARCH=wasm
@@ -2121,8 +2122,9 @@ for deterministic executions given an initi…&lt;/div&gt;
 &lt;p&gt;另一条路线是 &lt;a href=&quot;https://github.com/resonatehq/resonate&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;Resonate&lt;/a&gt;，他们则是确实避免使用 goroutine，自己造了一套 coroutine：&lt;/p&gt;
 &lt;figure class=&quot;notion-bookmark&quot;&gt;
       &lt;a href=&quot;https://github.com/resonatehq/resonate/blob/268c588e302f13187309e4b37636d19595d42fa1/internal/kernel/scheduler/coroutine.go&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
-        &lt;div class=&quot;notion-bookmark-cover&quot;&gt;&lt;img src=&quot;https://opengraph.githubassets.com/a59078112fe83e7ff3ec989e3015b6535399d7127a9d47d1fbcb7c4299bb199f/resonatehq/resonate&quot; alt=&quot;&quot; loading=&quot;lazy&quot; /&gt;&lt;/div&gt;
+        &lt;div class=&quot;notion-bookmark-cover&quot;&gt;&lt;img src=&quot;https://opengraph.githubassets.com/1d9045cbbe94245e237295b57db98228ff939db420b89b2b325234dd700112dd/resonatehq/resonate&quot; alt=&quot;&quot; loading=&quot;lazy&quot; /&gt;&lt;/div&gt;
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
+          &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://github.githubassets.com/favicons/favicon.svg&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;resonate/internal/kernel/scheduler/coroutine.go at 268c588e302f13187309e4b37636d19595d42fa1 · resonatehq/resonate&lt;/div&gt;
           &lt;div class=&quot;notion-bookmark-description&quot;&gt;Distributed Async Await — Durable Executions, Dead Simple - resonatehq/resonate&lt;/div&gt;
           &lt;div class=&quot;notion-bookmark-url&quot;&gt;github.com&lt;/div&gt;
@@ -2410,8 +2412,9 @@ fn main() {
 &lt;p&gt;南京大学操作系统课程的其中一个实验就是实现这个程度的协程&lt;/p&gt;
 &lt;figure class=&quot;notion-bookmark&quot;&gt;
       &lt;a href=&quot;https://jyywiki.cn/OS/2024/labs/M2.md&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
-        &lt;div class=&quot;notion-bookmark-cover&quot;&gt;&lt;img src=&quot;https://jyywiki.cn/OS/img/vscode.svg&quot; alt=&quot;&quot; loading=&quot;lazy&quot; /&gt;&lt;/div&gt;
+        
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
+          &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://www.google.com/s2/favicons?domain=jyywiki.cn&amp;amp;sz=32&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;M2: 协程库 (libco)&lt;/div&gt;
           
           &lt;div class=&quot;notion-bookmark-url&quot;&gt;jyywiki.cn&lt;/div&gt;
@@ -2516,6 +2519,7 @@ fn main() {
       &lt;a href=&quot;https://mthli.xyz/coroutines-in-c/&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
         
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
+          &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://mthli.xyz/icons/icon-48x48.png?v=f165042f9f334601a4ff4a1f1b0b0de2&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;使用 C 语言实现协程&lt;/div&gt;
           &lt;div class=&quot;notion-bookmark-description&quot;&gt;一种基于达夫设备的思想实现的协程。&lt;/div&gt;
           &lt;div class=&quot;notion-bookmark-url&quot;&gt;mthli.xyz&lt;/div&gt;
@@ -2526,6 +2530,7 @@ fn main() {
       &lt;a href=&quot;https://www.bilibili.com/video/BV1dv4y127YT/&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
         
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
+          &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://www.google.com/s2/favicons?domain=www.bilibili.com&amp;amp;sz=32&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;bilibili.com&lt;/div&gt;
           
           &lt;div class=&quot;notion-bookmark-url&quot;&gt;bilibili.com&lt;/div&gt;
@@ -2536,6 +2541,7 @@ fn main() {
       &lt;a href=&quot;https://zhuanlan.zhihu.com/p/330606651&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
         
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
+          &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://www.google.com/s2/favicons?domain=zhuanlan.zhihu.com&amp;amp;sz=32&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;zhuanlan.zhihu.com&lt;/div&gt;
           
           &lt;div class=&quot;notion-bookmark-url&quot;&gt;zhuanlan.zhihu.com&lt;/div&gt;
@@ -2546,6 +2552,7 @@ fn main() {
       &lt;a href=&quot;https://www.zhihu.com/question/50185085/answer/1342613525&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
         
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
+          &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://www.google.com/s2/favicons?domain=www.zhihu.com&amp;amp;sz=32&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;zhihu.com&lt;/div&gt;
           
           &lt;div class=&quot;notion-bookmark-url&quot;&gt;zhihu.com&lt;/div&gt;
@@ -2556,6 +2563,7 @@ fn main() {
       &lt;a href=&quot;https://zhuanlan.zhihu.com/p/80037638&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
         
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
+          &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://www.google.com/s2/favicons?domain=zhuanlan.zhihu.com&amp;amp;sz=32&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;zhuanlan.zhihu.com&lt;/div&gt;
           
           &lt;div class=&quot;notion-bookmark-url&quot;&gt;zhuanlan.zhihu.com&lt;/div&gt;

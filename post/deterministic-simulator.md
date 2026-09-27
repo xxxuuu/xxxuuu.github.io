@@ -529,6 +529,8 @@ while (true) {
 
 ![](https://opengraph.githubassets.com/87e8c262666f4289280b098950624d382352a13bc2ff2d18524c0bc9859b943b/polarsignals/go/commit/ea083ca4892a62eb229c1886517e1cdb575ee19a)
 
+![](https://github.githubassets.com/favicons/favicon.svg)
+
 runtime: add GORANDSEED to seed go runtime’s randomness · polarsignals/go@ea083ca
 
 This helps with deterministic execution. This commit additionally enables randomized scheduling. The runtime needs to be run with GOOS=wasip1 GOARCH=wasm for deterministic executions given an initi…
@@ -545,7 +547,9 @@ github.com
 
 [
 
-![](https://opengraph.githubassets.com/a59078112fe83e7ff3ec989e3015b6535399d7127a9d47d1fbcb7c4299bb199f/resonatehq/resonate)
+![](https://opengraph.githubassets.com/1d9045cbbe94245e237295b57db98228ff939db420b89b2b325234dd700112dd/resonatehq/resonate)
+
+![](https://github.githubassets.com/favicons/favicon.svg)
 
 resonate/internal/kernel/scheduler/coroutine.go at 268c588e302f13187309e4b37636d19595d42fa1 · resonatehq/resonate
 
