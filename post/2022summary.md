@@ -21,13 +21,13 @@ canonical: "https://xxxuuu.me/post/2022summary"
 
 虽然最后也拿到了其他家的 offer，但还是蛮不容易的。后面实习刚入职时什么都觉得很新鲜，觉得办公环境又好，同事氛围也棒，还有喝不完的饮料等各种福利白嫖
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff6db9099-a2da-4886-b91e-0991fc16dcfd%2Fimage.png?table=block&id=dda5fc0e-6a82-4671-982c-d2ea0cbf48de&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff6db9099-a2da-4886-b91e-0991fc16dcfd%2Fimage.png?table=block&id=dda5fc0e-6a82-4671-982c-d2ea0cbf48de&cache=v2&width=384)
 
 进入工作状态后，感觉到实习所在的组业务比较边缘，项目也没什么亮点，坦白来讲学不到什么。也让我认识到大公司内部门与部门的差距可能比公司与公司之间的差距还大，不过好在公司资源够丰富，天天在内网冲浪还是 get 了不少干货
 
 到实习后期时秋招就陆续开始了，我也就直接进入摸鱼模式，在上班期间偷偷刷题，开会时上牛客看面经找公司疯狂投简历，可惜没体验到借公司会议室戴着工牌来面试秋招的感觉，不过这些都是后话了
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F98693c85-3da6-440c-98ff-c46cb21781dc%2Fimage.png?table=block&id=47f49f13-ac3e-47d5-9796-f5c373a84081&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F98693c85-3da6-440c-98ff-c46cb21781dc%2Fimage.png?table=block&id=47f49f13-ac3e-47d5-9796-f5c373a84081&cache=v2&width=432)
 
 
 
@@ -35,7 +35,7 @@ canonical: "https://xxxuuu.me/post/2022summary"
 
 时间到了 9 月份，在实习转正 hc 不明朗的情况下，果断决定拿完中秋礼盒就跑路回家准备秋招，那天和大家在公司附近一个湘菜馆吃了最后一顿散伙饭
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3f6182b3-6a97-414f-810a-1c2a725bd1d2%2Fimage.png?table=block&id=e4bcaa35-3e8c-46cc-bda1-a03a1645e06f&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3f6182b3-6a97-414f-810a-1c2a725bd1d2%2Fimage.png?table=block&id=e4bcaa35-3e8c-46cc-bda1-a03a1645e06f&cache=v2&width=480)
 
 有了春招投暑期实习的经验，秋招时内心预期就降低了不少，投递近 80 家最后只有 8~9 家进面，也算在意料之中
 
@@ -45,7 +45,7 @@ canonical: "https://xxxuuu.me/post/2022summary"
 
 听京东 HR 画完饼后我就开始摆烂了，后面几家去哪儿和一些游戏厂的面试和小 offer 直接推掉了，内心认定我的秋招已经结束。重新下回了弃坑很久的 FF14 玩，打算收到 offer 后再直接去提前实习，想着「结局也不算差」嘛
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4bc32384-1ee6-41d2-8acb-915d7277a68c%2Fimage.png?table=block&id=995761a8-7960-4433-892c-fba3f2bfa160&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4bc32384-1ee6-41d2-8acb-915d7277a68c%2Fimage.png?table=block&id=995761a8-7960-4433-892c-fba3f2bfa160&cache=v2&width=336)
 
 接着过了近一个月，时间来到十月中旬，此时京东还是没下文，发信息给 HR 也不回了。我意识到我又一次成了 🤡，并且是以相同的方式。我只能马上去邮件里翻出深信服前两天发的 offer，点击了 Accept。就这样，只能接受现实，我的秋招的确结束了
 

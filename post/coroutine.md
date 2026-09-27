@@ -120,7 +120,7 @@ fn main() {
 
 编译器会生成类似这样的实现，和我们前面的达夫设备基本基本没区别：
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3a9e11cf-1dd2-4987-b330-8e9d67ea3555%2FUntitled.png?table=block&id=14688756-3979-801b-8e1e-cf72d1848856&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3a9e11cf-1dd2-4987-b330-8e9d67ea3555%2FUntitled.png?table=block&id=14688756-3979-801b-8e1e-cf72d1848856&cache=v2&width=528)
 
 
 
@@ -154,11 +154,11 @@ jyywiki.cn
 
 一种实现是基于调度器的，称为非对称协程，A 返回到调度器，要求调度器 call B。这会带来一些性能损失，且不太能保证实时性
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F0f71dddd-810b-4881-81bf-75296977bd15%2FUntitled.png?table=block&id=14688756-3979-800d-8df6-f3fb9ba47926&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F0f71dddd-810b-4881-81bf-75296977bd15%2FUntitled.png?table=block&id=14688756-3979-800d-8df6-f3fb9ba47926&cache=v2&width=432)
 
 另一类是对称协程，需要一些特殊的指令，让 A 能够直接切换到 B，且 B 返回后直接回到了调度器，这个过程对调度器是不知情的，这种设计架空了调度器，实现上更加复杂，但性能更好更加灵活
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff34759e5-39ea-43d1-a126-b96a589bb37b%2FUntitled.png?table=block&id=14688756-3979-809a-af5f-ee8cc4612737&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff34759e5-39ea-43d1-a126-b96a589bb37b%2FUntitled.png?table=block&id=14688756-3979-809a-af5f-ee8cc4612737&cache=v2&width=384)
 
 
 

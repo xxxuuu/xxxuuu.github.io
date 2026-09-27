@@ -37,15 +37,15 @@ canonical: "https://xxxuuu.me/post/pve-migration-rescue"
 
 有了配置文件后，LXC 也都显示在了界面上，逐个启动确认正常或再次调整配置
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F2c3f56ed-831b-4034-b57a-43cae187c509%2Fimage.png?table=block&id=11e88756-3979-803b-8e7e-f994c7bac5f4&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F2c3f56ed-831b-4034-b57a-43cae187c509%2Fimage.png?table=block&id=11e88756-3979-803b-8e7e-f994c7bac5f4&cache=v2&width=384)
 
 现在 Cluster 已经有了，就可以直接在节点之间一键迁移 LXC 和 VM。不过这个 Cluster 比较弱智的另一点是，要求两端的存储在「名字」上是一样的，而不是提供目标节点存储选项，所以不一样的话还得先迁移一下磁盘所在的存储或想办法改个名
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fe397af75-d684-4ee2-9c54-348a35a4ec18%2Fimage.png?table=block&id=11e88756-3979-8070-a6d9-db93445bc299&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fe397af75-d684-4ee2-9c54-348a35a4ec18%2Fimage.png?table=block&id=11e88756-3979-8070-a6d9-db93445bc299&cache=v2&width=336)
 
 然后就可以直接迁移到另一个节点上
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7653fd5f-fde6-4cb8-b80e-0f298bd3660a%2Fimage.png?table=block&id=11e88756-3979-80e2-be42-e5187c90d119&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7653fd5f-fde6-4cb8-b80e-0f298bd3660a%2Fimage.png?table=block&id=11e88756-3979-80e2-be42-e5187c90d119&cache=v2&width=528)
 
 等待所有 LXC 和 VM 都迁移完成后，再次检查业务是否正常
 

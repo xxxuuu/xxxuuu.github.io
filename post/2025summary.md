@@ -41,13 +41,13 @@ canonical: "https://xxxuuu.me/post/2025summary"
 
 一切都让我非常煎熬，唯一优点是和前司一样比较 WLB，还是不由得后悔起这个选择，也许当时应该再多找一会，好事多磨
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3155ff14-0882-45c1-8285-e22a1b8ef4c6%2F6a21f448-d22b-4c00-9fc2-1fcad4f15fa2.png?table=block&id=2db88756-3979-80fc-9666-c6a50fc2d0ac&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3155ff14-0882-45c1-8285-e22a1b8ef4c6%2F6a21f448-d22b-4c00-9fc2-1fcad4f15fa2.png?table=block&id=2db88756-3979-80fc-9666-c6a50fc2d0ac&cache=v2&width=384)
 
 
 
 年底出现过一个小变量，被腾讯游戏某个 top 组捞起面试，虽然从没考虑过做游戏服务端的工作，但感觉千万日活必然也会面临独有技术挑战，而且以我的 bg 来说机会比较难得，毕竟这个项目传闻年终奖惊人。认真准备了面试后侥幸通过前几轮技术面（虽然准备的内容完全没用上），却在最后一轮面评都说点击即送的制作人面上挂了，面试过程中感觉还聊得挺好，据说原因是不太匹配，比较郁闷
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd4193281-5247-42fd-9784-cdef53124dab%2Fimage.png?table=block&id=2db88756-3979-8054-8a76-cf1e08d36ae5&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd4193281-5247-42fd-9784-cdef53124dab%2Fimage.png?table=block&id=2db88756-3979-8054-8a76-cf1e08d36ae5&cache=v2&width=336)
 
 
 
@@ -71,7 +71,7 @@ canonical: "https://xxxuuu.me/post/2025summary"
 
 因此今年也做了更多投资尝试，仓位不大，但基金和美股总体回报率还算满意。反而在加密货币上的策略转向保守，意外让我在几轮负面行情中不至于损失太多
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fe023f839-84f1-4d6a-8a71-279e01faa891%2Fe8008637-bbb8-4720-bd0d-d8f15fd5f77c.png?table=block&id=2da88756-3979-8078-8f1d-e33e86979fe1&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fe023f839-84f1-4d6a-8a71-279e01faa891%2Fe8008637-bbb8-4720-bd0d-d8f15fd5f77c.png?table=block&id=2da88756-3979-8078-8f1d-e33e86979fe1&cache=v2&width=288)
 
 
 
@@ -83,7 +83,7 @@ canonical: "https://xxxuuu.me/post/2025summary"
 
 人生还第一次去了漫展，过于社恐没有集邮，反而是路上看着摄影老师们的长枪短炮，急得我回家后马上买了个唯卓仕的大光定，虽然目前为止还没人可以给我拍hhh
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F08176db7-48c1-4c2e-b2c2-e08ec91902b4%2Fimage.png?table=block&id=2db88756-3979-80dd-b0fe-e7d6b61a3dce&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F08176db7-48c1-4c2e-b2c2-e08ec91902b4%2Fimage.png?table=block&id=2db88756-3979-80dd-b0fe-e7d6b61a3dce&cache=v2&width=432)
 
 
 
@@ -97,7 +97,7 @@ canonical: "https://xxxuuu.me/post/2025summary"
 
 玩游戏的时间也在变多。今年最喜欢的是天国拯救 2，文本量巨大，沉浸感非常强，从一代开始就一直关注战马工作室，算是个人心目中的年度最佳（但 TGA 上一个奖都没拿，实锤野榜）。年底也沉迷了一段时间战地 6，以前始终认为手柄玩 FPS 很反人类，现在觉得意外地舒适，只要调校合适
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3bf29a2b-dbed-4596-8b87-cf22db6629fc%2Fd9aa3ef8c2066932bb1b87a4c2fa847e.jpg?table=block&id=2db88756-3979-8065-b933-f02c48f66f45&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3bf29a2b-dbed-4596-8b87-cf22db6629fc%2Fd9aa3ef8c2066932bb1b87a4c2fa847e.jpg?table=block&id=2db88756-3979-8065-b933-f02c48f66f45&cache=v2&width=624)
 
 
 
@@ -117,7 +117,7 @@ canonical: "https://xxxuuu.me/post/2025summary"
 
 从去年开始使用 [Anki](https://apps.ankiweb.net/)，一开始只是因为找不到合适的能背日语单词的 App（大部分 App 的复习算法过于弱智），后面卡组越来越多，也开始自己制卡，每天一个半小时坚持了完整一年。任何需要记忆的东西几乎都可以使用 Anki，将一切交给 FSRS 算法
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F5c8eba36-d14a-4c63-98e4-6d02466f4a33%2Fimage.png?table=block&id=2db88756-3979-80a8-ad50-ca9fba3161e2&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F5c8eba36-d14a-4c63-98e4-6d02466f4a33%2Fimage.png?table=block&id=2db88756-3979-80a8-ad50-ca9fba3161e2&cache=v2&width=432)
 
 ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc611d3c5-70d2-44e4-ac07-ec2a2410a339%2Fimage.png?table=block&id=2db88756-3979-801f-ae17-c95e04b5c4d5&cache=v2&width=1400)
 

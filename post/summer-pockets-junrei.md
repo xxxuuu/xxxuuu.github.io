@@ -12,7 +12,7 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 7月底的时候被朋友提醒有香港到四国德岛的便宜机票，往返800带行李额，虽然没有明确的目标，但还是先买了机票，之后再制定计划，我愿称之为 TDT(Ticket-Driven Travel)
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F89ee8f0e-8bbf-4be8-ad13-ed22fc090499%2F6728a244-c20b-4bb3-9298-6b98ba9f7813.png?table=block&id=26088756-3979-808c-afe6-ffe706673c74&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F89ee8f0e-8bbf-4be8-ad13-ed22fc090499%2F6728a244-c20b-4bb3-9298-6b98ba9f7813.png?table=block&id=26088756-3979-808c-afe6-ffe706673c74&cache=v2&width=240)
 
 打开[巡礼地图](https://www.anitabi.cn/map)，在德岛附近第一眼看到的是 Summer Pockets，恰好最近动漫放送，决定趁着这个机会去一趟正式的圣地巡礼，目标确定
 
@@ -37,10 +37,10 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 出发当天，如果不在香港过夜要从深圳出发只能走24h的皇岗口岸过关，到达机场时刚好日出。作为冷门航线，这趟航班人意外地多，据说是香港-德岛航线在8月底将会关停，所以有不少人专程来坐最后几趟
 
-![香港机场的日出](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F6f0f538b-ddb2-4e43-97b4-840b4b2d3e98%2FIMG_0690.jpeg?table=block&id=26088756-3979-8047-9c02-c9019db6e757&cache=v2&width=1400)
+![香港机场的日出](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F6f0f538b-ddb2-4e43-97b4-840b4b2d3e98%2FIMG_0690.jpeg?table=block&id=26088756-3979-8047-9c02-c9019db6e757&cache=v2&width=384)
 *香港机场的日出*
 
-![廉航惯例边缘登机口](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ffc0928ba-bc03-4004-bc7b-b631c7aab039%2FIMG_0694.jpeg?table=block&id=26088756-3979-80d2-a3ea-cc284a6d7618&cache=v2&width=1400)
+![廉航惯例边缘登机口](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ffc0928ba-bc03-4004-bc7b-b631c7aab039%2FIMG_0694.jpeg?table=block&id=26088756-3979-80d2-a3ea-cc284a6d7618&cache=v2&width=384)
 *廉航惯例边缘登机口*
 
 德岛机场很小，航站楼还没深圳很多地铁站大，国际航班只有香港和韩国仁川两条航线（其中一条还即将关停）。为了吸引游客，机场会免费发放 BUS PASS 给国际线的乘客（仅限外国人），可以在两天内免费乘坐所有市内巴士，也包括机场巴士，可以直达德岛站
@@ -55,7 +55,7 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 在德岛能很明显感受到这座小城的老龄化和人口流失，除了车站和永旺这类购物中心外，其他地方的人流量都非常少，商店街也看不到几个人，大部分店铺处于关停状态
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F68a34e82-2dbd-4095-b1de-9cf8ad96a64b%2FIMG_0728.jpeg?table=block&id=26088756-3979-8069-9dbc-d0ef1d7513cd&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F68a34e82-2dbd-4095-b1de-9cf8ad96a64b%2FIMG_0728.jpeg?table=block&id=26088756-3979-8069-9dbc-d0ef1d7513cd&cache=v2&width=528)
 
 ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F56c99f36-57d7-42b1-ad83-50b0c871e983%2FIMG_0715.jpeg?table=block&id=26088756-3979-80d7-8f72-c83de48755fd&cache=v2&width=1400)
 
@@ -79,11 +79,11 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 售票处内自动售票机可以直接买不定班次的往返票（去程票当日有效，返程票7日内有效），船分为渡轮（フェリー）和高速旅客船，班次和时间都不一样，具体可以看网站上的[时刻表](https://www.shikokukisen.com/instant/)
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ffcf65ff8-b433-4b0f-b85e-264c3a1488ff%2F683f5f74-d9e8-473d-8b77-8405f124c0af.png?table=block&id=26088756-3979-804f-a6d0-e7fb584f7d03&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ffcf65ff8-b433-4b0f-b85e-264c3a1488ff%2F683f5f74-d9e8-473d-8b77-8405f124c0af.png?table=block&id=26088756-3979-804f-a6d0-e7fb584f7d03&cache=v2&width=288)
 
 最好乘坐一早9点或10点的的班次，渡轮位置很多，我这趟没有坐满，行程大约50分钟
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fb93e9ef3-32a2-4f88-989c-318307eff07c%2FIMG_0759.jpeg?table=block&id=26088756-3979-8066-875c-f26c33dd543d&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fb93e9ef3-32a2-4f88-989c-318307eff07c%2FIMG_0759.jpeg?table=block&id=26088756-3979-8066-875c-f26c33dd543d&cache=v2&width=624)
 
 
 
@@ -105,7 +105,7 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 理论上也可以徒步走，但直岛不小，如果要在一天内巡礼完，徒步会很折磨。另外务必做好防晒措施，8月的濑户内海紫外线指数非常高，只需要半小时就足够晒伤皮肤（现身说法
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7643dfd0-2558-4892-b634-4a1a44125bc9%2FIMG_0799.jpeg?table=block&id=26088756-3979-805c-a2d5-ceda4f4c985d&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7643dfd0-2558-4892-b634-4a1a44125bc9%2FIMG_0799.jpeg?table=block&id=26088756-3979-805c-a2d5-ceda4f4c985d&cache=v2&width=336)
 
 
 
@@ -217,7 +217,7 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 相比直岛，男木岛航线的船相对较小，位置会不太够，但也不需要坐下，中途有重要巡礼点，建议上船后直接走到船头等待
 
-![这个方向其实是船尾，靠岸时船头朝向岸边，登船铁板会降下来](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3582733e-d5a6-4b63-838f-30e3accaff85%2FDSC_1163_726CF7244C7A_CAMERAMARK.jpeg?table=block&id=26188756-3979-80ea-ba39-ce081c9edc5e&cache=v2&width=1400)
+![这个方向其实是船尾，靠岸时船头朝向岸边，登船铁板会降下来](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3582733e-d5a6-4b63-838f-30e3accaff85%2FDSC_1163_726CF7244C7A_CAMERAMARK.jpeg?table=block&id=26188756-3979-80ea-ba39-ce081c9edc5e&cache=v2&width=480)
 *这个方向其实是船尾，靠岸时船头朝向岸边，登船铁板会降下来*
 
 从女木岛再次启程后5分钟左右，原作开头的鸟白岛全景就在眼前，拍摄窗口只有一分钟，错过了也没关系，返程时在船尾还能再拍一次
@@ -246,7 +246,7 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 回头看到的是船入港的小白塔
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7c23d40d-6f31-419f-aae3-7bedc5ed0a88%2FDSC_1236_7835430F2DEB_CAMERAMARK.jpeg?table=block&id=26188756-3979-809b-ab31-dd2a62eba25e&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7c23d40d-6f31-419f-aae3-7bedc5ed0a88%2FDSC_1236_7835430F2DEB_CAMERAMARK.jpeg?table=block&id=26188756-3979-809b-ab31-dd2a62eba25e&cache=v2&width=480)
 
 
 
@@ -276,7 +276,7 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 如果进去了，应该能看到满墙的周边和同人作
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F69d7cc12-af23-4fd7-a63f-f37812716d7c%2Fimage.png?table=block&id=26188756-3979-8001-87ac-f576746cf6e3&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F69d7cc12-af23-4fd7-a63f-f37812716d7c%2Fimage.png?table=block&id=26188756-3979-8001-87ac-f576746cf6e3&cache=v2&width=528)
 
 
 
@@ -344,7 +344,7 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9403f24b-ad26-4f94-940c-e02ef229a3b1%2FDSC_1423_152ED221EE2F_CAMERAMARK.jpeg?table=block&id=26188756-3979-80ca-84fc-e733058a9565&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9403f24b-ad26-4f94-940c-e02ef229a3b1%2FDSC_1423_152ED221EE2F_CAMERAMARK.jpeg?table=block&id=26188756-3979-80ca-84fc-e733058a9565&cache=v2&width=528)
 
 旁边是可以自由参观的灯台资料馆，这里记录了灯台和男木岛的历史，还有一些活动
 
@@ -366,7 +366,7 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 灯台背后的台阶能走下海滩，整个男木岛的最北方
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc3a7edae-e70c-4d8c-9fd4-2385856ef797%2FDSC_1385_6305A78DE574_CAMERAMARK.jpeg?table=block&id=26188756-3979-806c-a47c-f9102bb6b356&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc3a7edae-e70c-4d8c-9fd4-2385856ef797%2FDSC_1385_6305A78DE574_CAMERAMARK.jpeg?table=block&id=26188756-3979-806c-a47c-f9102bb6b356&cache=v2&width=528)
 
 这个角度的灯台也是RB的主视觉图
 
@@ -388,7 +388,7 @@ canonical: "https://xxxuuu.me/post/summer-pockets-junrei"
 
 回去港口时注意提前预留时间，最后一班船在下午5点，错过就只能在岛上过夜了
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fffec5c7e-7959-4b3a-b18e-523921c436a4%2FIMG_0814.heic?table=block&id=26188756-3979-80bc-aab3-e163e9859ce2&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fffec5c7e-7959-4b3a-b18e-523921c436a4%2FIMG_0814.heic?table=block&id=26188756-3979-80bc-aab3-e163e9859ce2&cache=v2&width=528)
 
 
 

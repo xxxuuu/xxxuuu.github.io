@@ -45,4 +45,4 @@ infra 产品本身就是业务的公司，日子也不好过。国内这类公�
 
 但纵使有这么多缺点，在如今看来不是一个「聪明」的选择，也仍然想做 infra 的话，只能有一个原因：Just for fun。就像 saka 老师在这张图里说的一样：
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff4b09812-f6f6-4838-8c70-349046b1faef%2Fimage.png?table=block&id=2e2d110f-ab39-4244-a1d3-db33fab12b4b&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff4b09812-f6f6-4838-8c70-349046b1faef%2Fimage.png?table=block&id=2e2d110f-ab39-4244-a1d3-db33fab12b4b&cache=v2&width=576)

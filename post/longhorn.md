@@ -31,7 +31,7 @@ Engine 有 V1 和 V2 两个版本，先从 V1 Engine 开始分析，自底向上
 
 replica 在节点上对应一组 sparse file，代码中这个结构称为 `diffDisk`，每个 file 有点类似于 LSM-Tree 中的 layer/level，这里称为 snapshot（除了最新一层叫 head/live data）：
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F09606cc3-8f19-4e2f-9a02-c9c0ace747f9%2FUntitled.png?table=block&id=c0ea8054-fb66-4660-9340-c9e8e46a1185&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F09606cc3-8f19-4e2f-9a02-c9c0ace747f9%2FUntitled.png?table=block&id=c0ea8054-fb66-4660-9340-c9e8e46a1185&cache=v2&width=576)
 
 每个 `diffDisk` 的元数据存在一个 `volume.meta` 文件中，还会有一个 `revision.counter` 文件记录写入的版本号。每一层 file 划分为多个 4K 大小的 sector，这是写入的最小单元，因为都是 sparse file，所以 Longhorn 的卷自然支持精简配置。file 之间从新到旧连接起来，索引表 `location` 则存储 sector 位于哪一个 file 中
 
@@ -67,7 +67,7 @@ Controller 负责整个 volume 视角的读写，它被调度在和最终 client
 
 为了避免和 K8s 中的 Controller 混淆，后面都直接称这个 Controller 为 Engine
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd7d422a8-aa34-4ff3-b059-b898eb14bf56%2FUntitled.png?table=block&id=6080c1ce-0625-443b-a0dc-fc07904694e3&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd7d422a8-aa34-4ff3-b059-b898eb14bf56%2FUntitled.png?table=block&id=6080c1ce-0625-443b-a0dc-fc07904694e3&cache=v2&width=528)
 
 
 
@@ -142,7 +142,7 @@ V1 Engine 的 rebuild 最终执行了 AddReplica Task，所以 rebuild 实际上
 
 这里在打完快照后，新 replica 的写入就全都在 head/live data 上了，写入是安全的。snapshot 的 sync 在后台异步进行，利用了 `diffDisk` 的特性和快照实现了在线 rebuild
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4984c535-3b59-4ae9-b363-c56f764adf27%2FUntitled.png?table=block&id=aa4a4965-7412-479a-b045-9d4061d971fe&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4984c535-3b59-4ae9-b363-c56f764adf27%2FUntitled.png?table=block&id=aa4a4965-7412-479a-b045-9d4061d971fe&cache=v2&width=528)
 
 
 
@@ -160,7 +160,7 @@ share manager 内运行了一个 nfs ganesha，作为 NFS server。最后 share 
 
 share manager 和 volume 的 status 在 controller reconcile 中被更新，设置 NFS 连接信息，现在 CSI 就可以获取到 NFS 连接配置，完成最终的用户 Pod 挂载流程
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F634f0ba3-651c-4cb3-ade9-b46c64d446bb%2FUntitled.png?table=block&id=30cca0e4-3eeb-4644-83e6-a121dc1ec3a0&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F634f0ba3-651c-4cb3-ade9-b46c64d446bb%2FUntitled.png?table=block&id=30cca0e4-3eeb-4644-83e6-a121dc1ec3a0&cache=v2&width=624)
 
 
 
@@ -188,7 +188,7 @@ V2 Engine 使用了 SPDK，基本是复用了 SPDK 自带的功能，Go 只是�
 
 Replica 已经暴露了 NVMf bdev，Engine 同样通过 SPDK 连接到每个 Replica 的 NVMf bdev，再组成 RAID1 bdev，这样又利用了 SPDK 直接实现了多副本，最后暴露出 NVMf Target 给 client 连接
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fdcf8bbf2-409a-4d6c-bff0-bf9dc67fdcc1%2FUntitled.png?table=block&id=6e079fd5-54fa-4c0f-8fd9-9c090bea781e&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fdcf8bbf2-409a-4d6c-bff0-bf9dc67fdcc1%2FUntitled.png?table=block&id=6e079fd5-54fa-4c0f-8fd9-9c090bea781e&cache=v2&width=528)
 
 
 

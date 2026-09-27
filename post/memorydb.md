@@ -31,7 +31,7 @@ MemoryDB 直接基于 Redis 构建，但并没有进行侵入性修改。这里�
 
 Redis 主节点自身的复制流会被拦截，重定向到事务日志中。在同步写入日志成功后对客户端返回，所有其他副本都只是重放日志
 
-![MemoryDB 架构（话说这图真糊啊](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc20e8ae2-0be9-402e-a134-7c5ce4a0fa29%2Fimage.png?table=block&id=12d88756-3979-8038-bd8a-faad3d98bd5e&cache=v2&width=1400)
+![MemoryDB 架构（话说这图真糊啊](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc20e8ae2-0be9-402e-a134-7c5ce4a0fa29%2Fimage.png?table=block&id=12d88756-3979-8038-bd8a-faad3d98bd5e&cache=v2&width=384)
 *MemoryDB 架构（话说这图真糊啊*
 
 
@@ -54,7 +54,7 @@ MemoryDB 这里的日志是一种 WBL（Write-behind logging），选择 WBL 而
 
 但这样会带来的问题是写入日志前故障会导致不一致，所以这里需要事务日志 ACK 了才能向客户端返回。MemoryDB 通过添加一层 client blocking 层作为 tracker 实现这一点，考虑到 MemoryDB 避免修改 Redis 的前提下，我猜应该类似这样的实现
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fbfc3d68f-ea82-430d-99cb-248f2d66a4bc%2F%25E6%259C%25AA%25E5%2591%25BD%25E5%2590%258D%25E7%25BB%2598%25E5%259B%25BE.drawio.png?table=block&id=14188756-3979-804a-bb79-e2f6312ba5b5&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fbfc3d68f-ea82-430d-99cb-248f2d66a4bc%2F%25E6%259C%25AA%25E5%2591%25BD%25E5%2590%258D%25E7%25BB%2598%25E5%259B%25BE.drawio.png?table=block&id=14188756-3979-804a-bb79-e2f6312ba5b5&cache=v2&width=288)
 
 这里的好处同样是解耦了 Redis，即使事务日志写入未确认，仍然可以让 Redis 继续处理接下来的请求
 
@@ -90,7 +90,7 @@ MemoryDB 完美利用事务日志实现了以上三点。事务日志中除了�
 
 MemoryDB 做了很多优化去减少 MTTR（Mean time to recovery）。在运行时，Redis 自身的持久化/快照（RDB）机制也在工作，快照被上传到 S3 中，新副本启动或恢复时会通过 S3 获得快照快速赶上进度然后开始回放事务日志
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9f382b69-dd91-4ea1-909c-793eeaef7f63%2Fimage.png?table=block&id=14088756-3979-80e3-9143-ffcc1806f24d&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9f382b69-dd91-4ea1-909c-793eeaef7f63%2Fimage.png?table=block&id=14088756-3979-80e3-9143-ffcc1806f24d&cache=v2&width=336)
 
 Redis 的快照是通过 Linux 的 fork 写时复制特性来实现的，虽然整体开销已经很小，但也不可避免地带来一些性能抖动，包括瞬时的内存占用
 
@@ -108,7 +108,7 @@ MemoryDB 的优化相当于把写时复制从进程扩展到集群层面，快�
 
 只读(a)和只写(b)负载：
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F85832d91-1442-4d30-a09f-b8357d87adbc%2Fimage.png?table=block&id=14188756-3979-8022-a5d3-dc5667a7f2d2&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F85832d91-1442-4d30-a09f-b8357d87adbc%2Fimage.png?table=block&id=14188756-3979-8022-a5d3-dc5667a7f2d2&cache=v2&width=528)
 
 写请求由于有对事务日志的同步写入，性能基本是 Redis 的 1/3 到 1/2 左右，符合预期。但读性能没有理由 MemoryDB 能比 Redis 还快啊？感觉有些猫腻，论文里说是因为 MemoryDB 通过优化过的 I/O 多路复用聚合了客户端链接，但我对此保留疑问
 

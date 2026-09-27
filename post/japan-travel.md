@@ -17,7 +17,7 @@ canonical: "https://xxxuuu.me/post/japan-travel"
 
 国庆期间的机票就不好买了，ANA 深圳飞东京单程基本要 4000+，只能改去香港坐廉航，去程是快运航空飞东京，返程是大湾区航空从大阪回。这些廉航还都没有行李额度（包括手提行李），得额外加钱托运。最后算下来单人往返 3000 出头
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F6ce09f8e-8e00-4c91-8ff9-0b767eaf92d2%2Fimage.png?table=block&id=11788756-3979-801b-a8ba-d4007162ff8d&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F6ce09f8e-8e00-4c91-8ff9-0b767eaf92d2%2Fimage.png?table=block&id=11788756-3979-801b-a8ba-d4007162ff8d&cache=v2&width=528)
 
 
 
@@ -45,7 +45,7 @@ canonical: "https://xxxuuu.me/post/japan-travel"
 
 机酒合计一人将近 6000，基本就是这趟旅程的主要开销了（不购物的情况下）。不过另一个间接开销是，为了拍照，买了台相机，Nikon Z30 配 18-140 旅游头，算下来差不多 9000：
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4ada107d-9d7b-473c-b184-7ec068ed1f46%2Fimage.png?table=block&id=11788756-3979-8065-a2dc-e0303fa382b7&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4ada107d-9d7b-473c-b184-7ec068ed1f46%2Fimage.png?table=block&id=11788756-3979-8065-a2dc-e0303fa382b7&cache=v2&width=480)
 
 
 
@@ -53,7 +53,7 @@ canonical: "https://xxxuuu.me/post/japan-travel"
 
 日本大部分旅游区都可以支持微信和支付宝付款，但一些地方还只能刷卡或使用现金，所以还是去银行办了 VISA 卡和换了 3w 円。上网可以去淘宝买 Softbank 的上网卡，交通卡则直接在 iPhone 钱包添加 Suica：
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7cbb31c1-b252-476c-8c37-64ff7b22527e%2Fimage.png?table=block&id=11788756-3979-801f-8877-eaec8eba4193&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7cbb31c1-b252-476c-8c37-64ff7b22527e%2Fimage.png?table=block&id=11788756-3979-801f-8877-eaec8eba4193&cache=v2&width=336)
 
 
 
@@ -61,11 +61,11 @@ canonical: "https://xxxuuu.me/post/japan-travel"
 
 出发当天，中午吃完饭后去皇岗口岸入境香港，坐永东巴士一小时直达机场。登机口不出意外在最角落，走了很远。飞机 17 点半起飞，东京时间 23 点左右到，廉航没有免费餐食，在机场买了两个🍙饭团作为晚餐
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F041098fb-b273-47c8-b088-8a08f0b57057%2FIMG_6680.jpeg?table=block&id=11788756-3979-8050-8886-ee86f5c7c541&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F041098fb-b273-47c8-b088-8a08f0b57057%2FIMG_6680.jpeg?table=block&id=11788756-3979-8050-8886-ee86f5c7c541&cache=v2&width=480)
 
 落地时比计划早了半小时，东京的天气很凉快，是深圳几乎没有的秋天感觉，十分舒适
 
-![舷窗好脏😥](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa9b9703c-32d4-4d86-99b0-11908d82d6fc%2FIMG_6689.jpeg?table=block&id=12188756-3979-80d6-a55a-f8309e4eeaf8&cache=v2&width=1400)
+![舷窗好脏😥](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa9b9703c-32d4-4d86-99b0-11908d82d6fc%2FIMG_6689.jpeg?table=block&id=12188756-3979-80d6-a55a-f8309e4eeaf8&cache=v2&width=624)
 *舷窗好脏😥*
 
 虽然已经是晚上十点多，入境处还是挤满了人，目测一半中国人，一半南亚人
@@ -74,26 +74,26 @@ canonical: "https://xxxuuu.me/post/japan-travel"
 
 
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd1da0edd-9c1b-46a4-bcfd-c81540ade16e%2Fimage.png?table=block&id=11788756-3979-8062-9a89-cdf804a2ce01&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd1da0edd-9c1b-46a4-bcfd-c81540ade16e%2Fimage.png?table=block&id=11788756-3979-8062-9a89-cdf804a2ce01&cache=v2&width=288)
 
 飞机上空乘会发纸质入境单填写，但 Visit Japan Web 能直接出示二维码扫描，更方便些。这里 VJW 需要填写电子签证的申请号，申请号写在签证办理后寄回来的那张纸上，所以千万不要直接把它丢了
 
 一直排了大概半个多小时才过境，上陆许可get
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4a213b66-febe-4827-8d5a-b942ad844bcd%2FIMG_6692.jpeg?table=block&id=12188756-3979-8071-8251-f80d3e50eb27&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4a213b66-febe-4827-8d5a-b942ad844bcd%2FIMG_6692.jpeg?table=block&id=12188756-3979-8071-8251-f80d3e50eb27&cache=v2&width=528)
 
 越过过境处的门，就能看到「ようこそ東京へ」
 
-![ようこそ東京へ](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fca450923-0daa-4c74-a9e1-924120745962%2FIMG_6694.jpeg?table=block&id=11788756-3979-808f-9837-ca3d17307145&cache=v2&width=1400)
+![ようこそ東京へ](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fca450923-0daa-4c74-a9e1-924120745962%2FIMG_6694.jpeg?table=block&id=11788756-3979-808f-9837-ca3d17307145&cache=v2&width=432)
 *ようこそ東京へ*
 
 机场大厅内的自助售票机可以买机场大巴车票，直达新宿和池袋。但不知道为什么这个机子上我的两张 VISA 卡都用不了，最后只能花了现金，机场大巴这个价还是不便宜的。大巴最后一班在 2 点半，所以落地比较晚也不用担心，如果实在超过了这个点，不如直接在机场等到 5 点多电车发车后再去酒店
 
 PS：这趟大巴上也基本全是中国游客（包括一个台湾同胞
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa85cb65e-51bd-46c3-b623-396def17df5e%2FIMG_6695.jpeg?table=block&id=11788756-3979-80b2-95d2-dbc3dbffc041&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa85cb65e-51bd-46c3-b623-396def17df5e%2FIMG_6695.jpeg?table=block&id=11788756-3979-80b2-95d2-dbc3dbffc041&cache=v2&width=336)
 
-![“台湾制造”](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F6eceb09f-30b4-4430-8c21-d159ab89dcb4%2FIMG_6697.jpeg?table=block&id=11788756-3979-8015-aaec-deeaa8976c8b&cache=v2&width=1400)
+![“台湾制造”](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F6eceb09f-30b4-4430-8c21-d159ab89dcb4%2FIMG_6697.jpeg?table=block&id=11788756-3979-8015-aaec-deeaa8976c8b&cache=v2&width=336)
 *“台湾制造”*
 
 从机场到池袋大概一个小时车程，下车时已经接近两点半。池袋站附近路边散落着不少喝醉酒的上班族，每个路口还都有拉客的メイドさん，马路上时不时穿过炸街的摩托党，给了我点初到东京的小震撼。不过一天行程后实在太累，没有精力再逛，到离车站 3 分钟路程的酒店 check in 完就匆匆洗漱躺下睡觉了，结束第一天
@@ -110,32 +110,32 @@ PS：这趟大巴上也基本全是中国游客（包括一个台湾同胞
 
 过程中还出了点小意外，在一台自助售票机上 VISA 卡被机器吞了。正想找工作人员时，机子旁边的墙上直接开了个洞，车站工作人员从洞里把头钻出来，把我们吓了一跳：
 
-![原来机子背后有人是真的](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9d2ce9f9-29f3-4259-aaa2-c6d2cce2328e%2Fimage.png?table=block&id=11788756-3979-80ff-bfb6-c338ca35475a&cache=v2&width=1400)
+![原来机子背后有人是真的](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9d2ce9f9-29f3-4259-aaa2-c6d2cce2328e%2Fimage.png?table=block&id=11788756-3979-80ff-bfb6-c338ca35475a&cache=v2&width=528)
 *原来机子背后有人是真的*
 
 整个早上和中午都在车站附近闲逛，因为是在落地后正式的第一天，什么都充满了新鲜感，所以并没有设定任何实际的目标，暂时沉浸在探索街道的乐趣中
 
 在传说中的池袋西北口，确实到处都是面向国人的中文广告，不过国人比例好像也并没有想象的那么高。一出站还碰到了当地的祭奠活动，整条路都封了，查了一下那两天刚好是「ふくろ祭り」：
 
-![ふくろ祭り](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F780c8d22-a782-4a45-9777-ad21a38a756a%2FIMG_6710.jpeg?table=block&id=11788756-3979-80ce-925b-f1bd70bff0b5&cache=v2&width=1400)
+![ふくろ祭り](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F780c8d22-a782-4a45-9777-ad21a38a756a%2FIMG_6710.jpeg?table=block&id=11788756-3979-80ce-925b-f1bd70bff0b5&cache=v2&width=624)
 *ふくろ祭り*
 
 往南走出 500 米左右，就到了居民区，是窄路和一户建，典型的日本街道，非常安静
 
-![乱入居民区](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F888cc8db-6dbe-4854-b8d6-69c155687751%2FIMG_6712.jpeg?table=block&id=11788756-3979-806e-b2dd-d91e45064b1f&cache=v2&width=1400)
+![乱入居民区](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F888cc8db-6dbe-4854-b8d6-69c155687751%2FIMG_6712.jpeg?table=block&id=11788756-3979-806e-b2dd-d91e45064b1f&cache=v2&width=432)
 *乱入居民区*
 
 之后一路沿着铁道走，沿途这种铁道挨着街道的街景有种天气之子的即视感，一直到了下一个车站目白，天上下起小雨，我们才准备吃午饭顺便避避雨。打开 Google 地图，第一眼就看到一家蔡徐坤餐厅，虽然一看就是国人恶搞改的名，评分也不太高，但还是忍不住去探险了一番
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F5a9c799a-ecdb-42ae-8c19-2eb44c697c65%2FIMG_7756.png?table=block&id=11788756-3979-80c6-bb3d-def23eba2789&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F5a9c799a-ecdb-42ae-8c19-2eb44c697c65%2FIMG_7756.png?table=block&id=11788756-3979-80c6-bb3d-def23eba2789&cache=v2&width=336)
 
 这是一家拉面店，猪肉拉面看样子和印象中的日式拉面一模一样，配菜堆得比面还高
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F00dc15ef-894d-4da8-8a21-b7543c4e12af%2FIMG_6715.jpeg?table=block&id=11788756-3979-8086-a689-fd72e55f1d3e&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F00dc15ef-894d-4da8-8a21-b7543c4e12af%2FIMG_6715.jpeg?table=block&id=11788756-3979-8086-a689-fd72e55f1d3e&cache=v2&width=480)
 
 但当我正吃下第一口时，やばいー 浓重的大蒜和猪油味直冲脑门，还特别咸，这才想起“印象中”的拉面出处是这玩意：
 
-![拉面咒语](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F73a1e84f-a7b5-4dff-a026-bf8ac69e13a4%2Fimage.png?table=block&id=11888756-3979-809d-81ee-d94ea63d34f8&cache=v2&width=1400)
+![拉面咒语](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F73a1e84f-a7b5-4dff-a026-bf8ac69e13a4%2Fimage.png?table=block&id=11888756-3979-809d-81ee-d94ea63d34f8&cache=v2&width=624)
 *拉面咒语*
 
 
@@ -146,13 +146,13 @@ PS：这趟大巴上也基本全是中国游客（包括一个台湾同胞
 
 中途在日本桥逛了逛，这里附近的建筑维护得很好，外立面很干净，看起来有一股高级感。高楼大厦紧挨在人行道边上，离得很近，显得密度很高，建筑压迫感也更强。国内相比通常是有一片园林或空地隔断，搜了下，这种概念还有个专有名词，叫「建筑退线」
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F93786b2d-892a-4a80-b257-b6299c6e4e1d%2FIMG_6720.heic?table=block&id=12388756-3979-8079-af5a-d67e52685bc7&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F93786b2d-892a-4a80-b257-b6299c6e4e1d%2FIMG_6720.heic?table=block&id=12388756-3979-8079-af5a-d67e52685bc7&cache=v2&width=624)
 
 
 
 继续来到浅草寺后，天气完全变成了阴天，但游客是一点不少，耳边还不断传来中文
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F45476acb-1dd4-4e3f-9e8c-2fa120d742a3%2FIMG_6723.heic?table=block&id=12388756-3979-8049-bd45-d0ea74b6092a&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F45476acb-1dd4-4e3f-9e8c-2fa120d742a3%2FIMG_6723.heic?table=block&id=12388756-3979-8049-bd45-d0ea74b6092a&cache=v2&width=624)
 
 不过浅草寺的人实在多到对我这种 I 人来说有点生理不适了，而且除了一条街的纪念品商店和御守、抽签外，也没啥别的东西了
 
@@ -164,7 +164,7 @@ PS：这趟大巴上也基本全是中国游客（包括一个台湾同胞
 
 匆匆逛完后，就向着在浅草寺看起来近在咫尺的天空树走去
 
-![虽然看着很近，但实际上要走将近两公里](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fb2a1c913-3594-4c41-a666-187006e1a670%2FDSC_0390.jpg?table=block&id=12388756-3979-8019-af67-c994d6c69764&cache=v2&width=1400)
+![虽然看着很近，但实际上要走将近两公里](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fb2a1c913-3594-4c41-a666-187006e1a670%2FDSC_0390.jpg?table=block&id=12388756-3979-8019-af67-c994d6c69764&cache=v2&width=576)
 *虽然看着很近，但实际上要走将近两公里*
 
 
@@ -207,7 +207,7 @@ PS：这趟大巴上也基本全是中国游客（包括一个台湾同胞
 
 10000 円都夹不下来的茜… 被资本主义狠狠收割
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F130ea3f4-2ce7-4eba-9de4-a169d07f80fc%2FIMG_6894.heic?table=block&id=12588756-3979-80c5-8de7-fc5beaa67542&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F130ea3f4-2ce7-4eba-9de4-a169d07f80fc%2FIMG_6894.heic?table=block&id=12588756-3979-80c5-8de7-fc5beaa67542&cache=v2&width=528)
 
 
 
@@ -225,13 +225,13 @@ PS：这趟大巴上也基本全是中国游客（包括一个台湾同胞
 
 在酒店继续赖床，等到中午直接去吃了麦，每个地方的麦当劳都有些当地特供食物。试着点了个国内没有的汉堡🍔，上面有一层很腻的肉酱，我的评价是不如板烧
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F0f04c5a9-3d06-42fe-b873-31f7e446cd85%2FIMG_7050.heic?table=block&id=12588756-3979-80fa-895c-e5d4eab16e7f&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F0f04c5a9-3d06-42fe-b873-31f7e446cd85%2FIMG_7050.heic?table=block&id=12588756-3979-80fa-895c-e5d4eab16e7f&cache=v2&width=528)
 
 
 
 来到六本木，在一个公园里发现藏在城市间的美军基地，是个直升机场
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F50dbc9db-d733-4a25-9c1f-7bc709dc5bb8%2FIMG_7054.heic?table=block&id=12588756-3979-801b-a8aa-ec3beac838b5&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F50dbc9db-d733-4a25-9c1f-7bc709dc5bb8%2FIMG_7054.heic?table=block&id=12588756-3979-801b-a8aa-ec3beac838b5&cache=v2&width=528)
 
 ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fcd0e632d-92c0-41fd-a607-71e71039966a%2Fimage.png?table=block&id=12588756-3979-801b-a935-f24e848ec3bc&cache=v2&width=1400)
 
@@ -287,7 +287,7 @@ PS：这趟大巴上也基本全是中国游客（包括一个台湾同胞
 
 作为日本文化的象征之一，大大小小的神社藏在城市之间，真是遍地都是
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F59583336-e5a3-49ac-9c7b-2ed7db604cc2%2FDSC_0624.jpg?table=block&id=12588756-3979-80c0-8dfd-eda9bf925d50&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F59583336-e5a3-49ac-9c7b-2ed7db604cc2%2FDSC_0624.jpg?table=block&id=12588756-3979-80c0-8dfd-eda9bf925d50&cache=v2&width=624)
 
 
 
@@ -339,7 +339,7 @@ LUUP 作为电动交通工具，投放点还是蛮多的，但价格不低，50 
 
 吃完饭过后，天气已经完全放晴，我们向着海边出发。中途去了一下镰仓大佛，这里除了一尊大佛像基本就没别的东西了，有点无聊，不过还好门票才 300 円
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fbcf83629-55b3-4566-a972-f14041c6a01b%2FDSC_0712.jpg?table=block&id=12588756-3979-80bd-9fdd-fb9c18bfb798&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fbcf83629-55b3-4566-a972-f14041c6a01b%2FDSC_0712.jpg?table=block&id=12588756-3979-80bd-9fdd-fb9c18bfb798&cache=v2&width=576)
 
 
 
@@ -407,7 +407,7 @@ LUUP 作为电动交通工具，投放点还是蛮多的，但价格不低，50 
 
 这边すき家的工资最低是1300円／時，来这种地方上班的一般都是学生来做アルバイト，日本貌似很多学生都会这样去做兼职，这在国内很罕见，不清楚是什么原因。对于学生来说这个薪水应该还算不错了（是不是应该拍个购买力挑战
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F2bb662d1-68a8-47d2-99e4-b230204b8c79%2FIMG_7366.heic?table=block&id=12588756-3979-803f-a63c-c3e7588d4fd2&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F2bb662d1-68a8-47d2-99e4-b230204b8c79%2FIMG_7366.heic?table=block&id=12588756-3979-803f-a63c-c3e7588d4fd2&cache=v2&width=528)
 
 
 
@@ -427,13 +427,13 @@ LUUP 作为电动交通工具，投放点还是蛮多的，但价格不低，50 
 
 新干线座位空间很大，在座位前面放个行李箱也很富余，运行起来速度和稳定性上感觉和国内高铁没什么区别
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4c365fdc-46c8-44dd-8c07-ca518949718b%2FIMG_7662.heic?table=block&id=12588756-3979-801d-af3a-fcf1f95e7e5d&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F4c365fdc-46c8-44dd-8c07-ca518949718b%2FIMG_7662.heic?table=block&id=12588756-3979-801d-af3a-fcf1f95e7e5d&cache=v2&width=576)
 
 
 
 到京都的路线上能近距离看到富士山（不过那时候我睡着了，只有一张比较远的照片
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ffcc0be9e-bc48-4f1b-8831-7748dafba738%2FIMG_7666.heic?table=block&id=12588756-3979-803f-b3f0-d3c49cc07715&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ffcc0be9e-bc48-4f1b-8831-7748dafba738%2FIMG_7666.heic?table=block&id=12588756-3979-803f-b3f0-d3c49cc07715&cache=v2&width=576)
 
 
 
@@ -443,7 +443,7 @@ LUUP 作为电动交通工具，投放点还是蛮多的，但价格不低，50 
 
 京都的建筑看起来更加有历史感，电车线路密度比东京少了很多，只有寥寥几条线，也没有机场，据说是为了保存历史古迹？
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd78798ed-dddc-4fb5-9d15-9c3042b432d4%2FIMG_7671.heic?table=block&id=12588756-3979-803d-95b0-e2e76e1b5f55&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd78798ed-dddc-4fb5-9d15-9c3042b432d4%2FIMG_7671.heic?table=block&id=12588756-3979-803d-95b0-e2e76e1b5f55&cache=v2&width=576)
 
 
 
@@ -471,7 +471,7 @@ LUUP 作为电动交通工具，投放点还是蛮多的，但价格不低，50 
 
 爬到半山腰时一个牌子写着登顶（到伏见稻荷大社）还要 40 分钟，累得直接放弃了，下山打道回府
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F8f72ce38-7ded-4d1e-a6ec-0ace77378fa6%2FDSC_0874.jpg?table=block&id=12588756-3979-80c9-9431-d850a52c2aa8&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F8f72ce38-7ded-4d1e-a6ec-0ace77378fa6%2FDSC_0874.jpg?table=block&id=12588756-3979-80c9-9431-d850a52c2aa8&cache=v2&width=576)
 
 
 
@@ -507,7 +507,7 @@ LUUP 作为电动交通工具，投放点还是蛮多的，但价格不低，50 
 
 看雨小了一些，打算去清水寺逛逛，半路雨又开始大起来
 
-![又一个神社⛩️](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F50f00687-802b-4730-980b-c5096e94dcbf%2FIMG_7716.heic?table=block&id=12588756-3979-8094-bda1-e912b2bac1f3&cache=v2&width=1400)
+![又一个神社⛩️](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F50f00687-802b-4730-980b-c5096e94dcbf%2FIMG_7716.heic?table=block&id=12588756-3979-8094-bda1-e912b2bac1f3&cache=v2&width=528)
 *又一个神社⛩️*
 
 拖着被淋湿大半的身体一路走到了清水寺，真正让我崩溃的是，这里人超！级！多！完全到了国内景点的地步，和高峰期地铁一样。雨大到照片都没法拍，让我马上逃回京都站
@@ -522,7 +522,7 @@ LUUP 作为电动交通工具，投放点还是蛮多的，但价格不低，50 
 
 但大阪也在下大雨，毕竟京都和大阪也只隔了几十公里，还是被迫窝在酒店里。到了晚上雨停后又去挑战了一次拉面，还好这家口味不重，味道还不错（除了饺子，很难吃
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9a402dd3-27fc-46c3-ad24-dafad9511b62%2FIMG_7728.heic?table=block&id=12588756-3979-8076-828a-f7bb291875f3&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9a402dd3-27fc-46c3-ad24-dafad9511b62%2FIMG_7728.heic?table=block&id=12588756-3979-8076-828a-f7bb291875f3&cache=v2&width=432)
 
 
 
@@ -534,34 +534,34 @@ LUUP 作为电动交通工具，投放点还是蛮多的，但价格不低，50 
 
 残念，最后一天，还在下雨。继续睡到退房的点后就出发去机场了
 
-![チカンは犯罪です！](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fec87e332-ef72-4362-9f5a-d2686acedc98%2FIMG_7731.heic?table=block&id=12588756-3979-8033-ad9b-e74614e0c13d&cache=v2&width=1400)
+![チカンは犯罪です！](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fec87e332-ef72-4362-9f5a-d2686acedc98%2FIMG_7731.heic?table=block&id=12588756-3979-8033-ad9b-e74614e0c13d&cache=v2&width=480)
 *チカンは犯罪です！*
 
 
 
 在关西国际机场，到处都是 25 年世博会的海报，这个吉祥物看多了居然也觉得挺顺眼，丑萌丑萌的了
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F93172b23-d774-4113-88c4-e7cb96a75a37%2FIMG_7735.heic?table=block&id=12588756-3979-80c3-ac65-c6b539c9d972&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F93172b23-d774-4113-88c4-e7cb96a75a37%2FIMG_7735.heic?table=block&id=12588756-3979-80c3-ac65-c6b539c9d972&cache=v2&width=432)
 
 不知道哪来的小车，我也好想开😭
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7b2262ff-0719-4cd2-8dba-dbab8b2df002%2FIMG_7738.heic?table=block&id=12588756-3979-8070-9377-c5e897a35604&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7b2262ff-0719-4cd2-8dba-dbab8b2df002%2FIMG_7738.heic?table=block&id=12588756-3979-8070-9377-c5e897a35604&cache=v2&width=432)
 
 
 
 机场便利店的肉うどん，在日本的最后一餐
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Febf0f18f-eeb5-44e0-bd42-1e5d5775e9ef%2FIMG_7739.heic?table=block&id=12588756-3979-80b7-97c0-e564db41f40f&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Febf0f18f-eeb5-44e0-bd42-1e5d5775e9ef%2FIMG_7739.heic?table=block&id=12588756-3979-80b7-97c0-e564db41f40f&cache=v2&width=480)
 
 机场有很多扭蛋机，让游客可以把硬币花完
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7ead2f8e-58b6-46e9-8e3c-f97338d676e6%2FIMG_7742.heic?table=block&id=12588756-3979-8086-aaef-cf70dbeaa138&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F7ead2f8e-58b6-46e9-8e3c-f97338d676e6%2FIMG_7742.heic?table=block&id=12588756-3979-8086-aaef-cf70dbeaa138&cache=v2&width=480)
 
 
 
 登机后隔壁的日本人居然在看甄嬛传hhh
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fde4f077e-d9bd-481e-ab1b-3846a864500f%2FIMG_7743.heic?table=block&id=12588756-3979-8050-9d39-e894ab4fdf53&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fde4f077e-d9bd-481e-ab1b-3846a864500f%2FIMG_7743.heic?table=block&id=12588756-3979-8050-9d39-e894ab4fdf53&cache=v2&width=480)
 
 
 

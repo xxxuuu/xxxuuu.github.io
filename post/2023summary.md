@@ -101,7 +101,7 @@ canonical: "https://xxxuuu.me/post/2023summary"
 
 YOASOBI 今年的歌 アイドル 虽然很火，但个人不是很喜欢，勇者作为 フリーレン 的 OP 完全在整烂活，Biri-Biri 挺有新意的但重复度太高，前段时间的 HEART BEAT 倒蛮喜欢的，合唱部分很感动，有种群青的感觉，果然是给年轻人的歌啊
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F2ba8325f-d237-49d0-8a10-54def9b8b212%2Fimage.png?table=block&id=061d8e5f-c5ef-4518-9e9e-8c6986481f5c&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F2ba8325f-d237-49d0-8a10-54def9b8b212%2Fimage.png?table=block&id=061d8e5f-c5ef-4518-9e9e-8c6986481f5c&cache=v2&width=336)
 
 另外偶然看了是枝裕和的几部电影，表面上都是很平淡的家庭片，但背后蕴含着无数的情感，还蛮喜欢这种感觉的
 

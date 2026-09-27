@@ -22,7 +22,7 @@ canonical: "https://xxxuuu.me/post/deterministic-simulator"
 
 2.  时钟不可靠：时钟漂移，拖尾，回退
 
-    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F8674fe3b-771b-43f4-860a-10847162d1f5%2FUntitled.png?table=block&id=7f92640c-e8eb-42cf-a384-8d18a5089a04&cache=v2&width=1400)
+    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F8674fe3b-771b-43f4-860a-10847162d1f5%2FUntitled.png?table=block&id=7f92640c-e8eb-42cf-a384-8d18a5089a04&cache=v2&width=528)
 
     ![时钟使得事件排序不可靠](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F03aedc4e-a2cf-4b3a-b645-d32d76a5b468%2FUntitled.png?table=block&id=84ea3146-11e8-488a-93cc-61dfd64e986d&cache=v2&width=1400)
     *时钟使得事件排序不可靠*
@@ -56,7 +56,7 @@ canonical: "https://xxxuuu.me/post/deterministic-simulator"
 
 一些 bug 可能需要运行数千次，才会发生一次，且几乎无法复现
 
-![MIT 6.824 指南通常打着「数千次都不出错」的 slogan，也进一步说明了测试的困难](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff9fa10f4-1198-4a2f-b546-aed8998940c7%2FUntitled.png?table=block&id=14688756-3979-8040-a39f-f7a4e9444f67&cache=v2&width=1400)
+![MIT 6.824 指南通常打着「数千次都不出错」的 slogan，也进一步说明了测试的困难](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff9fa10f4-1198-4a2f-b546-aed8998940c7%2FUntitled.png?table=block&id=14688756-3979-8040-a39f-f7a4e9444f67&cache=v2&width=528)
 *MIT 6.824 指南通常打着「数千次都不出错」的 slogan，也进一步说明了测试的困难*
 
 如何解决在分布式系统上进行测试的问题？
@@ -69,11 +69,11 @@ canonical: "https://xxxuuu.me/post/deterministic-simulator"
 
 -   混沌测试：ChaosMesh
 
-    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fce9ced73-aa89-44bf-aa5f-7bc067eeaf13%2Fimage.png?table=block&id=14d88756-3979-8036-95ba-c8201bde96f0&cache=v2&width=1400)
+    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fce9ced73-aa89-44bf-aa5f-7bc067eeaf13%2Fimage.png?table=block&id=14d88756-3979-8036-95ba-c8201bde96f0&cache=v2&width=576)
 
 -   验证框架：Jepsen
 
-    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fdfc75047-5a34-4cc6-91a0-c2a82f4e4cf8%2FUntitled.png?table=block&id=87659099-a29a-423f-b646-11284eb2ffeb&cache=v2&width=1400)
+    ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fdfc75047-5a34-4cc6-91a0-c2a82f4e4cf8%2FUntitled.png?table=block&id=87659099-a29a-423f-b646-11284eb2ffeb&cache=v2&width=576)
 
 
 主动向系统注入故障并验证，这能提高错误发生概率，暴露问题。但无法复现的根本问题还是没有解决：
@@ -95,7 +95,7 @@ canonical: "https://xxxuuu.me/post/deterministic-simulator"
 
 Sled（一个类似 RocksDB 的嵌入式存储引擎） 的作者在[一篇文章](https://sled.rs/simulation.html)中提到他是如何在系统中进行测试的：
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff0ceda69-c45c-4992-bc66-37c150805e04%2FUntitled.png?table=block&id=14688756-3979-8004-b4bf-eb00d0243e23&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff0ceda69-c45c-4992-bc66-37c150805e04%2FUntitled.png?table=block&id=14688756-3979-8004-b4bf-eb00d0243e23&cache=v2&width=624)
 
 > Jepsen 的出现成功击溃了几乎所有它测试的分布式系统，这表明我们在根本上以一种错误的方式构建分布式系统，这种方式无法避免 bug 的出现
 
@@ -103,7 +103,7 @@ Sled（一个类似 RocksDB 的嵌入式存储引擎） 的作者在[一篇文�
 
 那我们要怎么做才是正确的？
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F973a1bbf-337b-4131-91f6-446e7fe51205%2FUntitled.png?table=block&id=14688756-3979-8016-b156-d447217c8c99&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F973a1bbf-337b-4131-91f6-446e7fe51205%2FUntitled.png?table=block&id=14688756-3979-8016-b156-d447217c8c99&cache=v2&width=672)
 
 > 1\. 将代码写成能在模拟器上被确定性运行的形式 
 > 2\. 写一个模拟器去模拟真实世界的行为
@@ -120,7 +120,7 @@ Sled（一个类似 RocksDB 的嵌入式存储引擎） 的作者在[一篇文�
 
 FoundationDB 是 Apple 开源的分布式 KV 数据库，FoundationDB 在开发之初花了两年实现模拟器，在后期取得了非常大的回报，是业界最早全面落地确定性测试的工程之一，也是为数不多能够通过 Jepsen 的系统
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F976d433c-4a1f-4a57-8512-3d3a96b455f1%2FUntitled.png?table=block&id=14688756-3979-807f-b5ed-f38e8d6f9f4e&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F976d433c-4a1f-4a57-8512-3d3a96b455f1%2FUntitled.png?table=block&id=14688756-3979-807f-b5ed-f38e8d6f9f4e&cache=v2&width=381.9957275390625)
 
 FoundationDB 基于 C++ 扩展出了一个名为 Flow 的语言（与其说是语言，更像一种扩展的宏功能，只进行了预编译处理）
 
@@ -173,7 +173,7 @@ FoundationDB 本身是开源的，但可惜模拟器部分没有开源，论文�
 
 > Anyway, we did this for a while and found all of the bugs in the database. I know, I know, that’s an insane thing to say. It’s kind of true though. In the entire history of the company, I think we only ever had one or two bugs reported by a customer. *Ever*. Kyle Kingsbury aka “aphyr” didn’t even bother testing it with Jepsen, because he didn’t think he’d find anything.
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ffb249a39-9fb3-4972-8d23-40a0631b0304%2Fimage.png?table=block&id=16388756-3979-809a-a586-f2403bc1a49b&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ffb249a39-9fb3-4972-8d23-40a0631b0304%2Fimage.png?table=block&id=16388756-3979-809a-a586-f2403bc1a49b&cache=v2&width=480)
 
 无论如何，FoundationDB 开创了确定性模拟的先河。所有后来者都无法绕过 FoundationDB 的影响
 
@@ -211,7 +211,7 @@ MadSim 中，系统中每一个节点被抽象成状态机。输入会触发节�
 
 在系统的一开始，存在一个初始状态，接着一些节点的定时器可能被激活（例如心跳或注册等），触发状态转移，发送消息给其它节点，进一步触发其它节点的转移
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd758bf6b-a683-4d6d-af43-3d498791c1e7%2FUntitled.png?table=block&id=93733ab2-0e61-4462-b5bf-01440b2c8d59&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fd758bf6b-a683-4d6d-af43-3d498791c1e7%2FUntitled.png?table=block&id=93733ab2-0e61-4462-b5bf-01440b2c8d59&cache=v2&width=672)
 
 从更高的维度将「整个系统」看作一个大的状态机，唯一的外部输入就只有时间，整个系统就是一个随着时间不断变化状态的状态机，可以看作只有状态转移的时候，时间才被推进了
 
@@ -424,11 +424,11 @@ Dropbox 中 Sync Engine 是一个核心功能，负责在客户端和服务器�
 
 动机就像我们一开始提到的那样，问题复现困难，也没有足够日志定位：
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F70b000f9-def1-4452-ba16-29d7a0af0188%2Fimage.png?table=block&id=15688756-3979-8002-812b-c1bfb8bb916e&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F70b000f9-def1-4452-ba16-29d7a0af0188%2Fimage.png?table=block&id=15688756-3979-8002-812b-c1bfb8bb916e&cache=v2&width=624)
 
 整个测试流程也是类似的，通过 seed 构造全局随机数生成器来生成之后的所有随机决策，如果测试失败则输出 seed
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F5cf0904e-be75-4d15-a553-96685049fef7%2Fimage.png?table=block&id=15688756-3979-8098-ad64-f1f378d9ea14&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F5cf0904e-be75-4d15-a553-96685049fef7%2Fimage.png?table=block&id=15688756-3979-8098-ad64-f1f378d9ea14&cache=v2&width=576)
 
 由于也是 Rust 开发，Trinity 也是作为一个异步 runtime 执行，其他方面也都类似，包括文件系统、网络和时间模拟
 
@@ -445,7 +445,7 @@ Rust 生态中异步 runtime 的事实标准 tokio 也宣布了其官方的确�
 
 并且这个模拟版本 [SimTigerBeetle](https://sim.tigerbeetle.com/) 是可以运行在浏览器中的，还包装成了一个游戏的形式，能够折磨这些 beetle（注入故障）
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff577125b-a82f-4bc4-9273-af63ba3158d2%2Fimage.png?table=block&id=15688756-3979-8040-9b67-fbf1dc7c01f3&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Ff577125b-a82f-4bc4-9273-af63ba3158d2%2Fimage.png?table=block&id=15688756-3979-8040-9b67-fbf1dc7c01f3&cache=v2&width=624)
 
 他们开发了称为 Viewstamped Operation Replicator (VOPR) 的模拟器，并将系统编译为 WebAssembly 运行，和前面的模拟器一样，这里也都包含网络、存储、时钟的模拟，并支持故障注入
 
@@ -604,7 +604,7 @@ func Test(t *testing.T) {
 
 因此，Antithesis 开发了一个**确定性模拟计算机**的 hypervisor。这很疯狂，但确实可行，只要整个虚拟机都是确定性的，那对被测试的软件就是完全透明的
 
-![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9b66cf7a-d962-4958-83cf-d796d9aa08ad%2Fimage.png?table=block&id=16388756-3979-8053-89c7-c17c592b3b22&cache=v2&width=1400)
+![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F9b66cf7a-d962-4958-83cf-d796d9aa08ad%2Fimage.png?table=block&id=16388756-3979-8053-89c7-c17c592b3b22&cache=v2&width=528)
 
 脱离语言的另一个好处是，可以真正运行「整个系统」。例如 FoundationDB 没法在模拟器中使用 RocksDB，因为它有后台线程。RisingWave 也给 etcd 和 Kafka 编写了单独的模拟器。但在 Antithesis 中都不需要为这些依赖的库和组件操心
 
