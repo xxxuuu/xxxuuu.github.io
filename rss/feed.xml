@@ -2122,7 +2122,7 @@ for deterministic executions given an initi…&lt;/div&gt;
 &lt;p&gt;另一条路线是 &lt;a href=&quot;https://github.com/resonatehq/resonate&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;Resonate&lt;/a&gt;，他们则是确实避免使用 goroutine，自己造了一套 coroutine：&lt;/p&gt;
 &lt;figure class=&quot;notion-bookmark&quot;&gt;
       &lt;a href=&quot;https://github.com/resonatehq/resonate/blob/268c588e302f13187309e4b37636d19595d42fa1/internal/kernel/scheduler/coroutine.go&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
-        &lt;div class=&quot;notion-bookmark-cover&quot;&gt;&lt;img src=&quot;https://opengraph.githubassets.com/1d9045cbbe94245e237295b57db98228ff939db420b89b2b325234dd700112dd/resonatehq/resonate&quot; alt=&quot;&quot; loading=&quot;lazy&quot; /&gt;&lt;/div&gt;
+        &lt;div class=&quot;notion-bookmark-cover&quot;&gt;&lt;img src=&quot;https://opengraph.githubassets.com/584747ca8724ea1d99be1522b3a75a4a3c656d1c6405fb3176c85327fd4a2f93/resonatehq/resonate&quot; alt=&quot;&quot; loading=&quot;lazy&quot; /&gt;&lt;/div&gt;
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
           &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://github.githubassets.com/favicons/favicon.svg&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;resonate/internal/kernel/scheduler/coroutine.go at 268c588e302f13187309e4b37636d19595d42fa1 · resonatehq/resonate&lt;/div&gt;
@@ -2415,7 +2415,7 @@ fn main() {
         
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
           &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://www.google.com/s2/favicons?domain=jyywiki.cn&amp;amp;sz=32&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
-          &lt;div class=&quot;notion-bookmark-title&quot;&gt;jyywiki.cn&lt;/div&gt;
+          &lt;div class=&quot;notion-bookmark-title&quot;&gt;M2: 协程库 (libco)&lt;/div&gt;
           
           &lt;div class=&quot;notion-bookmark-url&quot;&gt;jyywiki.cn&lt;/div&gt;
         &lt;/div&gt;
