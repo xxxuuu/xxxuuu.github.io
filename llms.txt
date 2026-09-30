@@ -4,6 +4,7 @@
 
 ## Posts
 
+- [使用 FizzBee 进行形式化验证](https://xxxuuu.me/post/fizzbee-for-formal-verification.md): 前段时间形式化验证的话题在推上似乎有些热度。虽然之前也看过几篇 TLA+ 的入门文章，不过 TLA+ 的语法和思考方式还是太数学了，既难写又难看懂。即使有 PlusCal 这样可以编译成 TLA+ 的「高级」语言，依然很反人类。直到最近…
 - [2026 年夏入 大阪大学情報科学 博士前期/修士课程 合格记](https://xxxuuu.me/post/uosaka-master-exam.md)
 - [DDIA 第二版读后感](https://xxxuuu.me/post/ddia-2nd.md)
 - [2025 年度总结](https://xxxuuu.me/post/2025summary.md)
