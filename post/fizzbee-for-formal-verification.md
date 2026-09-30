@@ -65,11 +65,9 @@ always assertion NotSolved:
 
 打开生成的 `graph.svg` 可以看到整个搜索空间，中间底部的红色状态就是违反安全性约束的状态，即解
 
-
-
 ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc92f6bc3-a3c3-4c0c-abd4-834767ae200e%2Fimage.png?table=block&id=3eb88756-3979-801a-9527-dcfe58c01add&cache=v2&width=1400)
 
-`error-graph.svg` 可以显示只到该状态的路径
+`error-graph.svg` 只显示到该状态的路径
 
 ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F67542f21-37f3-4c80-b443-1a1ba17469bf%2Fimage.png?table=block&id=3eb88756-3979-80b0-a1d6-e27ef6a6da82&cache=v2&width=288)
 
@@ -326,7 +324,7 @@ action Init:
 
 使用 `symmetry.ordinal` 定义一个拥有序数对称性的值域。`limit` 表示其中共存的值数量，因此需要覆盖 Host 本地保存的 `epoch`，以及仍然存在于消息中的 `epoch`
 
-`fresh()` 用于返回一个新的最大值，这里看起来和 `epoch+1` 有一丝语义不一致，`epoch+1` 得到的结果只是比本地值更大，而 `fresh()` 则是全局最大，这在系统里暗示能精确知道其他所有节点的值，这在分布式系统里是不可能的。但别忘了前面提到锁持有者必然有最大的 `epoch`，所以两者还是等价的
+`fresh()` 用于返回一个新的最大值，这里看起来和 `epoch+1` 有一丝语义不一致，`epoch+1` 得到的结果只是比本地值更大，而 `fresh()` 则是全局最大，暗示能精确知道系统其他所有节点的值，这在分布式系统里是不可能的。但别忘了前面提到锁持有者必然有最大的 `epoch`，所以两者还是等价的
 
 
 
@@ -340,7 +338,7 @@ Time taken to check liveness: 375.883417ms
 PASSED: Model checker completed successfully
 ```
 
-状态数从 `max_actions: 20` 时的 27652 下降到 892。成功将其转化成了一个有限状态空间的问题，能够真正穷举所有可能性实现证明了
+状态数从 `max_actions: 20` 时的 27652 下降到 2224。成功将其转化成了一个有限状态空间的问题，能够真正穷举所有可能性实现证明了
 
 
 

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>x³u³</title><description>Life is an append-only log</description><link>https://xxxuuu.me</link><language>zh-CN</language><item><title>使用 FizzBee 进行形式化验证</title><link>https://xxxuuu.me/post/fizzbee-for-formal-verification</link><guid isPermaLink="true">https://xxxuuu.me/post/fizzbee-for-formal-verification</guid><description>前段时间形式化验证的话题在推上似乎有些热度。虽然之前也看过几篇 TLA+ 的入门文章，不过 TLA+ 的语法和思考方式还是太数学了，既难写又难看懂。即使有 PlusCal 这样可以编译成 TLA+ 的「高级」语言，依然很反人类。直到最近…</description><pubDate>Thu, 01 Oct 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;&lt;br&gt;&lt;/p&gt;
-&lt;p&gt;前段时间形式化验证的话题在推上似乎有些热度。虽然之前也看过几篇 TLA+ 的入门文章，不过 TLA+ 的语法和思考方式还是太数学了，既难写又难看懂。即使有 PlusCal 这样可以编译成 TLA+ 的「高级」语言，依然很反人类&lt;/p&gt;
+<?xml version="1.0" encoding="UTF-8"?><rss version="2.0" xmlns:content="http://purl.org/rss/1.0/modules/content/"><channel><title>x³u³</title><description>Life is an append-only log</description><link>https://xxxuuu.me</link><language>zh-CN</language><item><title>使用 FizzBee 进行形式化验证</title><link>https://xxxuuu.me/post/fizzbee-for-formal-verification</link><guid isPermaLink="true">https://xxxuuu.me/post/fizzbee-for-formal-verification</guid><description>前段时间形式化验证的话题在推上似乎有些热度。虽然之前也看过几篇 TLA+ 的入门文章，不过 TLA+ 的语法和思考方式还是太数学了，既难写又难看懂。即使有 PlusCal 这样可以编译成 TLA+ 的「高级」语言，依然很反人类。直到最近…</description><pubDate>Thu, 01 Oct 2026 00:00:00 GMT</pubDate><content:encoded>&lt;p&gt;前段时间形式化验证的话题在推上似乎有些热度。虽然之前也看过几篇 TLA+ 的入门文章，不过 TLA+ 的语法和思考方式还是太数学了，既难写又难看懂。即使有 PlusCal 这样可以编译成 TLA+ 的「高级」语言，依然很反人类&lt;/p&gt;
 &lt;p&gt;直到最近在研究 &lt;a href=&quot;https://slatedb.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot; class=&quot;notion-mention&quot;&gt;
       &lt;span class=&quot;notion-mention-icon&quot;&gt;&lt;img src=&quot;https://slatedb.io/favicon.svg&quot; alt=&quot;&quot; class=&quot;notion-mention-favicon&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;&lt;/span&gt;
       &lt;span class=&quot;notion-mention-text&quot;&gt;SlateDB — An embedded database built on object storage&lt;/span&gt;
@@ -86,14 +85,13 @@ action Init:
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;p&gt;运行 &lt;code&gt;fizz hanoi.fizz&lt;/code&gt; 后模型检查器开始计算，自动触发 action。很快就报错 &lt;code&gt;FAILED: Model checker failed. Invariant:  NotSolved&lt;/code&gt;，说明找到了一个解&lt;/p&gt;
 &lt;p&gt;打开生成的 &lt;code&gt;graph.svg&lt;/code&gt; 可以看到整个搜索空间，中间底部的红色状态就是违反安全性约束的状态，即解&lt;/p&gt;
-&lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;figure class=&quot;notion-image notion-image-center notion-image-page-width&quot; &gt;
       &lt;a href=&quot;https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc92f6bc3-a3c3-4c0c-abd4-834767ae200e%2Fimage.png?table=block&amp;amp;id=3eb88756-3979-801a-9527-dcfe58c01add&quot; class=&quot;glightbox&quot; data-gallery=&quot;article-images&quot; data-description=&quot;&quot; data-title=&quot;Image&quot; style=&quot;aspect-ratio: 1.336553;&quot; data-aspect-ratio=&quot;1.336553&quot;&gt;
         &lt;img src=&quot;https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc92f6bc3-a3c3-4c0c-abd4-834767ae200e%2Fimage.png?table=block&amp;amp;id=3eb88756-3979-801a-9527-dcfe58c01add&amp;amp;cache=v2&amp;amp;width=1400&quot; alt=&quot;Image&quot; loading=&quot;lazy&quot; srcset=&quot;https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc92f6bc3-a3c3-4c0c-abd4-834767ae200e%2Fimage.png?table=block&amp;amp;id=3eb88756-3979-801a-9527-dcfe58c01add&amp;amp;cache=v2&amp;amp;width=750 750w, https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc92f6bc3-a3c3-4c0c-abd4-834767ae200e%2Fimage.png?table=block&amp;amp;id=3eb88756-3979-801a-9527-dcfe58c01add&amp;amp;cache=v2&amp;amp;width=1080 1080w, https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fc92f6bc3-a3c3-4c0c-abd4-834767ae200e%2Fimage.png?table=block&amp;amp;id=3eb88756-3979-801a-9527-dcfe58c01add&amp;amp;cache=v2&amp;amp;width=1400 1400w&quot; sizes=&quot;(min-width: 900px) 900px, 100vw&quot; /&gt;
       &lt;/a&gt;
       
     &lt;/figure&gt;
-&lt;p&gt;&lt;code&gt;error-graph.svg&lt;/code&gt; 可以显示只到该状态的路径&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;error-graph.svg&lt;/code&gt; 只显示到该状态的路径&lt;/p&gt;
 &lt;figure class=&quot;notion-image notion-image-center&quot; style=&quot;max-width: 288px;&quot;&gt;
       &lt;a href=&quot;https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F67542f21-37f3-4c80-b443-1a1ba17469bf%2Fimage.png?table=block&amp;amp;id=3eb88756-3979-80b0-a1d6-e27ef6a6da82&quot; class=&quot;glightbox&quot; data-gallery=&quot;article-images&quot; data-description=&quot;&quot; data-title=&quot;Image&quot; style=&quot;aspect-ratio: 0.885764;&quot; data-aspect-ratio=&quot;0.885764&quot;&gt;
         &lt;img src=&quot;https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F67542f21-37f3-4c80-b443-1a1ba17469bf%2Fimage.png?table=block&amp;amp;id=3eb88756-3979-80b0-a1d6-e27ef6a6da82&amp;amp;cache=v2&amp;amp;width=288&quot; alt=&quot;Image&quot; loading=&quot;lazy&quot; srcset=&quot;https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F67542f21-37f3-4c80-b443-1a1ba17469bf%2Fimage.png?table=block&amp;amp;id=3eb88756-3979-80b0-a1d6-e27ef6a6da82&amp;amp;cache=v2&amp;amp;width=288 288w, https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F67542f21-37f3-4c80-b443-1a1ba17469bf%2Fimage.png?table=block&amp;amp;id=3eb88756-3979-80b0-a1d6-e27ef6a6da82&amp;amp;cache=v2&amp;amp;width=576 576w&quot; sizes=&quot;(min-width: 288px) 288px, 100vw&quot; /&gt;
@@ -487,7 +485,7 @@ action Init:
       
     &lt;/div&gt;
 &lt;p&gt;使用 &lt;code&gt;symmetry.ordinal&lt;/code&gt; 定义一个拥有序数对称性的值域。&lt;code&gt;limit&lt;/code&gt; 表示其中共存的值数量，因此需要覆盖 Host 本地保存的 &lt;code&gt;epoch&lt;/code&gt;，以及仍然存在于消息中的 &lt;code&gt;epoch&lt;/code&gt;&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;fresh()&lt;/code&gt; 用于返回一个新的最大值，这里看起来和 &lt;code&gt;epoch+1&lt;/code&gt; 有一丝语义不一致，&lt;code&gt;epoch+1&lt;/code&gt; 得到的结果只是比本地值更大，而 &lt;code&gt;fresh()&lt;/code&gt; 则是全局最大，这在系统里暗示能精确知道其他所有节点的值，这在分布式系统里是不可能的。但别忘了前面提到锁持有者必然有最大的 &lt;code&gt;epoch&lt;/code&gt;，所以两者还是等价的&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;fresh()&lt;/code&gt; 用于返回一个新的最大值，这里看起来和 &lt;code&gt;epoch+1&lt;/code&gt; 有一丝语义不一致，&lt;code&gt;epoch+1&lt;/code&gt; 得到的结果只是比本地值更大，而 &lt;code&gt;fresh()&lt;/code&gt; 则是全局最大，暗示能精确知道系统其他所有节点的值，这在分布式系统里是不可能的。但别忘了前面提到锁持有者必然有最大的 &lt;code&gt;epoch&lt;/code&gt;，所以两者还是等价的&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;p&gt;删除 &lt;code&gt;max_actions&lt;/code&gt; 的步数限制后运行：&lt;/p&gt;
 &lt;div class=&quot;notion-code-block&quot;&gt;
@@ -510,7 +508,7 @@ Time taken to check liveness: 375.883417ms
 PASSED: Model checker completed successfully&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
-&lt;p&gt;状态数从 &lt;code&gt;max_actions: 20&lt;/code&gt; 时的 27652 下降到 892。成功将其转化成了一个有限状态空间的问题，能够真正穷举所有可能性实现证明了&lt;/p&gt;
+&lt;p&gt;状态数从 &lt;code&gt;max_actions: 20&lt;/code&gt; 时的 27652 下降到 2224。成功将其转化成了一个有限状态空间的问题，能够真正穷举所有可能性实现证明了&lt;/p&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
 &lt;h2 id=&quot;&quot;&gt;最后&lt;/h2&gt;
 &lt;p&gt;FizzBee 是个有趣的项目，文档还有不少其他协议的建模例子，包括 &lt;a href=&quot;https://fizzbee.io/design/examples/two_phase_commit_actors/&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;2PC&lt;/a&gt; 和 &lt;a href=&quot;https://fizzbee.io/design/examples/raft-algorithm-reasoning-spec/&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;Raft&lt;/a&gt; 等。不过看这个项目最近关注度和活跃度都不是很高，希望之后还能继续维护&lt;/p&gt;
