@@ -116,7 +116,7 @@ always assertion NotSolved:
 
 
 
-最后运行再看搜索的状态空间，相比一开始小了不少
+运行后再看搜索的状态空间，相比一开始小了不少
 
 ![Image](https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F3c620bbb-dbde-438a-acd8-39b4743c6a77%2Fimage.png?table=block&id=3eb88756-3979-8026-8e42-fae50285b1f8&cache=v2&width=1400)
 
