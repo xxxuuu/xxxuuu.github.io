@@ -2,7 +2,7 @@
 title: "使用 FizzBee 进行形式化验证"
 description: "前段时间形式化验证的话题在推上似乎有些热度。虽然之前也看过几篇 TLA+ 的入门文章，不过 TLA+ 的语法和思考方式还是太数学了，既难写又难看懂。即使有 PlusCal 这样可以编译成 TLA+ 的「高级」语言，依然很反人类。直到最近…"
 date: "2026-10-01"
-image: "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F0ab30027-250f-4346-9582-54c005670012%2FCD5B42CD-6942-46AC-9A2A-5C3472297273.jpeg?table=block&id=3ea88756-3979-804a-92d8-c185eefdafb9"
+image: "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F828c4906-fce1-4bdc-a8bc-f333be19d324%2F%25E8%259C%259C%25E8%259C%2582%25E7%25A9%25BF%25E6%25A2%25AD%25E7%258A%25B6%25E6%2580%2581%25E7%25A9%25BA%25E9%2597%25B4%25E4%25B8%258E%25E4%25BB%25A3%25E7%25A0%2581%25E5%259B%25BE%25E8%25B0%25B1.png?table=block&id=3ea88756-3979-804a-92d8-c185eefdafb9"
 tags:
   - "分布式系统"
   - "形式化验证"

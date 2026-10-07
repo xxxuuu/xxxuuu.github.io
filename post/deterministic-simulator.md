@@ -2,6 +2,7 @@
 title: "确定性模拟器"
 description: "最初接触到确定性模拟的概念是在 2022 年 Rust China Conf 上听的一场演讲，后续一直持续关注着这个领域，也在腾讯组内分享过相关议题"
 date: "2024-12-21"
+image: "https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fcb59d888-24d4-406a-a7f6-2291102580f4%2F%25E4%25BB%258E%25E6%25B7%25B7%25E6%25B2%258C%25E5%2588%25B0%25E7%25A1%25AE%25E5%25AE%259A%25E6%2580%25A7%25E9%2587%258D%25E6%25BC%2594.png?table=block&id=14688756-3979-80f8-8f88-d0bb8697b4a4"
 tags:
   - "分布式系统"
 canonical: "https://xxxuuu.me/post/deterministic-simulator"
