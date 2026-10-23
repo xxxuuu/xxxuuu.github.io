@@ -23,16 +23,16 @@
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;role Rod:
-    action Init:
-        self.disks = []
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;role Rod&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+    action Init&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;disks &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;[]&lt;/span&gt;
 
-    atomic action Move:
-        require len(self.disks) &amp;gt; 0
-        other_rod = oneof RODS \
-            if other_rod != self and \
-                (len(other_rod.disks) == 0 or other_rod.disks[-1] &amp;gt; self.disks[-1])
-        other_rod.disks.append(self.disks.pop())&lt;/code&gt;&lt;/pre&gt;
+    atomic action Move&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+        require &lt;span class=&quot;code-function&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;disks&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;0&lt;/span&gt;
+        other_rod &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; oneof RODS &lt;span class=&quot;code-punctuation&quot;&gt;\&lt;/span&gt;
+            &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; other_rod &lt;span class=&quot;code-operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;and&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;\&lt;/span&gt;
+                &lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;other_rod&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;disks&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;or&lt;/span&gt; other_rod&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;disks&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;disks&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;])&lt;/span&gt;
+        other_rod&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;disks&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;append&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;disks&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;pop&lt;span class=&quot;code-punctuation&quot;&gt;())&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;这里有几个和 Python 不同的 keyword：&lt;/p&gt;
@@ -55,13 +55,13 @@
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;NUM_RODS = 3
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;NUM_RODS &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;3&lt;/span&gt;
 
-action Init:
-    RODS = []
-    for _ in range(NUM_RODS):
-        RODS.append(Rod())
-    RODS[0].disks = [3,2,1]&lt;/code&gt;&lt;/pre&gt;
+action Init&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+    RODS &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;[]&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;for&lt;/span&gt; _ &lt;span class=&quot;code-keyword&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;range&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;NUM_RODS&lt;span class=&quot;code-punctuation&quot;&gt;):&lt;/span&gt;
+        RODS&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;append&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;Rod&lt;span class=&quot;code-punctuation&quot;&gt;())&lt;/span&gt;
+    RODS&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;].&lt;/span&gt;disks &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;形式化验证通过探索状态空间来寻找违反约束的反例，这里我们需要寻找的是一个解，所以最后要反过来将停止条件作为安全性（safety）不变量，使用 &lt;code&gt;always assertion&lt;/code&gt; 声明安全性约束：&lt;/p&gt;
@@ -78,8 +78,8 @@ action Init:
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;always assertion NotSolved:
-    return RODS[-1].disks != [3,2,1]&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;always assertion NotSolved&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; RODS&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;].&lt;/span&gt;disks &lt;span class=&quot;code-operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;]&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
@@ -134,8 +134,8 @@ action Init:
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-diff&quot;&gt;- role Rod:
-+ symmetric role Rod:&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-diff&quot;&gt;&lt;span class=&quot;code-punctuation&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-comment&quot;&gt; role Rod:&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt; symmetric role Rod:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;修改初始化部分，&lt;code&gt;RODS&lt;/code&gt; 从 &lt;code&gt;list&lt;/code&gt; 替换成 &lt;code&gt;bag&lt;/code&gt;，&lt;code&gt;bag&lt;/code&gt; 是 multiset，能够忽略元素顺序。并显式定义 &lt;code&gt;source&lt;/code&gt;，因为检查结果时需要判断圆盘不能在起始柱子上:&lt;/p&gt;
@@ -153,16 +153,16 @@ action Init:
       &lt;/div&gt;
     
       &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-diff&quot;&gt;action Init:
--    RODS = []
--    for _ in range(NUM_RODS):
--        RODS.append(Rod())
--    RODS[0].disks = [3,2,1]
-+    RODS = bag()
-+    source = Rod()
-+    source.disks = [3, 2, 1]
-+    RODS.add(source)
-+    for _ in range(NUM_RODS-1):
-+        RODS.add(Rod())&lt;/code&gt;&lt;/pre&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-comment&quot;&gt;    RODS = []&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-comment&quot;&gt;    for _ in range(NUM_RODS):&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-comment&quot;&gt;        RODS.append(Rod())&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-comment&quot;&gt;    RODS[0].disks = [3,2,1]&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;    RODS = bag()&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;    source = Rod()&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;    source.disks = [3, 2, 1]&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;    RODS.add(source)&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;    for _ in range(NUM_RODS-1):&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;        RODS.add(Rod())&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;最后修改安全性约束，圆盘可以位于起始柱子之外的任意柱子&lt;/p&gt;
@@ -180,8 +180,8 @@ action Init:
       &lt;/div&gt;
     
       &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-diff&quot;&gt;always assertion NotSolved:
--    return RODS[-1].disks != [3,2,1]
-+    return all([rod == source or rod.disks != [3, 2, 1] for rod in RODS])&lt;/code&gt;&lt;/pre&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-comment&quot;&gt;    return RODS[-1].disks != [3,2,1]&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;    return all([rod == source or rod.disks != [3, 2, 1] for rod in RODS])&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
@@ -234,11 +234,11 @@ action Init:
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;action Send:
-    target = oneof HOSTS if target != self
-    MSG[self][target].append(self.epoch+1)
-    epoch = oneof MSGS[self][target]
-    target.receive_grant(epoch)&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;action Send&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+    target &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; oneof HOSTS &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; target &lt;span class=&quot;code-operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;
+    MSG&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;][&lt;/span&gt;target&lt;span class=&quot;code-punctuation&quot;&gt;].&lt;/span&gt;append&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;epoch&lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;
+    epoch &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; oneof MSGS&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;][&lt;/span&gt;target&lt;span class=&quot;code-punctuation&quot;&gt;]&lt;/span&gt;
+    target&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;receive_grant&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;epoch&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;&lt;code&gt;MSGS&lt;/code&gt; 用于存储所有发送过的消息集合，在发送时通过 &lt;code&gt;oneof&lt;/code&gt; 随机选择一个消息发送，模拟乱序和重复。关于丢失，之前提到 FizzBee 是存在隐式故障注入的，非 &lt;code&gt;atmoic&lt;/code&gt; 的 action 会自动进行故障注入，action 的每一行间都可能 crash。延迟则等价于消息丢失后重发&lt;/p&gt;
@@ -257,27 +257,27 @@ action Init:
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;symmetric role Host:
-    action Init:
-        self.holds = False
-        self.epoch = 0
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;symmetric role Host&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+    action Init&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;holds &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;False&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;epoch &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;0&lt;/span&gt;
 
-    atomic action Grant:
-        require self.holds == True
-        self.holds = False
-        target = oneof HOSTS if target != self
-        MSGS[self][target].add(self.epoch+1)
+    atomic action Grant&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+        require &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;holds &lt;span class=&quot;code-operator&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;True&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;holds &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;False&lt;/span&gt;
+        target &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; oneof HOSTS &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; target &lt;span class=&quot;code-operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;
+        MSGS&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;][&lt;/span&gt;target&lt;span class=&quot;code-punctuation&quot;&gt;].&lt;/span&gt;add&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;epoch&lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;
 
-    action Send:
-        require len(MSGS[self]) &amp;gt; 0
-        target = oneof HOSTS if target != self
-        epoch = oneof MSGS[self][target]
-        target.receive_grant(epoch)
+    action Send&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+        require &lt;span class=&quot;code-function&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;MSGS&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;0&lt;/span&gt;
+        target &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; oneof HOSTS &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; target &lt;span class=&quot;code-operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;
+        epoch &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; oneof MSGS&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;][&lt;/span&gt;target&lt;span class=&quot;code-punctuation&quot;&gt;]&lt;/span&gt;
+        target&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;receive_grant&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;epoch&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;
 
-    atomic func receive_grant(new_epoch):
-        if new_epoch &amp;gt; self.epoch:
-            self.holds = True
-            self.epoch = new_epoch&lt;/code&gt;&lt;/pre&gt;
+    atomic func receive_grant&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;new_epoch&lt;span class=&quot;code-punctuation&quot;&gt;):&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; new_epoch &lt;span class=&quot;code-operator&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;epoch&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;holds &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;True&lt;/span&gt;
+            &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;epoch &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; new_epoch&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;这里将 Grant 和 Send 拆开，Send 表示消息投递过程，因为需要故障注入所以必须是非 &lt;code&gt;atmoic&lt;/code&gt; 的。其他流程可以视为节点本地的状态转换，不产生中间状态，使用 &lt;code&gt;atomic&lt;/code&gt; 修饰，这也能优化模型检查器执行性能&lt;/p&gt;
@@ -296,12 +296,12 @@ action Init:
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;always assertion MutualExclusion:
-    return len([
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;always assertion MutualExclusion&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;len&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;([&lt;/span&gt;
         host
-        for host in HOSTS
-        if host.holds
-    ]) &amp;lt;= 1&lt;/code&gt;&lt;/pre&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;for&lt;/span&gt; host &lt;span class=&quot;code-keyword&quot;&gt;in&lt;/span&gt; HOSTS
+        &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; host&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;holds
+    &lt;span class=&quot;code-punctuation&quot;&gt;])&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;&amp;lt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;不难发现这里还有另一个性质，锁持有者必然拥有最大的 &lt;code&gt;epoch&lt;/code&gt;。也加入约束里&lt;/p&gt;
@@ -318,13 +318,13 @@ action Init:
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;always assertion HolderHasMaxEpoch:
-    for holder in HOSTS:
-        if holder.holds:
-            for host in HOSTS:
-                if host.epoch &amp;gt; holder.epoch:
-                    return False
-    return True&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;always assertion HolderHasMaxEpoch&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;for&lt;/span&gt; holder &lt;span class=&quot;code-keyword&quot;&gt;in&lt;/span&gt; HOSTS&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; holder&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;holds&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;code-keyword&quot;&gt;for&lt;/span&gt; host &lt;span class=&quot;code-keyword&quot;&gt;in&lt;/span&gt; HOSTS&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; host&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;epoch &lt;span class=&quot;code-operator&quot;&gt;&amp;gt;&lt;/span&gt; holder&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;epoch&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+                    &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;False&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;True&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
@@ -342,9 +342,9 @@ action Init:
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-yaml&quot;&gt;deadlock_detection: false
-options:
-  max_actions: 20&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-yaml&quot;&gt;&lt;span class=&quot;code-tag&quot;&gt;deadlock_detection&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;false&lt;/span&gt;
+&lt;span class=&quot;code-tag&quot;&gt;options&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;code-tag&quot;&gt;max_actions&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;20&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;注意 &lt;code&gt;max_actions&lt;/code&gt; 太低也可能导致无法覆盖某些重要路径从而验证失真。实际上该问题原本是要做任意数量 Host 下的归纳证明，但 FizzBee 只能对有限状态空间下做模型验证，还无法进行参数化定理证明&lt;/p&gt;
@@ -384,11 +384,11 @@ PASSED: Model checker completed successfully&lt;/code&gt;&lt;/pre&gt;
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;always eventually assertion HolderExists:
-    return any([
-        host.holds
-        for host in HOSTS
-    ])&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-python&quot;&gt;always eventually assertion HolderExists&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;any&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;([&lt;/span&gt;
+        host&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;holds
+        &lt;span class=&quot;code-keyword&quot;&gt;for&lt;/span&gt; host &lt;span class=&quot;code-keyword&quot;&gt;in&lt;/span&gt; HOSTS
+    &lt;span class=&quot;code-punctuation&quot;&gt;])&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;再次运行，检查器很快就报错了，符合预期。case 是 Host 0 向 Host 1 进行 Grant 后消息丢失&lt;/p&gt;
@@ -458,29 +458,29 @@ Host#2: fields(epoch = 0, holds = False, msgs = {0: {}, 1: {}})
     
       &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-diff&quot;&gt;...
 
-+ EPOCHS = symmetry.ordinal(name=&amp;quot;epoch&amp;quot;, limit=2*NUM_HOSTS+1)
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt; EPOCHS = symmetry.ordinal(name=&amp;quot;epoch&amp;quot;, limit=2*NUM_HOSTS+1)&lt;/span&gt;
 
 ...
 
 symmetric role Host:
     action Init:
         self.holds = False
--        self.epoch = 0
-+        self.epoch = EPOCHS.min()
+&lt;span class=&quot;code-punctuation&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-comment&quot;&gt;        self.epoch = 0&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;        self.epoch = EPOCHS.min()&lt;/span&gt;
 
     atomic action Grant:
         require self.holds == True
         self.holds = False
         target = oneof HOSTS if target != self
--        MSGS[self][target].add(self.epoch+1)
-+        MSGS[self][target].add(EPOCHS.fresh())
+&lt;span class=&quot;code-punctuation&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-comment&quot;&gt;        MSGS[self][target].add(self.epoch+1)&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;        MSGS[self][target].add(EPOCHS.fresh())&lt;/span&gt;
 
 ...
 
 action Init:
 ...
--    initial_holder.epoch = 1
-+    initial_holder.epoch = EPOCHS.fresh()
+&lt;span class=&quot;code-punctuation&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;code-comment&quot;&gt;    initial_holder.epoch = 1&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;+&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;    initial_holder.epoch = EPOCHS.fresh()&lt;/span&gt;
 ...   &lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
@@ -491,7 +491,7 @@ action Init:
 &lt;div class=&quot;notion-code-block&quot;&gt;
       
       &lt;div class=&quot;notion-code-header&quot;&gt;
-        &lt;span class=&quot;notion-code-language&quot;&gt;Diff&lt;/span&gt;
+        &lt;span class=&quot;notion-code-language&quot;&gt;Plain text&lt;/span&gt;
         &lt;button class=&quot;notion-code-copy&quot; title=&quot;复制代码&quot; aria-label=&quot;复制代码&quot;&gt;
           &lt;svg width=&quot;16&quot; height=&quot;16&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;2&quot; stroke-linecap=&quot;round&quot; stroke-linejoin=&quot;round&quot;&gt;
             &lt;rect x=&quot;9&quot; y=&quot;9&quot; width=&quot;13&quot; height=&quot;13&quot; rx=&quot;2&quot; ry=&quot;2&quot;&gt;&lt;/rect&gt;
@@ -501,7 +501,7 @@ action Init:
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-diff&quot;&gt;...
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-plain text&quot;&gt;...
 Valid Nodes: 4077 Unique states: 2224
 IsLive: true
 Time taken to check liveness: 375.883417ms
@@ -2161,10 +2161,10 @@ PASSED: Model checker completed successfully&lt;/code&gt;&lt;/pre&gt;
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;ACTOR Future&amp;lt;float&amp;gt; asyncAdd(Futur&amp;lt;float&amp;gt; f, float offset) {
-    float value = wait(f);
-    return value + offset;
-}&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;&lt;span class=&quot;code-variable&quot;&gt;ACTOR&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Future&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;asyncAdd&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;Futur&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;float&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;wait&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;f&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;value&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;offset&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;模拟器中每个测试由一段配置文件定义，这里包括了测试的行为，以及注入的故障，例如向网络注入延迟、关闭连接、杀死节点、变更配置等。只要用相同的配置文件作为输入，模拟器就会产生相同的执行历史，问题就能被复现&lt;/p&gt;
@@ -2282,24 +2282,24 @@ PASSED: Model checker completed successfully&lt;/code&gt;&lt;/pre&gt;
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;/// Create a new runtime instance with given seed and config.
-pub fn with_seed_and_config(seed: u64, config: Config) -&amp;gt; Self {
-    let rand = rand::GlobalRng::new_with_seed(seed);
-    let sims = Arc::new(Mutex::new(HashMap::new()));
-    let task = task::Executor::new(rand.clone(), sims.clone());
-    let handle = Handle {
-        rand: rand.clone(),
-        time: task.time_handle().clone(),
-        task: task.handle().clone(),
-        sims,
-        config,
-        allow_system_thread: false,
-    };
-    let rt = Runtime { rand, task, handle };
-    rt.add_simulator::&amp;lt;fs::FsSim&amp;gt;();
-    rt.add_simulator::&amp;lt;net::NetSim&amp;gt;();
-    rt
-}&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;&lt;span class=&quot;code-comment&quot;&gt;/// Create a new runtime instance with given seed and config.&lt;/span&gt;
+&lt;span class=&quot;code-keyword&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;with_seed_and_config&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;seed&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;u64&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Config&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;Self&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;rand&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; rand&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;GlobalRng&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;new_with_seed&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;seed&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;sims&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Arc&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;Mutex&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;HashMap&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()));&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;task&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; task&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Executor&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;rand&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;sims&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;());&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;handle&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Handle&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;rand&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;rand&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(),&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;task&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;time_handle&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(),&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;task&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;task&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;handle&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(),&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;sims&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;allow_system_thread&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;false&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;};&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;rt&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Runtime&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;rand&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;task&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;handle&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;};&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;rt&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;add_simulator&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;&lt;/span&gt;fs&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;FsSim&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;gt;();&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;rt&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;add_simulator&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;&lt;/span&gt;net&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;NetSim&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;gt;();&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;rt&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       &lt;div class=&quot;notion-code-caption&quot;&gt;madsim/src/sim/runtime/mod.rs&lt;/div&gt;
     &lt;/div&gt;&lt;/li&gt;
 &lt;li&gt;定时器，实质上是在时间堆中加入了一个带定时器回调的输入
@@ -2316,18 +2316,18 @@ pub fn with_seed_and_config(seed: u64, config: Config) -&amp;gt; Self {
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;pub(crate) fn add_timer_at(
-    &amp;amp;self,
-    deadline: Instant,
-    callback: impl FnOnce() + Send + Sync + &amp;#039;static,
-) {
-    let mut timer = self.timer.lock();
-    timer.add(deadline - self.clock.base_instant(), |_| callback());
-}
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;&lt;span class=&quot;code-keyword&quot;&gt;pub&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;crate&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;add_timer_at&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;deadline&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Instant&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;impl&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;FnOnce&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Send&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Sync&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;&amp;#039;&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;static&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;timer&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;timer&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;lock&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;timer&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;add&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;deadline&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;clock&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;base_instant&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;_&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;());&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
 
-pub(crate) fn add_timer(&amp;amp;self, dur: Duration, callback: impl FnOnce() + Send + Sync + &amp;#039;static) {
-    self.add_timer_at(self.clock.now_instant() + dur, callback);
-}&lt;/code&gt;&lt;/pre&gt;
+&lt;span class=&quot;code-keyword&quot;&gt;pub&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;crate&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;add_timer&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dur&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Duration&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;impl&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;FnOnce&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Send&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Sync&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;&amp;#039;&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;static&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;add_timer_at&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;clock&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;now_instant&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dur&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;callback&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       &lt;div class=&quot;notion-code-caption&quot;&gt;madsim/src/sim/time/mod.rs&lt;/div&gt;
     &lt;/div&gt;&lt;/li&gt;
 &lt;li&gt;调度器：通过 event-loop 来进行调度，从就绪队列里随机取任务执行，这里的「随机」也是基于全局的随机数生成器，调度顺序都是被 seed 确定的。然后直接跳转到下一个事件的时间点
@@ -2344,39 +2344,39 @@ pub(crate) fn add_timer(&amp;amp;self, dur: Duration, callback: impl FnOnce() + 
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;pub fn block_on&amp;lt;F: Future&amp;gt;(&amp;amp;self, future: F) -&amp;gt; F::Output {
-    // ...
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;&lt;span class=&quot;code-keyword&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;block_on&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Future&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;future&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;F&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;-&amp;gt;&lt;/span&gt; F&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Output&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-comment&quot;&gt;// ...&lt;/span&gt;
     
-    loop {
-        self.run_all_ready();
-        if task.is_finished() {
-            return task.now_or_never().unwrap();
-        }
-        let going = self.time.advance_to_next_event();
+    &lt;span class=&quot;code-keyword&quot;&gt;loop&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;run_all_ready&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;task&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;is_finished&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;task&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;now_or_never&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;unwrap&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;();&lt;/span&gt;
+        &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;going&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;time&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;advance_to_next_event&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;();&lt;/span&gt;
         
-        // ...
-    }
-}
+        &lt;span class=&quot;code-comment&quot;&gt;// ...&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
 
-/// Drain all tasks from ready queue and run them.
-fn run_all_ready(&amp;amp;self) {
-    while let Ok(runnable) = self.queue.try_recv_random(&amp;amp;self.rand) {
-        // ...
+&lt;span class=&quot;code-comment&quot;&gt;/// Drain all tasks from ready queue and run them.&lt;/span&gt;
+&lt;span class=&quot;code-keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;run_all_ready&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;while&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Ok&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;runnable&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;queue&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;try_recv_random&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;rand&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-comment&quot;&gt;// ...&lt;/span&gt;
         
-        // run the task
-        let res = {
-            let _guard = crate::context::enter_task(info.clone());
-            std::panic::catch_unwind(move || work(runnable))
-        };
-        if let Err(e) = res {
-            // ...
-        }
+        &lt;span class=&quot;code-comment&quot;&gt;// run the task&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;_guard&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;crate&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;context&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;enter_task&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;info&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;());&lt;/span&gt;
+            std&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;panic&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;catch_unwind&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;move&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;work&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;runnable&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;code-punctuation&quot;&gt;};&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Err&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;e&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;res&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+            &lt;span class=&quot;code-comment&quot;&gt;// ...&lt;/span&gt;
+        &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
 
-        // advance time: 50-100ns
-        let dur = Duration::from_nanos(self.rand.with(|rng| rng.gen_range(50..100)));
-        self.time.handle().advance(dur);
-    }
-}&lt;/code&gt;&lt;/pre&gt;
+        &lt;span class=&quot;code-comment&quot;&gt;// advance time: 50-100ns&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dur&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Duration&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;from_nanos&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;rand&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;with&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;|&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;rng&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;|&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;rng&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;gen_range&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;50&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;100&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)));&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;time&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;handle&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;advance&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;dur&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       &lt;div class=&quot;notion-code-caption&quot;&gt;madsim/src/sim/task/mod.rs&lt;/div&gt;
     &lt;/div&gt;&lt;/li&gt;
 &lt;li&gt;网络接口的语义比较复杂，这部分有不小工作量，最底下是维护链接的实现，这里存储了所有节点的信息，使用 channel 进行通信，并且可以根据配置的丢包率和延迟来注入故障。再往上提供 socket 语义的接口，感觉都是体力活
@@ -2393,69 +2393,69 @@ fn run_all_ready(&amp;amp;self) {
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;/// Opens a new connection to destination.
-pub(crate) async fn connect1(
-    self: &amp;amp;Arc&amp;lt;Self&amp;gt;,
-    node: NodeId,
-    port: u16,
-    mut dst: SocketAddr,
-    protocol: IpProtocol,
-) -&amp;gt; io::Result&amp;lt;(PayloadSender, PayloadReceiver, SocketAddr)&amp;gt; {
-    self.rand_delay().await?;
-    if let Some(addr) = self
-        .ipvs
-        .get_server(ServiceAddr::from_addr_proto(dst, protocol))
-    {
-        dst = addr.parse().expect(&amp;quot;invalid socket address&amp;quot;);
-    }
-    let (ip, dst_node, socket, latency) = (self.network.lock().try_send(node, dst, protocol))
-        .ok_or_else(|| {
-        io::Error::new(io::ErrorKind::ConnectionRefused, &amp;quot;connection refused&amp;quot;)
-    })?;
-    let src = (ip, port).into();
-    let (tx1, rx1) = self.channel(node, dst, protocol);
-    let (tx2, rx2) = self.channel(dst_node, src, protocol);
-    trace!(?latency, &amp;quot;delay&amp;quot;);
-    // FIXME: delay
-    // self.time.add_timer(latency, move || {
-    socket.new_connection(src, dst, tx2, rx1);
-    // });
-    Ok((tx1, rx2, src))
-}
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;&lt;span class=&quot;code-comment&quot;&gt;/// Opens a new connection to destination.&lt;/span&gt;
+&lt;span class=&quot;code-keyword&quot;&gt;pub&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;crate&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;async&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;connect1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Arc&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;Self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;NodeId&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;u16&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;SocketAddr&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;IpProtocol&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;-&amp;gt;&lt;/span&gt; io&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Result&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;(&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;PayloadSender&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;PayloadReceiver&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;SocketAddr&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;rand_delay&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;await&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Some&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;addr&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;
+        &lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;ipvs
+        &lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;get_server&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;ServiceAddr&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;from_addr_proto&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;))&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;addr&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;parse&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;expect&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;invalid socket address&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;ip&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst_node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;latency&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;network&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;lock&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;try_send&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;))&lt;/span&gt;
+        &lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;ok_or_else&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        io&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;Error&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;io&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;ErrorKind&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;ConnectionRefused&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;connection refused&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;})&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;src&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;ip&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;into&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;();&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;tx1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;rx1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;channel&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;tx2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;rx2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;channel&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;dst_node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;code-function&quot;&gt;trace!&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;latency&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;delay&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;code-comment&quot;&gt;// FIXME: delay&lt;/span&gt;
+    &lt;span class=&quot;code-comment&quot;&gt;// self.time.add_timer(latency, move || {&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;socket&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;new_connection&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;tx2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;rx1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;code-comment&quot;&gt;// });&lt;/span&gt;
+    &lt;span class=&quot;code-function&quot;&gt;Ok&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;tx1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;rx2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
 
-/// Try sending a message to the destination.
-///
-/// If destination is not found or packet loss, returns `None`.
-/// Otherwise returns the source IP, socket and latency.
-pub fn try_send(
-    &amp;amp;mut self,
-    node: NodeId,
-    dst: SocketAddr,
-    protocol: IpProtocol,
-) -&amp;gt; Option&amp;lt;(IpAddr, NodeId, Arc&amp;lt;dyn Socket&amp;gt;, Duration)&amp;gt; {
-    let dst_node = self.resolve_dest_node(node, dst, protocol)?;
-    let latency = self.test_link(node, dst_node)?;
-    let sockets = &amp;amp;self.nodes.get(&amp;amp;dst_node)?.sockets;
-    let ep = (sockets.get(&amp;amp;(dst, protocol)))
-        .or_else(|| sockets.get(&amp;amp;((Ipv4Addr::UNSPECIFIED, dst.port()).into(), protocol)))?;
-    let src_ip = if dst.ip().is_loopback() {
-        IpAddr::V4(Ipv4Addr::LOCALHOST)
-    } else {
-        self.nodes.get(&amp;amp;node).expect(&amp;quot;node not found&amp;quot;).ip.unwrap()
-    };
-    Some((src_ip, dst_node, ep.clone(), latency))
-}
+&lt;span class=&quot;code-comment&quot;&gt;/// Try sending a message to the destination.&lt;/span&gt;
+&lt;span class=&quot;code-comment&quot;&gt;///&lt;/span&gt;
+&lt;span class=&quot;code-comment&quot;&gt;/// If destination is not found or packet loss, returns `None`.&lt;/span&gt;
+&lt;span class=&quot;code-comment&quot;&gt;/// Otherwise returns the source IP, socket and latency.&lt;/span&gt;
+&lt;span class=&quot;code-keyword&quot;&gt;pub&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;try_send&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;
+    &lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;NodeId&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;SocketAddr&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;code-variable&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;IpProtocol&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Option&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;(&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;IpAddr&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;NodeId&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Arc&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;dyn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Socket&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;gt;,&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Duration&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst_node&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;resolve_dest_node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;latency&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;test_link&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst_node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;sockets&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;nodes&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;dst_node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;?.&lt;/span&gt;sockets&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;ep&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;sockets&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)))&lt;/span&gt;
+        &lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;or_else&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;sockets&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;((&lt;/span&gt;Ipv4Addr&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;UNSPECIFIED&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;())&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;into&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)))&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;?&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;src_ip&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;ip&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;is_loopback&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-function&quot;&gt;IpAddr&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;V4&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;Ipv4Addr&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;LOCALHOST&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;nodes&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;get&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;expect&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;node not found&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;ip&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;unwrap&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;};&lt;/span&gt;
+    &lt;span class=&quot;code-function&quot;&gt;Some&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;src_ip&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst_node&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;ep&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(),&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;latency&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;))&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
 
-/// Returns the latency of sending a packet. If packet loss, returns `None`.
-fn test_link(&amp;amp;mut self, src: NodeId, dst: NodeId) -&amp;gt; Option&amp;lt;Duration&amp;gt; {
-    if self.link_clogged(src, dst) || self.rand.gen_bool(self.config.packet_loss_rate) {
-        None
-    } else {
-        self.stat.msg_count += 1;
-        // TODO: special value for loopback
-        Some(self.rand.gen_range(self.config.send_latency.clone()))
-    }
-}&lt;/code&gt;&lt;/pre&gt;
+&lt;span class=&quot;code-comment&quot;&gt;/// Returns the latency of sending a packet. If packet loss, returns `None`.&lt;/span&gt;
+&lt;span class=&quot;code-keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;test_link&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;NodeId&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;NodeId&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;-&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Option&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Duration&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;link_clogged&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;src&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;dst&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;||&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;rand&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;gen_bool&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;config&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;packet_loss_rate&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-function&quot;&gt;None&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;else&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;stat&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;msg_count &lt;span class=&quot;code-operator&quot;&gt;+=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-comment&quot;&gt;// TODO: special value for loopback&lt;/span&gt;
+        &lt;span class=&quot;code-function&quot;&gt;Some&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;rand&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;gen_range&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;self&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;config&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;send_latency&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;clone&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()))&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       &lt;div class=&quot;notion-code-caption&quot;&gt;madsim/src/sim/net/mod.rs &amp; madsim/src/sim/net/network.rs&lt;/div&gt;
     &lt;/div&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -2636,7 +2636,7 @@ for deterministic executions given an initi…&lt;/div&gt;
 &lt;p&gt;另一条路线是 &lt;a href=&quot;https://github.com/resonatehq/resonate&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;Resonate&lt;/a&gt;，他们则是确实避免使用 goroutine，自己造了一套 coroutine：&lt;/p&gt;
 &lt;figure class=&quot;notion-bookmark&quot;&gt;
       &lt;a href=&quot;https://github.com/resonatehq/resonate/blob/268c588e302f13187309e4b37636d19595d42fa1/internal/kernel/scheduler/coroutine.go&quot; target=&quot;_blank&quot; rel=&quot;noopener noreferrer&quot;&gt;
-        &lt;div class=&quot;notion-bookmark-cover&quot;&gt;&lt;img src=&quot;https://opengraph.githubassets.com/631b152479525b3b41563a5ae1d9266faceb86cd7ffe89779dc55d5591bf867a/resonatehq/resonate&quot; alt=&quot;&quot; loading=&quot;lazy&quot; /&gt;&lt;/div&gt;
+        &lt;div class=&quot;notion-bookmark-cover&quot;&gt;&lt;img src=&quot;https://opengraph.githubassets.com/f46f2caf015366699d2121552454cc43600651bab39fe545bb4d0d70ee3c2cac/resonatehq/resonate&quot; alt=&quot;&quot; loading=&quot;lazy&quot; /&gt;&lt;/div&gt;
         &lt;div class=&quot;notion-bookmark-info&quot;&gt;
           &lt;img class=&quot;notion-bookmark-icon&quot; src=&quot;https://github.githubassets.com/favicons/favicon.svg&quot; alt=&quot;&quot; loading=&quot;lazy&quot; onerror=&quot;this.style.display=&apos;none&apos;&quot; /&gt;
           &lt;div class=&quot;notion-bookmark-title&quot;&gt;resonate/internal/kernel/scheduler/coroutine.go at 268c588e302f13187309e4b37636d19595d42fa1 · resonatehq/resonate&lt;/div&gt;
@@ -2665,22 +2665,22 @@ for deterministic executions given an initi…&lt;/div&gt;
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-go&quot;&gt;import (
-	&amp;quot;testing&amp;quot;
-	&amp;quot;testing/synctest&amp;quot;
-	&amp;quot;time&amp;quot;
-)
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-go&quot;&gt;&lt;span class=&quot;code-keyword&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;
+	&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;testing&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;
+	&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;testing/synctest&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;
+	&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;
 
-func Test(t *testing.T) {
-	synctest.Run(func() {
-		before := time.Now()
-		time.Sleep(time.Second)
-		after := time.Now()
-		if d := after.Sub(before); d != time.Second {
-			t.Fatalf(&amp;quot;took %v&amp;quot;, d)
-		}
-	})
-}&lt;/code&gt;&lt;/pre&gt;
+&lt;span class=&quot;code-keyword&quot;&gt;func&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Test&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;t&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;testing&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;T&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+	&lt;span class=&quot;code-variable&quot;&gt;synctest&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Run&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;func&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+		&lt;span class=&quot;code-variable&quot;&gt;before&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Now&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;
+		&lt;span class=&quot;code-variable&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Sleep&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;Second&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;
+		&lt;span class=&quot;code-variable&quot;&gt;after&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Now&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;
+		&lt;span class=&quot;code-keyword&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;:=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;after&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Sub&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;before&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;d&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;!=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;Second&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+			&lt;span class=&quot;code-variable&quot;&gt;t&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Fatalf&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;took %v&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;d&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt;
+		&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
+	&lt;span class=&quot;code-punctuation&quot;&gt;})&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;这也是确定性模拟中所需的一个重要机制，希望随着 Go 自身的进一步开发，未来能有更 native 的方式在 Go 上实现确定性模拟&lt;/p&gt;
@@ -2801,17 +2801,17 @@ func Test(t *testing.T) {
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;generator&amp;lt;int&amp;gt; fib() {
-    int a = 1, b = 1;
-    yield a;
-    yield b;
-    while(true) {
-        int c = a + b;
-        yield c;
-        a = b;
-        b = c;
-    }
-}&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;&lt;span class=&quot;code-function&quot;&gt;generator&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;fib&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-function&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-function&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-function&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;对 fib 进行调用，会返回斐波那契数列 1，1，2，3，5，8… &lt;/p&gt;
@@ -2833,39 +2833,39 @@ func Test(t *testing.T) {
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;int fib() {
-    static int state = 0;
-    static int a = 1;
-    static int b = 1;
-    static int c = 0;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;&lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;fib&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;static&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
 
-    switch (state) {
-        case 0:
-            state = 1;
-            goto s0;
-        case 1:
-            state = 2;
-            goto s1;
-        case 2:
-            state = 3;
-            goto s2;
-        case 3:
-            goto s3;
-    }
+    &lt;span class=&quot;code-keyword&quot;&gt;switch&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;code-variable&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;code-keyword&quot;&gt;goto&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;s0&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;code-variable&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;code-keyword&quot;&gt;goto&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;s1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;code-variable&quot;&gt;state&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+            &lt;span class=&quot;code-keyword&quot;&gt;goto&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;s2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;case&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;code-keyword&quot;&gt;goto&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;s3&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
 
-s0:
-    return a;
-s1:
-    return b;
-s2:
-    while(true) {
-        c = a + b;
-        return c;
-        s3:
-        a = b;
-        b = c;
-    }
-}&lt;/code&gt;&lt;/pre&gt;
+&lt;span class=&quot;code-variable&quot;&gt;s0&lt;/span&gt;:
+    &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;code-variable&quot;&gt;s1&lt;/span&gt;:
+    &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;code-variable&quot;&gt;s2&lt;/span&gt;:
+    &lt;span class=&quot;code-keyword&quot;&gt;while&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;true&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        s3&lt;span class=&quot;code-punctuation&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;a&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;
@@ -2886,28 +2886,28 @@ s2:
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;#![feature(generators, generator_trait)]
-use std::ops::Generator;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-rust&quot;&gt;&lt;span class=&quot;code-punctuation&quot;&gt;#&lt;/span&gt;!&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;feature&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;generators&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; generator_trait&lt;span class=&quot;code-punctuation&quot;&gt;)]&lt;/span&gt;
+&lt;span class=&quot;code-keyword&quot;&gt;use&lt;/span&gt; std&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;ops&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Generator&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
 
-use std::pin::Pin;
+&lt;span class=&quot;code-keyword&quot;&gt;use&lt;/span&gt; std&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;pin&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;Pin&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
 
-fn main() {
-    let mut gen = ||{
-        yield 1;
-        yield 2;
-        yield 3;
-        return 4;
-    };
+&lt;span class=&quot;code-keyword&quot;&gt;fn&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;main&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;gen&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;||&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;1&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;yield&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+        &lt;span class=&quot;code-keyword&quot;&gt;return&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;};&lt;/span&gt;
 
-    let mut pin = Pin::new(&amp;amp;mut gen);
-    for _ in 0..4 {
-        println!(&amp;quot;{:?}&amp;quot;, pin.as_mut().resume(()));
-        // Yielded(1)
-        // Yielded(2)
-        // Yielded(3)
-        // Complete(4)
-    }
-}&lt;/code&gt;&lt;/pre&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;pin&lt;/span&gt; &lt;span class=&quot;code-operator&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;Pin&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;::&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;new&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;&amp;amp;&lt;/span&gt;&lt;span class=&quot;code-keyword&quot;&gt;mut&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;gen&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;);&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;for&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;_&lt;/span&gt; &lt;span class=&quot;code-keyword&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;code-number&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;..&lt;/span&gt;&lt;span class=&quot;code-number&quot;&gt;4&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;code-function&quot;&gt;println!&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;&amp;quot;{&lt;/span&gt;&lt;span class=&quot;code-string&quot;&gt;:?&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;}&amp;quot;&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;pin&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;as_mut&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;()&lt;/span&gt;&lt;span class=&quot;code-operator&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;code-function&quot;&gt;resume&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;(()));&lt;/span&gt;
+        &lt;span class=&quot;code-comment&quot;&gt;// Yielded(1)&lt;/span&gt;
+        &lt;span class=&quot;code-comment&quot;&gt;// Yielded(2)&lt;/span&gt;
+        &lt;span class=&quot;code-comment&quot;&gt;// Yielded(3)&lt;/span&gt;
+        &lt;span class=&quot;code-comment&quot;&gt;// Complete(4)&lt;/span&gt;
+    &lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;编译器会生成类似这样的实现，和我们前面的达夫设备基本基本没区别：&lt;/p&gt;
@@ -2967,12 +2967,12 @@ fn main() {
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;struct fib_state {
-    int a;
-    int b;
-    int c;
-    int state;
-}&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;&lt;span class=&quot;code-keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;fib_state&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;a&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;b&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;c&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+    &lt;span class=&quot;code-keyword&quot;&gt;int&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;state&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;;&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;而有栈协程对于帧的保存，无论是哪个协程，都是直接申请一大块内存，将其作为函数的调用栈来使用，一切状态都保存在内部。从这个角度来讲，有栈协程更接近普通函数&lt;/p&gt;
@@ -2989,9 +2989,9 @@ fn main() {
         &lt;/button&gt;
       &lt;/div&gt;
     
-      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;struct co {
-    byte stack[STACK_SIZE];
-}&lt;/code&gt;&lt;/pre&gt;
+      &lt;pre class=&quot;notion-code&quot;&gt;&lt;code class=&quot;language-c++&quot;&gt;&lt;span class=&quot;code-keyword&quot;&gt;struct&lt;/span&gt; &lt;span class=&quot;code-function&quot;&gt;co&lt;/span&gt; &lt;span class=&quot;code-punctuation&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;code-function&quot;&gt;byte&lt;/span&gt; &lt;span class=&quot;code-variable&quot;&gt;stack&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;code-variable&quot;&gt;STACK_SIZE&lt;/span&gt;&lt;span class=&quot;code-punctuation&quot;&gt;];&lt;/span&gt;
+&lt;span class=&quot;code-punctuation&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;
       
     &lt;/div&gt;
 &lt;p&gt;&lt;br&gt;&lt;/p&gt;

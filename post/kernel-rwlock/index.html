@@ -1,85 +1,85 @@
-<!DOCTYPE html><html data-astro-cid-5nzstywq lang="zh-CN"><head><meta charset="UTF-8"><meta content="width=device-width,initial-scale=1" name="viewport"><meta content="true" name="astro-view-transitions-enabled"><meta content="animate" name="astro-view-transitions-fallback"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang._uGr_JH5.js"></script><link href="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F49b4570c-b2f0-457b-81b7-b68e2693a471%2Favatar.png?table=collection&amp;id=0bb2e606-8d0c-4f7c-aca9-70986e90c055" rel="icon"><link href="https://xxxuuu.me/post/kernel-rwlock/" rel="canonical"><link href="/rss/feed.xml" rel="alternate" title="x³u³" type="application/rss+xml"><link href="/post/kernel-rwlock.md" rel="alternate" title="从 Linux 内核看读写锁设计" type="text/markdown"><link href="/sitemap-index.xml" rel="sitemap"><title>从 Linux 内核看读写锁设计 | x³u³</title><meta content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的" name="description"><meta content="website" property="og:type"><meta content="https://xxxuuu.me/post/kernel-rwlock/" property="og:url"><meta content="从 Linux 内核看读写锁设计 | x³u³" property="og:title"><meta content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的" property="og:description"><meta content="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa9af1d6b-f284-4734-ba06-990353cf3f84%2FElaina.jpg?table=collection&amp;id=0bb2e606-8d0c-4f7c-aca9-70986e90c055" property="og:image"><meta content="summary_large_image" name="twitter:card"><meta content="@xxuuu0" name="twitter:site"><meta content="从 Linux 内核看读写锁设计 | x³u³" name="twitter:title"><meta content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的" name="twitter:description"><meta content="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa9af1d6b-f284-4734-ba06-990353cf3f84%2FElaina.jpg?table=collection&amp;id=0bb2e606-8d0c-4f7c-aca9-70986e90c055" name="twitter:image"><link href="/_astro/BaseLayout.DLecpd9U.css" rel="stylesheet"><link href="/_astro/notion.XskMa_k6.css" rel="stylesheet"><link href="/_astro/_slug_.DpOqj8II.css" rel="stylesheet"><script type="module" src="/_astro/page.Fg5MKtB-.js"></script><script>!function(){function e(){try{var e=localStorage.getItem("theme")||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.classList.remove("light","dark"),document.documentElement.classList.add(e)}catch(e){}}e(),document.addEventListener("astro:after-swap",e)}()</script></head><body data-astro-cid-5nzstywq><header class="notion-header" data-astro-cid-e4ojpbft><div class="header-container" data-astro-cid-e4ojpbft><div class="header-content" data-astro-cid-e4ojpbft><div class="logo" data-astro-cid-e4ojpbft><a href="/" class="logo-link" data-astro-cid-e4ojpbft>x³u³</a></div><div class="header-actions" data-astro-cid-e4ojpbft><nav class="nav" data-astro-cid-e4ojpbft><a href="/" class="nav-link" data-astro-cid-e4ojpbft>🏠 首页</a><a href="/archive" class="nav-link" data-astro-cid-e4ojpbft>📃 归档</a><a href="/links" class="nav-link" data-astro-cid-e4ojpbft>👬 友链</a><a href="https://p.xxxuuu.me" class="nav-link" data-astro-cid-e4ojpbft rel="noopener noreferrer" target="_blank">📷 摄影<span class="external-icon" data-astro-cid-e4ojpbft>↗</span></a><a href="/about" class="nav-link" data-astro-cid-e4ojpbft>👤 关于</a></nav><div class="nav-more" data-astro-cid-e4ojpbft hidden><button aria-label="更多导航" class="nav-more-trigger" type="button" data-astro-cid-e4ojpbft aria-controls="nav-more-panel" aria-expanded="false" aria-haspopup="true"><svg fill="currentColor" viewBox="0 0 24 24" height="20" width="20" aria-hidden="true" data-astro-cid-e4ojpbft><circle cx="5" cy="12" r="1.8" data-astro-cid-e4ojpbft></circle><circle cx="12" cy="12" r="1.8" data-astro-cid-e4ojpbft></circle><circle cx="19" cy="12" r="1.8" data-astro-cid-e4ojpbft></circle></svg></button><div class="nav-more-panel" data-astro-cid-e4ojpbft hidden id="nav-more-panel"></div></div><button aria-label="Toggle theme" title="切换主题" data-astro-cid-h7bd72go id="theme-toggle"><svg fill="none" viewBox="0 0 24 24" height="20" width="20" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round" class="sun-icon" data-astro-cid-h7bd72go xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5" data-astro-cid-h7bd72go></circle><line x1="12" x2="12" y1="1" y2="3" data-astro-cid-h7bd72go></line><line x1="12" x2="12" y1="21" y2="23" data-astro-cid-h7bd72go></line><line x1="4.22" x2="5.64" y1="4.22" y2="5.64" data-astro-cid-h7bd72go></line><line x1="18.36" x2="19.78" y1="18.36" y2="19.78" data-astro-cid-h7bd72go></line><line x1="1" x2="3" y1="12" y2="12" data-astro-cid-h7bd72go></line><line x1="21" x2="23" y1="12" y2="12" data-astro-cid-h7bd72go></line><line x1="4.22" x2="5.64" y1="19.78" y2="18.36" data-astro-cid-h7bd72go></line><line x1="18.36" x2="19.78" y1="5.64" y2="4.22" data-astro-cid-h7bd72go></line></svg><svg fill="none" viewBox="0 0 24 24" height="20" width="20" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round" class="moon-icon" data-astro-cid-h7bd72go xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-astro-cid-h7bd72go></path></svg></button><script type="module">document.addEventListener("astro:page-load",()=>{let e=document.getElementById("theme-toggle"),t=document.documentElement;e?.addEventListener("click",()=>{let e=t.classList.contains("dark")?"dark":"light",a="dark"===e?"light":"dark";t.classList.remove(e),t.classList.add(a),localStorage.setItem("theme",a)})})</script><button aria-label="搜索" class="search-trigger" title="搜索 (Ctrl/⌘ + K)" data-astro-cid-e4ojpbft type="button"><svg fill="none" viewBox="0 0 24 24" height="20" width="20" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round" aria-hidden="true" data-astro-cid-e4ojpbft><circle cx="11" cy="11" r="7" data-astro-cid-e4ojpbft></circle><line x1="21" x2="16.65" y1="21" y2="16.65" data-astro-cid-e4ojpbft></line></svg></button></div></div></div></header><script type="module">var e=null;function t(){e?.abort(),e=new AbortController;let{signal:t}=e,n=document.querySelector(".header-content"),r=document.querySelector(".nav"),d=document.querySelector(".nav-more"),a=d?.querySelector(".nav-more-trigger"),l=d?.querySelector(".nav-more-panel");if(!(n&&r&&d&&a&&l))return;let o=Array.from(r.querySelectorAll("a"));if(0===o.length)return;let i,c=()=>{let e=[...n.children].reduce((e,t)=>e+t.offsetWidth,0);return n.clientWidth-e},u=()=>{l.hidden=!0,a.setAttribute("aria-expanded","false")},s=()=>{u();for(let e of o)r.append(e);for(d.hidden=!0;c()<48;){let e=r.querySelectorAll("a"),t=e[e.length-1];if(!t)break;l.prepend(t),d.hidden=!1}};a.addEventListener("click",()=>{let e=l.hidden;l.hidden=!e,a.setAttribute("aria-expanded",String(e))},{signal:t}),document.addEventListener("click",e=>{let t=e.target;d.contains(t)?l.contains(t)&&t.closest("a")&&u():u()},{signal:t}),document.addEventListener("keydown",e=>{"Escape"===e.key&&!l.hidden&&(u(),a.focus())},{signal:t}),window.addEventListener("resize",()=>{clearTimeout(i),i=setTimeout(s,100)},{signal:t}),s(),document.fonts?.ready.then(s).catch(()=>{})}document.addEventListener("astro:page-load",t)</script><main class="notion-main" data-astro-cid-5nzstywq><article class="content" data-astro-cid-xtreypgh><div class="notion-page" data-astro-cid-xtreypgh><div class="page-container" data-astro-cid-xtreypgh><div class="page-main" data-astro-cid-xtreypgh><header class="page-header" data-astro-cid-xtreypgh><h1 class="page-title" data-astro-cid-xtreypgh>从 Linux 内核看读写锁设计</h1></header><div class="page-meta" data-astro-cid-xtreypgh><div class="meta-info" data-astro-cid-xtreypgh><span class="meta-item" data-astro-cid-xtreypgh><span class="meta-icon" data-astro-cid-xtreypgh>📅</span><time data-astro-cid-xtreypgh datetime="2024-01-04">2024年01月04日</time></span><span class="meta-item" data-astro-cid-xtreypgh><span class="meta-icon" data-astro-cid-xtreypgh>⏱️</span><span data-astro-cid-xtreypgh>11 分钟阅读</span></span></div><div class="meta-tags" data-astro-cid-xtreypgh><span class="tags-icon" data-astro-cid-xtreypgh>🏷️</span><a href="/tag/linux" class="tag-pill" data-astro-cid-xtreypgh>Linux</a><a href="/tag/操作系统" class="tag-pill" data-astro-cid-xtreypgh>操作系统</a></div><div class="meta-description" data-astro-cid-xtreypgh>前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的</div></div><hr class="page-divider" data-astro-cid-xtreypgh><!-- This page is also available as Markdown: https://xxxuuu.me/post/kernel-rwlock.md --><div class="notion-content" data-astro-cid-xtreypgh><p>前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的</p><h2>读/写自旋锁</h2><p>内核代码中，要定义读/写自旋锁，通过下面的宏进行初始化：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">DEFINE_RWLOCK(mr_rwlock);</code></pre></div><p>使用上读锁和写锁是分开加锁的</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">read_lock(&amp;mr_rwlock);
-// 只读临界区
-read_unlock(&amp;mr_rwlock);
+<!DOCTYPE html><html data-astro-cid-5nzstywq lang="zh-CN"><head><meta charset="UTF-8"><meta content="width=device-width,initial-scale=1" name="viewport"><meta content="true" name="astro-view-transitions-enabled"><meta content="animate" name="astro-view-transitions-fallback"><script type="module" src="/_astro/ClientRouter.astro_astro_type_script_index_0_lang._uGr_JH5.js"></script><link href="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2F49b4570c-b2f0-457b-81b7-b68e2693a471%2Favatar.png?table=collection&amp;id=0bb2e606-8d0c-4f7c-aca9-70986e90c055" rel="icon"><link href="https://xxxuuu.me/post/kernel-rwlock/" rel="canonical"><link href="/rss/feed.xml" rel="alternate" title="x³u³" type="application/rss+xml"><link href="/post/kernel-rwlock.md" rel="alternate" title="从 Linux 内核看读写锁设计" type="text/markdown"><link href="/sitemap-index.xml" rel="sitemap"><title>从 Linux 内核看读写锁设计 | x³u³</title><meta content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的" name="description"><meta content="website" property="og:type"><meta content="https://xxxuuu.me/post/kernel-rwlock/" property="og:url"><meta content="从 Linux 内核看读写锁设计 | x³u³" property="og:title"><meta content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的" property="og:description"><meta content="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa9af1d6b-f284-4734-ba06-990353cf3f84%2FElaina.jpg?table=collection&amp;id=0bb2e606-8d0c-4f7c-aca9-70986e90c055" property="og:image"><meta content="summary_large_image" name="twitter:card"><meta content="@xxuuu0" name="twitter:site"><meta content="从 Linux 内核看读写锁设计 | x³u³" name="twitter:title"><meta content="前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的" name="twitter:description"><meta content="https://www.notion.so/image/https%3A%2F%2Fprod-files-secure.s3.us-west-2.amazonaws.com%2F4cc04375-345a-4a1e-bdf0-3a7c88ef0425%2Fa9af1d6b-f284-4734-ba06-990353cf3f84%2FElaina.jpg?table=collection&amp;id=0bb2e606-8d0c-4f7c-aca9-70986e90c055" name="twitter:image"><link href="/_astro/BaseLayout.C5lYjANR.css" rel="stylesheet"><link href="/_astro/notion.CVYbW7hA.css" rel="stylesheet"><link href="/_astro/_slug_.DpOqj8II.css" rel="stylesheet"><script type="module" src="/_astro/page.Fg5MKtB-.js"></script><script>!function(){function e(){try{var e=localStorage.getItem("theme")||(window.matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");document.documentElement.classList.remove("light","dark"),document.documentElement.classList.add(e)}catch(e){}}e(),document.addEventListener("astro:after-swap",e)}()</script></head><body data-astro-cid-5nzstywq><header class="notion-header" data-astro-cid-e4ojpbft><div class="header-container" data-astro-cid-e4ojpbft><div class="header-content" data-astro-cid-e4ojpbft><div class="logo" data-astro-cid-e4ojpbft><a href="/" class="logo-link" data-astro-cid-e4ojpbft>x³u³</a></div><div class="header-actions" data-astro-cid-e4ojpbft><nav class="nav" data-astro-cid-e4ojpbft><a href="/" class="nav-link" data-astro-cid-e4ojpbft>🏠 首页</a><a href="/archive" class="nav-link" data-astro-cid-e4ojpbft>📃 归档</a><a href="/links" class="nav-link" data-astro-cid-e4ojpbft>👬 友链</a><a href="https://p.xxxuuu.me" class="nav-link" data-astro-cid-e4ojpbft rel="noopener noreferrer" target="_blank">📷 摄影<span class="external-icon" data-astro-cid-e4ojpbft>↗</span></a><a href="/about" class="nav-link" data-astro-cid-e4ojpbft>👤 关于</a></nav><div class="nav-more" data-astro-cid-e4ojpbft hidden><button aria-label="更多导航" class="nav-more-trigger" type="button" data-astro-cid-e4ojpbft aria-controls="nav-more-panel" aria-expanded="false" aria-haspopup="true"><svg fill="currentColor" viewBox="0 0 24 24" height="20" width="20" aria-hidden="true" data-astro-cid-e4ojpbft><circle cx="5" cy="12" r="1.8" data-astro-cid-e4ojpbft></circle><circle cx="12" cy="12" r="1.8" data-astro-cid-e4ojpbft></circle><circle cx="19" cy="12" r="1.8" data-astro-cid-e4ojpbft></circle></svg></button><div class="nav-more-panel" data-astro-cid-e4ojpbft hidden id="nav-more-panel"></div></div><button aria-label="Toggle theme" title="切换主题" data-astro-cid-h7bd72go id="theme-toggle"><svg fill="none" viewBox="0 0 24 24" height="20" width="20" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round" class="sun-icon" data-astro-cid-h7bd72go xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="5" data-astro-cid-h7bd72go></circle><line x1="12" x2="12" y1="1" y2="3" data-astro-cid-h7bd72go></line><line x1="12" x2="12" y1="21" y2="23" data-astro-cid-h7bd72go></line><line x1="4.22" x2="5.64" y1="4.22" y2="5.64" data-astro-cid-h7bd72go></line><line x1="18.36" x2="19.78" y1="18.36" y2="19.78" data-astro-cid-h7bd72go></line><line x1="1" x2="3" y1="12" y2="12" data-astro-cid-h7bd72go></line><line x1="21" x2="23" y1="12" y2="12" data-astro-cid-h7bd72go></line><line x1="4.22" x2="5.64" y1="19.78" y2="18.36" data-astro-cid-h7bd72go></line><line x1="18.36" x2="19.78" y1="5.64" y2="4.22" data-astro-cid-h7bd72go></line></svg><svg fill="none" viewBox="0 0 24 24" height="20" width="20" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round" class="moon-icon" data-astro-cid-h7bd72go xmlns="http://www.w3.org/2000/svg"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" data-astro-cid-h7bd72go></path></svg></button><script type="module">document.addEventListener("astro:page-load",()=>{let e=document.getElementById("theme-toggle"),t=document.documentElement;e?.addEventListener("click",()=>{let e=t.classList.contains("dark")?"dark":"light",a="dark"===e?"light":"dark";t.classList.remove(e),t.classList.add(a),localStorage.setItem("theme",a)})})</script><button aria-label="搜索" class="search-trigger" title="搜索 (Ctrl/⌘ + K)" data-astro-cid-e4ojpbft type="button"><svg fill="none" viewBox="0 0 24 24" height="20" width="20" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round" aria-hidden="true" data-astro-cid-e4ojpbft><circle cx="11" cy="11" r="7" data-astro-cid-e4ojpbft></circle><line x1="21" x2="16.65" y1="21" y2="16.65" data-astro-cid-e4ojpbft></line></svg></button></div></div></div></header><script type="module">var e=null;function t(){e?.abort(),e=new AbortController;let{signal:t}=e,n=document.querySelector(".header-content"),r=document.querySelector(".nav"),d=document.querySelector(".nav-more"),a=d?.querySelector(".nav-more-trigger"),l=d?.querySelector(".nav-more-panel");if(!(n&&r&&d&&a&&l))return;let o=Array.from(r.querySelectorAll("a"));if(0===o.length)return;let i,c=()=>{let e=[...n.children].reduce((e,t)=>e+t.offsetWidth,0);return n.clientWidth-e},u=()=>{l.hidden=!0,a.setAttribute("aria-expanded","false")},s=()=>{u();for(let e of o)r.append(e);for(d.hidden=!0;c()<48;){let e=r.querySelectorAll("a"),t=e[e.length-1];if(!t)break;l.prepend(t),d.hidden=!1}};a.addEventListener("click",()=>{let e=l.hidden;l.hidden=!e,a.setAttribute("aria-expanded",String(e))},{signal:t}),document.addEventListener("click",e=>{let t=e.target;d.contains(t)?l.contains(t)&&t.closest("a")&&u():u()},{signal:t}),document.addEventListener("keydown",e=>{"Escape"===e.key&&!l.hidden&&(u(),a.focus())},{signal:t}),window.addEventListener("resize",()=>{clearTimeout(i),i=setTimeout(s,100)},{signal:t}),s(),document.fonts?.ready.then(s).catch(()=>{})}document.addEventListener("astro:page-load",t)</script><main class="notion-main" data-astro-cid-5nzstywq><article class="content" data-astro-cid-xtreypgh><div class="notion-page" data-astro-cid-xtreypgh><div class="page-container" data-astro-cid-xtreypgh><div class="page-main" data-astro-cid-xtreypgh><header class="page-header" data-astro-cid-xtreypgh><h1 class="page-title" data-astro-cid-xtreypgh>从 Linux 内核看读写锁设计</h1></header><div class="page-meta" data-astro-cid-xtreypgh><div class="meta-info" data-astro-cid-xtreypgh><span class="meta-item" data-astro-cid-xtreypgh><span class="meta-icon" data-astro-cid-xtreypgh>📅</span><time data-astro-cid-xtreypgh datetime="2024-01-04">2024年01月04日</time></span><span class="meta-item" data-astro-cid-xtreypgh><span class="meta-icon" data-astro-cid-xtreypgh>⏱️</span><span data-astro-cid-xtreypgh>11 分钟阅读</span></span></div><div class="meta-tags" data-astro-cid-xtreypgh><span class="tags-icon" data-astro-cid-xtreypgh>🏷️</span><a href="/tag/linux" class="tag-pill" data-astro-cid-xtreypgh>Linux</a><a href="/tag/操作系统" class="tag-pill" data-astro-cid-xtreypgh>操作系统</a></div><div class="meta-description" data-astro-cid-xtreypgh>前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的</div></div><hr class="page-divider" data-astro-cid-xtreypgh><!-- This page is also available as Markdown: https://xxxuuu.me/post/kernel-rwlock.md --><div class="notion-content" data-astro-cid-xtreypgh><p>前段时间看了《Linux内核设计与实现》，第 10 章「内核同步方法」中提到了几种内核中的读写锁。它们分别代表了几种比较典型的读写锁设计，非常值得学习，这里记录一下，讨论是基于 2.6 内核和 x86 体系结构的基础上进行的</p><h2>读/写自旋锁</h2><p>内核代码中，要定义读/写自旋锁，通过下面的宏进行初始化：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-function">DEFINE_RWLOCK</span><span class="code-punctuation">(</span>mr_rwlock<span class="code-punctuation">);</span></code></pre></div><p>使用上读锁和写锁是分开加锁的</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-function">read_lock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwlock</span><span class="code-punctuation">);</span>
+<span class="code-comment">// 只读临界区</span>
+<span class="code-function">read_unlock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwlock</span><span class="code-punctuation">);</span>
 
-write_lock(&amp;mr_rwlock);
-// 读写临界区
-write_unlock(&amp;mr_rwlock);</code></pre></div><p><strong>不能</strong>像这样将一个读锁升级成写锁，这会导致死锁；并且写锁也是不可重入的：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">read_lock(&amp;mr_rwlock);
-write_lock(&amp;mr_rwlock);</code></pre></div><p><br></p><p>读/写自旋锁的汇编级别实现比较类似信号量，都是在寄存器上对值做增减，但为了区分读锁和写锁，读锁是固定减 1，写锁则是固定减去一个很大的 magic number，通过结果值比较就能判断锁持有情况</p><p>代码分别位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwlock.h" rel="noopener noreferrer" target="_blank">include/asm-x86_64/rwlock.h</a> 和 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/spinlock.h" rel="noopener noreferrer" target="_blank">/include/asm-x86_64/spinlock.h</a> 中，这两块涉及的核心代码融合一下大致如下：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">#define RW_LOCK_BIAS 0x01000000
+<span class="code-function">write_lock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwlock</span><span class="code-punctuation">);</span>
+<span class="code-comment">// 读写临界区</span>
+<span class="code-function">write_unlock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwlock</span><span class="code-punctuation">);</span></code></pre></div><p><strong>不能</strong>像这样将一个读锁升级成写锁，这会导致死锁；并且写锁也是不可重入的：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-function">read_lock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwlock</span><span class="code-punctuation">);</span>
+<span class="code-function">write_lock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwlock</span><span class="code-punctuation">);</span></code></pre></div><p><br></p><p>读/写自旋锁的汇编级别实现比较类似信号量，都是在寄存器上对值做增减，但为了区分读锁和写锁，读锁是固定减 1，写锁则是固定减去一个很大的 magic number，通过结果值比较就能判断锁持有情况</p><p>代码分别位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwlock.h" rel="noopener noreferrer" target="_blank">include/asm-x86_64/rwlock.h</a> 和 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/spinlock.h" rel="noopener noreferrer" target="_blank">/include/asm-x86_64/spinlock.h</a> 中，这两块涉及的核心代码融合一下大致如下：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">RW_LOCK_BIAS</span> <span class="code-keyword">0x</span><span class="code-number">01000000</span>
 
-// 初始化时设置这个值为 magic number
-#define rwlock_init(x)	do { *(x) = RW_LOCK_UNLOCKED; } while(0)
+<span class="code-comment">// 初始化时设置这个值为 magic number</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">rwlock_init</span><span class="code-punctuation">(</span><span class="code-variable">x</span><span class="code-punctuation">)</span>	<span class="code-keyword">do</span> <span class="code-punctuation">{</span> <span class="code-operator">*</span><span class="code-punctuation">(</span>x<span class="code-punctuation">)</span> <span class="code-operator">=</span> RW_LOCK_UNLOCKED<span class="code-punctuation">;</span> <span class="code-punctuation">}</span> <span class="code-keyword">while</span><span class="code-punctuation">(</span><span class="code-number">0</span><span class="code-punctuation">)</span>
 
-// 获取读锁
-// 将eax寄存器指向的地址，也就是变量rw的值减1（subl $1）
-// 根据结果是否小于0（js 2f）做跳转，小于0就去调用传入的helper做获取失败的处理
-// 没有写锁的情况下是不会小于0的，不可能有这么多读者能让它减到0，所以不小于0就是获取成功
-#define __build_read_lock_ptr(rw, helper)   \
-	asm volatile(LOCK &quot;subl $1,(%0)\n\t&quot; \ 
-		     &quot;js 2f\n&quot; \ 
-		     &quot;1:\n&quot; \
-		    LOCK_SECTION_START(&quot;&quot;) \
-		     &quot;2:\tcall &quot; helper &quot;\n\t&quot; \
-		     &quot;jmp 1b\n&quot; \
+<span class="code-comment">// 获取读锁</span>
+<span class="code-comment">// 将eax寄存器指向的地址，也就是变量rw的值减1（subl $1）</span>
+<span class="code-comment">// 根据结果是否小于0（js 2f）做跳转，小于0就去调用传入的helper做获取失败的处理</span>
+<span class="code-comment">// 没有写锁的情况下是不会小于0的，不可能有这么多读者能让它减到0，所以不小于0就是获取成功</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">__build_read_lock_ptr</span><span class="code-punctuation">(</span><span class="code-variable">rw</span><span class="code-punctuation">,</span> <span class="code-variable">helper</span><span class="code-punctuation">)</span>   \
+	<span class="code-keyword">asm</span> <span class="code-keyword">volatile</span><span class="code-punctuation">(</span>LOCK <span class="code-punctuation">&quot;</span><span class="code-string">subl $1,(%0)\n\t</span><span class="code-punctuation">&quot;</span> \ 
+		     <span class="code-punctuation">&quot;</span><span class="code-string">js 2f\n</span><span class="code-punctuation">&quot;</span> \ 
+		     <span class="code-punctuation">&quot;</span><span class="code-string">1:\n</span><span class="code-punctuation">&quot;</span> \
+		    LOCK_SECTION_START<span class="code-punctuation">(</span><span class="code-punctuation">&quot;&quot;</span><span class="code-punctuation">)</span> \
+		     <span class="code-punctuation">&quot;</span><span class="code-string">2:\tcall </span><span class="code-punctuation">&quot;</span> helper <span class="code-punctuation">&quot;</span><span class="code-string">\n\t</span><span class="code-punctuation">&quot;</span> \
+		     <span class="code-punctuation">&quot;</span><span class="code-string">jmp 1b\n</span><span class="code-punctuation">&quot;</span> \
 		    LOCK_SECTION_END \
-		     ::&quot;a&quot; (rw) : &quot;memory&quot;)
+		     <span class="code-punctuation">::</span><span class="code-punctuation">&quot;</span><span class="code-string">a</span><span class="code-punctuation">&quot;</span> <span class="code-punctuation">(</span>rw<span class="code-punctuation">)</span> <span class="code-punctuation">:</span> <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">)</span>
 
-// 传入的helper位于arch/i386/kernel/semaphore.c
-// 这里就是一个自旋的逻辑，持续操作rw直到它是大于等于0的，相当于:
-// 
-// lock_failed:
-// rw++;
-// while(rw &lt; 1) {}
-// rw--;
-// if(rw &lt; 0) goto lock_failed;
-// 
-// 这里结尾还要判断一次，是因为前面的操作整体上不是原子或互斥的，所以decl后要再check一下
-asm(
-&quot;.text\n&quot;
-&quot;.align	4\n&quot;
-&quot;.globl	__read_lock_failed\n&quot;
-&quot;__read_lock_failed:\n\t&quot;
-	LOCK &quot;incl	(%eax)\n&quot;
-&quot;1:	rep; nop\n\t&quot;
-	&quot;cmpl	$1,(%eax)\n\t&quot;
-	&quot;js	1b\n\t&quot;
-	LOCK &quot;decl	(%eax)\n\t&quot;
-	&quot;js	__read_lock_failed\n\t&quot;
-	&quot;ret&quot;
-);
+<span class="code-comment">// 传入的helper位于arch/i386/kernel/semaphore.c</span>
+<span class="code-comment">// 这里就是一个自旋的逻辑，持续操作rw直到它是大于等于0的，相当于:</span>
+<span class="code-comment">// </span>
+<span class="code-comment">// lock_failed:</span>
+<span class="code-comment">// rw++;</span>
+<span class="code-comment">// while(rw &lt; 1) {}</span>
+<span class="code-comment">// rw--;</span>
+<span class="code-comment">// if(rw &lt; 0) goto lock_failed;</span>
+<span class="code-comment">// </span>
+<span class="code-comment">// 这里结尾还要判断一次，是因为前面的操作整体上不是原子或互斥的，所以decl后要再check一下</span>
+<span class="code-keyword">asm</span><span class="code-punctuation">(</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">.text\n</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">.align	4\n</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">.globl	__read_lock_failed\n</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">__read_lock_failed:\n\t</span><span class="code-punctuation">&quot;</span>
+	LOCK <span class="code-punctuation">&quot;</span><span class="code-string">incl	(%eax)\n</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">1:	rep; nop\n\t</span><span class="code-punctuation">&quot;</span>
+	<span class="code-punctuation">&quot;</span><span class="code-string">cmpl	$1,(%eax)\n\t</span><span class="code-punctuation">&quot;</span>
+	<span class="code-punctuation">&quot;</span><span class="code-string">js	1b\n\t</span><span class="code-punctuation">&quot;</span>
+	LOCK <span class="code-punctuation">&quot;</span><span class="code-string">decl	(%eax)\n\t</span><span class="code-punctuation">&quot;</span>
+	<span class="code-punctuation">&quot;</span><span class="code-string">js	__read_lock_failed\n\t</span><span class="code-punctuation">&quot;</span>
+	<span class="code-punctuation">&quot;</span><span class="code-string">ret</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">);</span>
 
-// 获取写锁
-// eax寄存器指向的地址值，也就是rw减去magic number
-// 判断结果是否刚好为0（jnz 2f），不是则说明有读锁在占用，跳转到helper调用
-#define __build_write_lock_ptr(rw, helper) \
-	asm volatile(LOCK &quot;subl $&quot; RW_LOCK_BIAS_STR &quot;,(%0)\n\t&quot; \
-		     &quot;jnz 2f\n&quot; \
-		     &quot;1:\n&quot; \
-		     LOCK_SECTION_START(&quot;&quot;) \
-		     &quot;2:\tcall &quot; helper &quot;\n\t&quot; \
-		     &quot;jmp 1b\n&quot; \
+<span class="code-comment">// 获取写锁</span>
+<span class="code-comment">// eax寄存器指向的地址值，也就是rw减去magic number</span>
+<span class="code-comment">// 判断结果是否刚好为0（jnz 2f），不是则说明有读锁在占用，跳转到helper调用</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">__build_write_lock_ptr</span><span class="code-punctuation">(</span><span class="code-variable">rw</span><span class="code-punctuation">,</span> <span class="code-variable">helper</span><span class="code-punctuation">)</span> \
+	<span class="code-keyword">asm</span> <span class="code-keyword">volatile</span><span class="code-punctuation">(</span>LOCK <span class="code-punctuation">&quot;</span><span class="code-string">subl $</span><span class="code-punctuation">&quot;</span> RW_LOCK_BIAS_STR <span class="code-punctuation">&quot;</span><span class="code-string">,(%0)\n\t</span><span class="code-punctuation">&quot;</span> \
+		     <span class="code-punctuation">&quot;</span><span class="code-string">jnz 2f\n</span><span class="code-punctuation">&quot;</span> \
+		     <span class="code-punctuation">&quot;</span><span class="code-string">1:\n</span><span class="code-punctuation">&quot;</span> \
+		     LOCK_SECTION_START<span class="code-punctuation">(</span><span class="code-punctuation">&quot;&quot;</span><span class="code-punctuation">)</span> \
+		     <span class="code-punctuation">&quot;</span><span class="code-string">2:\tcall </span><span class="code-punctuation">&quot;</span> helper <span class="code-punctuation">&quot;</span><span class="code-string">\n\t</span><span class="code-punctuation">&quot;</span> \
+		     <span class="code-punctuation">&quot;</span><span class="code-string">jmp 1b\n</span><span class="code-punctuation">&quot;</span> \
 		     LOCK_SECTION_END \
-		     ::&quot;a&quot; (rw) : &quot;memory&quot;)
+		     <span class="code-punctuation">::</span><span class="code-punctuation">&quot;</span><span class="code-string">a</span><span class="code-punctuation">&quot;</span> <span class="code-punctuation">(</span>rw<span class="code-punctuation">)</span> <span class="code-punctuation">:</span> <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">)</span>
 
-// 写锁传入的helper同样位于arch/i386/kernel/semaphore.c
-// 逻辑和读锁的基本一样
-asm(
-&quot;.text\n&quot;
-&quot;.align	4\n&quot;
-&quot;.globl	__write_lock_failed\n&quot;
-&quot;__write_lock_failed:\n\t&quot;
-	LOCK &quot;addl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n&quot;
-&quot;1:	rep; nop\n\t&quot;
-	&quot;cmpl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n\t&quot;
-	&quot;jne	1b\n\t&quot;
-	LOCK &quot;subl	$&quot; RW_LOCK_BIAS_STR &quot;,(%eax)\n\t&quot;
-	&quot;jnz	__write_lock_failed\n\t&quot;
-	&quot;ret&quot;
-);
+<span class="code-comment">// 写锁传入的helper同样位于arch/i386/kernel/semaphore.c</span>
+<span class="code-comment">// 逻辑和读锁的基本一样</span>
+<span class="code-keyword">asm</span><span class="code-punctuation">(</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">.text\n</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">.align	4\n</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">.globl	__write_lock_failed\n</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">__write_lock_failed:\n\t</span><span class="code-punctuation">&quot;</span>
+	LOCK <span class="code-punctuation">&quot;</span><span class="code-string">addl	$</span><span class="code-punctuation">&quot;</span> RW_LOCK_BIAS_STR <span class="code-punctuation">&quot;</span><span class="code-string">,(%eax)\n</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">&quot;</span><span class="code-string">1:	rep; nop\n\t</span><span class="code-punctuation">&quot;</span>
+	<span class="code-punctuation">&quot;</span><span class="code-string">cmpl	$</span><span class="code-punctuation">&quot;</span> RW_LOCK_BIAS_STR <span class="code-punctuation">&quot;</span><span class="code-string">,(%eax)\n\t</span><span class="code-punctuation">&quot;</span>
+	<span class="code-punctuation">&quot;</span><span class="code-string">jne	1b\n\t</span><span class="code-punctuation">&quot;</span>
+	LOCK <span class="code-punctuation">&quot;</span><span class="code-string">subl	$</span><span class="code-punctuation">&quot;</span> RW_LOCK_BIAS_STR <span class="code-punctuation">&quot;</span><span class="code-string">,(%eax)\n\t</span><span class="code-punctuation">&quot;</span>
+	<span class="code-punctuation">&quot;</span><span class="code-string">jnz	__write_lock_failed\n\t</span><span class="code-punctuation">&quot;</span>
+	<span class="code-punctuation">&quot;</span><span class="code-string">ret</span><span class="code-punctuation">&quot;</span>
+<span class="code-punctuation">);</span>
 
-// 解锁时就是加上1或magic number
-#define _raw_read_unlock(rw) asm volatile(&quot;lock ; incl %0&quot; :&quot;=m&quot; ((rw)-&gt;lock) : : &quot;memory&quot;)
-#define _raw_write_unlock(rw)	asm volatile(&quot;lock ; addl $&quot; RW_LOCK_BIAS_STR &quot;,%0&quot;:&quot;=m&quot; ((rw)-&gt;lock) : : &quot;memory&quot;)</code></pre></div><p>可以看出，读/写自旋锁是<strong>读优先</strong>的，会导致写饥饿。当有一个或多个读者持有读锁时，写操作无法获取锁，如果此时读锁被长时间占有，写锁将一直自旋等待，此时自旋会导致一个核心上的高昂开销</p><p><br></p><p>这里有一个处理上的细节，在真正开始自旋获取到写锁之前，就已经互斥了（减去 magic number），这时候新的读锁是无法获取的，这避免了写锁和读锁的争抢，能稍微缓解下写饥饿问题，例如这样的情况：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">Plain text</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-plain text">                            TIME
+<span class="code-comment">// 解锁时就是加上1或magic number</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">_raw_read_unlock</span><span class="code-punctuation">(</span><span class="code-variable">rw</span><span class="code-punctuation">)</span> <span class="code-keyword">asm</span> <span class="code-keyword">volatile</span><span class="code-punctuation">(</span><span class="code-punctuation">&quot;</span><span class="code-string">lock ; incl %0</span><span class="code-punctuation">&quot;</span> <span class="code-punctuation">:</span><span class="code-punctuation">&quot;</span><span class="code-string">=m</span><span class="code-punctuation">&quot;</span> <span class="code-punctuation">((</span>rw<span class="code-punctuation">)-&gt;</span><span class="code-variable">lock</span><span class="code-punctuation">)</span> <span class="code-punctuation">:</span> <span class="code-punctuation">:</span> <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">_raw_write_unlock</span><span class="code-punctuation">(</span><span class="code-variable">rw</span><span class="code-punctuation">)</span>	<span class="code-keyword">asm</span> <span class="code-keyword">volatile</span><span class="code-punctuation">(</span><span class="code-punctuation">&quot;</span><span class="code-string">lock ; addl $</span><span class="code-punctuation">&quot;</span> RW_LOCK_BIAS_STR <span class="code-punctuation">&quot;</span><span class="code-string">,%0</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">:</span><span class="code-punctuation">&quot;</span><span class="code-string">=m</span><span class="code-punctuation">&quot;</span> <span class="code-punctuation">((</span>rw<span class="code-punctuation">)-&gt;</span><span class="code-variable">lock</span><span class="code-punctuation">)</span> <span class="code-punctuation">:</span> <span class="code-punctuation">:</span> <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">)</span></code></pre></div><p>可以看出，读/写自旋锁是<strong>读优先</strong>的，会导致写饥饿。当有一个或多个读者持有读锁时，写操作无法获取锁，如果此时读锁被长时间占有，写锁将一直自旋等待，此时自旋会导致一个核心上的高昂开销</p><p><br></p><p>这里有一个处理上的细节，在真正开始自旋获取到写锁之前，就已经互斥了（减去 magic number），这时候新的读锁是无法获取的，这避免了写锁和读锁的争抢，能稍微缓解下写饥饿问题，例如这样的情况：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">Plain text</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-plain text">                            TIME
 ─────────────────────────────────────────────────────────►
  ┌──────────────┐
  │    reader    │
@@ -92,306 +92,306 @@ asm(
            └─────────────────────────┴───────────────┘
                         ┌────────────┬───────────┐
                         │    spin    │   reader  │
-                        └────────────┴───────────┘</code></pre></div><p><br></p><h2>读/写信号量</h2><p>读/写信号量的使用上和读/写自旋锁是类似的，但功能上要强大一些，分别支持静态和动态的初始化方法</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">// 静态定义
-static DECLARE_RWSEM(name);
-// 动态定义
-init_rwsem(struct rw_semaphore *sem);</code></pre></div><p>读/写信号量支持 trylock 操作和动态地将写锁降级为读锁</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">static DECLARE_RWSEM(mr_rwsem);
+                        └────────────┴───────────┘</code></pre></div><p><br></p><h2>读/写信号量</h2><p>读/写信号量的使用上和读/写自旋锁是类似的，但功能上要强大一些，分别支持静态和动态的初始化方法</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-comment">// 静态定义</span>
+<span class="code-keyword">static</span> <span class="code-function">DECLARE_RWSEM</span><span class="code-punctuation">(</span>name<span class="code-punctuation">);</span>
+<span class="code-comment">// 动态定义</span>
+<span class="code-function">init_rwsem</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">);</span></code></pre></div><p>读/写信号量支持 trylock 操作和动态地将写锁降级为读锁</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-keyword">static</span> <span class="code-function">DECLARE_RWSEM</span><span class="code-punctuation">(</span>mr_rwsem<span class="code-punctuation">);</span>
 
-down_read(&amp;mr_rwsem);
-// 只读临界区
-up_read(&amp;mr_rwsem);
+<span class="code-function">down_read</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwsem</span><span class="code-punctuation">);</span>
+<span class="code-comment">// 只读临界区</span>
+<span class="code-function">up_read</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwsem</span><span class="code-punctuation">);</span>
 
-down_write(&amp;mr_rwsem);
-// 读写临界区
-up_write(&amp;mr_rwsem);
+<span class="code-function">down_write</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwsem</span><span class="code-punctuation">);</span>
+<span class="code-comment">// 读写临界区</span>
+<span class="code-function">up_write</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwsem</span><span class="code-punctuation">);</span>
 
-down_write(&amp;mr_rwsem);
-// 读写临界区
-downgrade_write(&amp;mr_rwsem); // 写锁降级读锁
-// 只读临界区
-up_read(&amp;mr_rwsem);</code></pre></div><p><br></p><p><a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwsem.h#L99" rel="noopener noreferrer" target="_blank">include/asm-x86_64/rwsem.h</a> 中定义了汇编级别上的实现，和前面读/写自旋锁是类似的，但没有自旋，这里就不细说，内核源码这里也直接附带注释了：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">#define RWSEM_UNLOCKED_VALUE		  0x00000000
-#define RWSEM_ACTIVE_BIAS		      0x00000001
-#define RWSEM_ACTIVE_MASK		      0x0000ffff
-#define RWSEM_WAITING_BIAS		    (-0x00010000)
-#define RWSEM_ACTIVE_READ_BIAS		RWSEM_ACTIVE_BIAS
-#define RWSEM_ACTIVE_WRITE_BIAS		(RWSEM_WAITING_BIAS + RWSEM_ACTIVE_BIAS)
+<span class="code-function">down_write</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwsem</span><span class="code-punctuation">);</span>
+<span class="code-comment">// 读写临界区</span>
+<span class="code-function">downgrade_write</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwsem</span><span class="code-punctuation">);</span><span class="code-comment"> // 写锁降级读锁</span>
+<span class="code-comment">// 只读临界区</span>
+<span class="code-function">up_read</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_rwsem</span><span class="code-punctuation">);</span></code></pre></div><p><br></p><p><a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/asm-x86_64/rwsem.h#L99" rel="noopener noreferrer" target="_blank">include/asm-x86_64/rwsem.h</a> 中定义了汇编级别上的实现，和前面读/写自旋锁是类似的，但没有自旋，这里就不细说，内核源码这里也直接附带注释了：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">RWSEM_UNLOCKED_VALUE</span>		  <span class="code-keyword">0x</span><span class="code-number">00000000</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">RWSEM_ACTIVE_BIAS</span>		      <span class="code-keyword">0x</span><span class="code-number">00000001</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">RWSEM_ACTIVE_MASK</span>		      <span class="code-keyword">0x</span><span class="code-number">0000ffff</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">RWSEM_WAITING_BIAS</span>		    <span class="code-punctuation">(</span><span class="code-operator">-</span><span class="code-keyword">0x</span><span class="code-number">00010000</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">RWSEM_ACTIVE_READ_BIAS</span>		RWSEM_ACTIVE_BIAS
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">RWSEM_ACTIVE_WRITE_BIAS</span>		<span class="code-punctuation">(</span>RWSEM_WAITING_BIAS <span class="code-operator">+</span> RWSEM_ACTIVE_BIAS<span class="code-punctuation">)</span>
 
-/*
- * lock for reading
- */
-static inline void __down_read(struct rw_semaphore *sem)
-{
-	__asm__ __volatile__(
-		&quot;# beginning down_read\n\t&quot;
-LOCK_PREFIX	&quot;  incl      (%%rdi)\n\t&quot; /* adds 0x00000001, returns the old value */
-		&quot;  js        2f\n\t&quot; /* jump if we weren&#039;t granted the lock */
-		&quot;1:\n\t&quot;
-		LOCK_SECTION_START(&quot;&quot;) \
-		&quot;2:\n\t&quot;
-		&quot;  call      rwsem_down_read_failed_thunk\n\t&quot;
-		&quot;  jmp       1b\n&quot;
+<span class="code-comment">/*</span>
+<span class="code-comment"> * lock for reading</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">void</span> <span class="code-function">__down_read</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-keyword">__asm__</span> _<span class="code-function">_volatile__</span><span class="code-punctuation">(</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string"># beginning down_read\n\t</span><span class="code-punctuation">&quot;</span>
+LOCK_PREFIX	<span class="code-punctuation">&quot;</span><span class="code-string">  incl      (%%rdi)\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* adds 0x00000001, returns the old value */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  js        2f\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* jump if we weren&#039;t granted the lock */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">1:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-function">LOCK_SECTION_START</span><span class="code-punctuation">(</span><span class="code-punctuation">&quot;&quot;</span><span class="code-punctuation">)</span> \
+		<span class="code-punctuation">&quot;</span><span class="code-string">2:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  call      rwsem_down_read_failed_thunk\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jmp       1b\n</span><span class="code-punctuation">&quot;</span>
 		LOCK_SECTION_END \
-		&quot;# ending down_read\n\t&quot;
-		: &quot;+m&quot;(sem-&gt;count)
-		: &quot;D&quot;(sem)
-		: &quot;memory&quot;, &quot;cc&quot;);
-}
+		<span class="code-punctuation">&quot;</span><span class="code-string"># ending down_read\n\t</span><span class="code-punctuation">&quot;</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">+m</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">count</span><span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">D</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span>sem<span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">,</span> <span class="code-punctuation">&quot;</span><span class="code-string">cc</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">);</span>
+<span class="code-punctuation">}</span>
 
-/*
- * lock for writing
- */
-static inline void __down_write(struct rw_semaphore *sem)
-{
-	int tmp;
+<span class="code-comment">/*</span>
+<span class="code-comment"> * lock for writing</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">void</span> <span class="code-function">__down_write</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-keyword">int</span> tmp<span class="code-punctuation">;</span>
 
-	tmp = RWSEM_ACTIVE_WRITE_BIAS;
-	__asm__ __volatile__(
-		&quot;# beginning down_write\n\t&quot;
-LOCK_PREFIX	&quot;  xaddl      %0,(%%rdi)\n\t&quot; /* subtract 0x0000ffff, returns the old value */
-		&quot;  testl     %0,%0\n\t&quot; /* was the count 0 before? */
-		&quot;  jnz       2f\n\t&quot; /* jump if we weren&#039;t granted the lock */
-		&quot;1:\n\t&quot;
-		LOCK_SECTION_START(&quot;&quot;)
-		&quot;2:\n\t&quot;
-		&quot;  call      rwsem_down_write_failed_thunk\n\t&quot;
-		&quot;  jmp       1b\n&quot;
+	tmp <span class="code-operator">=</span> RWSEM_ACTIVE_WRITE_BIAS<span class="code-punctuation">;</span>
+	<span class="code-keyword">__asm__</span> _<span class="code-function">_volatile__</span><span class="code-punctuation">(</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string"># beginning down_write\n\t</span><span class="code-punctuation">&quot;</span>
+LOCK_PREFIX	<span class="code-punctuation">&quot;</span><span class="code-string">  xaddl      %0,(%%rdi)\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* subtract 0x0000ffff, returns the old value */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  testl     %0,%0\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* was the count 0 before? */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jnz       2f\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* jump if we weren&#039;t granted the lock */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">1:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-function">LOCK_SECTION_START</span><span class="code-punctuation">(</span><span class="code-punctuation">&quot;&quot;</span><span class="code-punctuation">)</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">2:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  call      rwsem_down_write_failed_thunk\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jmp       1b\n</span><span class="code-punctuation">&quot;</span>
 		LOCK_SECTION_END
-		&quot;# ending down_write&quot;
-		: &quot;=&amp;r&quot; (tmp) 
-		: &quot;0&quot;(tmp), &quot;D&quot;(sem)
-		: &quot;memory&quot;, &quot;cc&quot;);
-}
+		<span class="code-punctuation">&quot;</span><span class="code-string"># ending down_write</span><span class="code-punctuation">&quot;</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">=&amp;r</span><span class="code-punctuation">&quot;</span> <span class="code-punctuation">(</span>tmp<span class="code-punctuation">)</span> 
+		: <span class="code-punctuation">&quot;</span><span class="code-string">0</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span>tmp<span class="code-punctuation">),</span> <span class="code-punctuation">&quot;</span><span class="code-string">D</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span>sem<span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">,</span> <span class="code-punctuation">&quot;</span><span class="code-string">cc</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">);</span>
+<span class="code-punctuation">}</span>
 
-/*
- * unlock after reading
- */
-static inline void __up_read(struct rw_semaphore *sem)
-{
-	__s32 tmp = -RWSEM_ACTIVE_READ_BIAS;
-	__asm__ __volatile__(
-		&quot;# beginning __up_read\n\t&quot;
-LOCK_PREFIX	&quot;  xaddl      %[tmp],(%%rdi)\n\t&quot; /* subtracts 1, returns the old value */
-		&quot;  js        2f\n\t&quot; /* jump if the lock is being waited upon */
-		&quot;1:\n\t&quot;
-		LOCK_SECTION_START(&quot;&quot;)
-		&quot;2:\n\t&quot;
-		&quot;  decw      %w[tmp]\n\t&quot; /* do nothing if still outstanding active readers */
-		&quot;  jnz       1b\n\t&quot;
-		&quot;  call      rwsem_wake_thunk\n\t&quot;
-		&quot;  jmp       1b\n&quot;
+<span class="code-comment">/*</span>
+<span class="code-comment"> * unlock after reading</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">void</span> <span class="code-function">__up_read</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	__s32 tmp <span class="code-operator">=</span> <span class="code-operator">-</span>RWSEM_ACTIVE_READ_BIAS<span class="code-punctuation">;</span>
+	<span class="code-keyword">__asm__</span> _<span class="code-function">_volatile__</span><span class="code-punctuation">(</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string"># beginning __up_read\n\t</span><span class="code-punctuation">&quot;</span>
+LOCK_PREFIX	<span class="code-punctuation">&quot;</span><span class="code-string">  xaddl      %[tmp],(%%rdi)\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* subtracts 1, returns the old value */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  js        2f\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* jump if the lock is being waited upon */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">1:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-function">LOCK_SECTION_START</span><span class="code-punctuation">(</span><span class="code-punctuation">&quot;&quot;</span><span class="code-punctuation">)</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">2:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  decw      %w[tmp]\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* do nothing if still outstanding active readers */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jnz       1b\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  call      rwsem_wake_thunk\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jmp       1b\n</span><span class="code-punctuation">&quot;</span>
 		LOCK_SECTION_END
-		&quot;# ending __up_read\n&quot;
-		: &quot;+m&quot;(sem-&gt;count), [tmp] &quot;+r&quot; (tmp)
-		: &quot;D&quot;(sem)
-		: &quot;memory&quot;, &quot;cc&quot;);
-}
+		<span class="code-punctuation">&quot;</span><span class="code-string"># ending __up_read\n</span><span class="code-punctuation">&quot;</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">+m</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">count</span><span class="code-punctuation">),</span> <span class="code-punctuation">[</span>tmp<span class="code-punctuation">]</span> <span class="code-punctuation">&quot;</span><span class="code-string">+r</span><span class="code-punctuation">&quot;</span> <span class="code-punctuation">(</span>tmp<span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">D</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span>sem<span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">,</span> <span class="code-punctuation">&quot;</span><span class="code-string">cc</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">);</span>
+<span class="code-punctuation">}</span>
 
-/*
- * unlock after writing
- */
-static inline void __up_write(struct rw_semaphore *sem)
-{
-	unsigned tmp; 
-	__asm__ __volatile__(
-		&quot;# beginning __up_write\n\t&quot;
-		&quot;  movl     %[bias],%[tmp]\n\t&quot;
-LOCK_PREFIX	&quot;  xaddl     %[tmp],(%%rdi)\n\t&quot; /* tries to transition 0xffff0001 -&gt; 0x00000000 */
-		&quot;  jnz       2f\n\t&quot; /* jump if the lock is being waited upon */
-		&quot;1:\n\t&quot;
-		LOCK_SECTION_START(&quot;&quot;)
-		&quot;2:\n\t&quot;
-		&quot;  decw      %w[tmp]\n\t&quot; /* did the active count reduce to 0? */
-		&quot;  jnz       1b\n\t&quot; /* jump back if not */
-		&quot;  call      rwsem_wake_thunk\n\t&quot;
-		&quot;  jmp       1b\n&quot;
+<span class="code-comment">/*</span>
+<span class="code-comment"> * unlock after writing</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">void</span> <span class="code-function">__up_write</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-keyword">unsigned</span> tmp<span class="code-punctuation">;</span> 
+	<span class="code-keyword">__asm__</span> _<span class="code-function">_volatile__</span><span class="code-punctuation">(</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string"># beginning __up_write\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  movl     %[bias],%[tmp]\n\t</span><span class="code-punctuation">&quot;</span>
+LOCK_PREFIX	<span class="code-punctuation">&quot;</span><span class="code-string">  xaddl     %[tmp],(%%rdi)\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* tries to transition 0xffff0001 -&gt; 0x00000000 */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jnz       2f\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* jump if the lock is being waited upon */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">1:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-function">LOCK_SECTION_START</span><span class="code-punctuation">(</span><span class="code-punctuation">&quot;&quot;</span><span class="code-punctuation">)</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">2:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  decw      %w[tmp]\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* did the active count reduce to 0? */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jnz       1b\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* jump back if not */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  call      rwsem_wake_thunk\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jmp       1b\n</span><span class="code-punctuation">&quot;</span>
 		LOCK_SECTION_END
-		&quot;# ending __up_write\n&quot;
-		: &quot;+m&quot;(sem-&gt;count), [tmp] &quot;=r&quot; (tmp)
-		: &quot;D&quot;(sem), [bias] &quot;i&quot;(-RWSEM_ACTIVE_WRITE_BIAS)
-		: &quot;memory&quot;, &quot;cc&quot;);
-}</code></pre></div><p><br></p><p>信号量是睡眠锁，读锁和写锁在获取锁失败时最后都会进入到 <code>rwsem_down_failed_common</code>（位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/lib/rwsem.c#L123" rel="noopener noreferrer" target="_blank">lib/rwsem.c</a>） 中，这里会将进程加入等待队列中，然后重新调度进程</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">static inline struct rw_semaphore *rwsem_down_failed_common(struct rw_semaphore *sem,
-								 struct rwsem_waiter *waiter,
-								 signed long adjustment)
-{
-	struct task_struct *tsk = current;
-	signed long count;
+		<span class="code-punctuation">&quot;</span><span class="code-string"># ending __up_write\n</span><span class="code-punctuation">&quot;</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">+m</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">count</span><span class="code-punctuation">),</span> <span class="code-punctuation">[</span>tmp<span class="code-punctuation">]</span> <span class="code-punctuation">&quot;</span><span class="code-string">=r</span><span class="code-punctuation">&quot;</span> <span class="code-punctuation">(</span>tmp<span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">D</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span>sem<span class="code-punctuation">),</span> <span class="code-punctuation">[</span>bias<span class="code-punctuation">]</span> <span class="code-punctuation">&quot;</span><span class="code-string">i</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span><span class="code-operator">-</span>RWSEM_ACTIVE_WRITE_BIAS<span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">,</span> <span class="code-punctuation">&quot;</span><span class="code-string">cc</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">);</span>
+<span class="code-punctuation">}</span></code></pre></div><p><br></p><p>信号量是睡眠锁，读锁和写锁在获取锁失败时最后都会进入到 <code>rwsem_down_failed_common</code>（位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/lib/rwsem.c#L123" rel="noopener noreferrer" target="_blank">lib/rwsem.c</a>） 中，这里会将进程加入等待队列中，然后重新调度进程</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-function">rwsem_down_failed_common</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">,</span>
+								 <span class="code-keyword">struct</span> rwsem_waiter <span class="code-operator">*</span><span class="code-variable">waiter</span><span class="code-punctuation">,</span>
+								 <span class="code-keyword">signed</span> <span class="code-keyword">long</span> <span class="code-variable">adjustment</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-keyword">struct</span> task_struct <span class="code-operator">*</span>tsk <span class="code-operator">=</span> current<span class="code-punctuation">;</span>
+	<span class="code-keyword">signed</span> <span class="code-keyword">long</span> count<span class="code-punctuation">;</span>
 
-	set_task_state(tsk,TASK_UNINTERRUPTIBLE);
+	<span class="code-function">set_task_state</span><span class="code-punctuation">(</span>tsk<span class="code-punctuation">,</span>TASK_UNINTERRUPTIBLE<span class="code-punctuation">);</span>
 
-	/* set up my own style of waitqueue */
-	spin_lock(&amp;sem-&gt;wait_lock);
-	waiter-&gt;task = tsk;
+<span class="code-comment">	/* set up my own style of waitqueue */</span>
+	<span class="code-function">spin_lock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">wait_lock</span><span class="code-punctuation">);</span>
+	<span class="code-variable">waiter</span><span class="code-punctuation">-&gt;</span><span class="code-variable">task</span> <span class="code-operator">=</span> tsk<span class="code-punctuation">;</span>
 
-	list_add_tail(&amp;waiter-&gt;list,&amp;sem-&gt;wait_list);
+	<span class="code-function">list_add_tail</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">waiter</span><span class="code-punctuation">-&gt;</span><span class="code-variable">list</span><span class="code-punctuation">,</span><span class="code-operator">&amp;</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">wait_list</span><span class="code-punctuation">);</span>
 
-	/* note that we&#039;re now waiting on the lock, but no longer actively read-locking */
-	count = rwsem_atomic_update(adjustment,sem);
+<span class="code-comment">	/* note that we&#039;re now waiting on the lock, but no longer actively read-locking */</span>
+	count <span class="code-operator">=</span> <span class="code-function">rwsem_atomic_update</span><span class="code-punctuation">(</span>adjustment<span class="code-punctuation">,</span>sem<span class="code-punctuation">);</span>
 
-	/* if there are no longer active locks, wake the front queued process(es) up
-	 * - it might even be this process, since the waker takes a more active part
-	 */
-	if (!(count &amp; RWSEM_ACTIVE_MASK))
-		sem = __rwsem_do_wake(sem,1);
+<span class="code-comment">	/* if there are no longer active locks, wake the front queued process(es) up</span>
+<span class="code-comment">	 * - it might even be this process, since the waker takes a more active part</span>
+<span class="code-comment">	 */</span>
+	<span class="code-keyword">if</span> <span class="code-punctuation">(</span><span class="code-operator">!</span><span class="code-punctuation">(</span>count <span class="code-operator">&amp;</span> RWSEM_ACTIVE_MASK<span class="code-punctuation">))</span>
+		sem <span class="code-operator">=</span> <span class="code-function">__rwsem_do_wake</span><span class="code-punctuation">(</span>sem<span class="code-punctuation">,</span><span class="code-number">1</span><span class="code-punctuation">);</span>
 
-	spin_unlock(&amp;sem-&gt;wait_lock);
+	<span class="code-function">spin_unlock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">wait_lock</span><span class="code-punctuation">);</span>
 
-	/* wait to be given the lock */
-	for (;;) {
-		if (!waiter-&gt;flags)
-			break;
-		schedule();
-		set_task_state(tsk, TASK_UNINTERRUPTIBLE);
-	}
+<span class="code-comment">	/* wait to be given the lock */</span>
+	<span class="code-keyword">for</span> <span class="code-punctuation">(;;)</span> <span class="code-punctuation">{</span>
+		<span class="code-keyword">if</span> <span class="code-punctuation">(</span><span class="code-operator">!</span><span class="code-variable">waiter</span><span class="code-punctuation">-&gt;</span><span class="code-variable">flags</span><span class="code-punctuation">)</span>
+			<span class="code-keyword">break</span><span class="code-punctuation">;</span>
+		<span class="code-function">schedule</span><span class="code-punctuation">();</span>
+		<span class="code-function">set_task_state</span><span class="code-punctuation">(</span>tsk<span class="code-punctuation">,</span> TASK_UNINTERRUPTIBLE<span class="code-punctuation">);</span>
+	<span class="code-punctuation">}</span>
 
-	tsk-&gt;state = TASK_RUNNING;
+	<span class="code-variable">tsk</span><span class="code-punctuation">-&gt;</span><span class="code-variable">state</span> <span class="code-operator">=</span> TASK_RUNNING<span class="code-punctuation">;</span>
 
-	return sem;
-}</code></pre></div><p><br></p><p>值得一提的是 <code>trylock</code> 和 <code>downgrade_write</code> 操作，这两个操作是读/写自旋锁中没有的</p><p>两个 <code>trylock</code> 是类似的，都是用 <code>cmpxchg</code> 指令来做 CAS（compare-and-swap） 操作。写锁的 <code>trylock</code> 比较简单，因为是互斥的，所以只需要对初始值做 CAS 即可。而读锁可能被持有多个，所以它的 <code>trylock</code> 需要先将 <code>sem-&gt;count</code> 赋值给 <code>tmp</code>，再自增 <code>tmp</code> ，利用 <code>tmp</code> 的值进行 CAS</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">/*
- * trylock for reading -- returns 1 if successful, 0 if contention
- */
-static inline int __down_read_trylock(struct rw_semaphore *sem)
-{
-	__s32 result, tmp;
-	__asm__ __volatile__(
-		&quot;# beginning __down_read_trylock\n\t&quot;
-		&quot;  movl      %0,%1\n\t&quot;
-		&quot;1:\n\t&quot;
-		&quot;  movl	     %1,%2\n\t&quot;
-		&quot;  addl      %3,%2\n\t&quot;
-		&quot;  jle	     2f\n\t&quot;
-LOCK_PREFIX	&quot;  cmpxchgl  %2,%0\n\t&quot;
-		&quot;  jnz	     1b\n\t&quot;
-		&quot;2:\n\t&quot;
-		&quot;# ending __down_read_trylock\n\t&quot;
-		: &quot;+m&quot;(sem-&gt;count), &quot;=&amp;a&quot;(result), &quot;=&amp;r&quot;(tmp)
-		: &quot;i&quot;(RWSEM_ACTIVE_READ_BIAS)
-		: &quot;memory&quot;, &quot;cc&quot;);
-	return result&gt;=0 ? 1 : 0;
-}
+	<span class="code-keyword">return</span> sem<span class="code-punctuation">;</span>
+<span class="code-punctuation">}</span></code></pre></div><p><br></p><p>值得一提的是 <code>trylock</code> 和 <code>downgrade_write</code> 操作，这两个操作是读/写自旋锁中没有的</p><p>两个 <code>trylock</code> 是类似的，都是用 <code>cmpxchg</code> 指令来做 CAS（compare-and-swap） 操作。写锁的 <code>trylock</code> 比较简单，因为是互斥的，所以只需要对初始值做 CAS 即可。而读锁可能被持有多个，所以它的 <code>trylock</code> 需要先将 <code>sem-&gt;count</code> 赋值给 <code>tmp</code>，再自增 <code>tmp</code> ，利用 <code>tmp</code> 的值进行 CAS</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-comment">/*</span>
+<span class="code-comment"> * trylock for reading -- returns 1 if successful, 0 if contention</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">int</span> <span class="code-function">__down_read_trylock</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	__s32 result<span class="code-punctuation">,</span> tmp<span class="code-punctuation">;</span>
+	<span class="code-keyword">__asm__</span> _<span class="code-function">_volatile__</span><span class="code-punctuation">(</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string"># beginning __down_read_trylock\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  movl      %0,%1\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">1:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  movl	     %1,%2\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  addl      %3,%2\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jle	     2f\n\t</span><span class="code-punctuation">&quot;</span>
+LOCK_PREFIX	<span class="code-punctuation">&quot;</span><span class="code-string">  cmpxchgl  %2,%0\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jnz	     1b\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">2:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string"># ending __down_read_trylock\n\t</span><span class="code-punctuation">&quot;</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">+m</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">count</span><span class="code-punctuation">),</span> <span class="code-punctuation">&quot;</span><span class="code-string">=&amp;a</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span>result<span class="code-punctuation">),</span> <span class="code-punctuation">&quot;</span><span class="code-string">=&amp;r</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span>tmp<span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">i</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span>RWSEM_ACTIVE_READ_BIAS<span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">,</span> <span class="code-punctuation">&quot;</span><span class="code-string">cc</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">);</span>
+	<span class="code-keyword">return</span> result<span class="code-operator">&gt;=</span><span class="code-number">0</span> <span class="code-operator">?</span> <span class="code-number">1</span> <span class="code-operator">:</span> <span class="code-number">0</span><span class="code-punctuation">;</span>
+<span class="code-punctuation">}</span>
 
-/*
- * trylock for writing -- returns 1 if successful, 0 if contention
- */
-static inline int __down_write_trylock(struct rw_semaphore *sem)
-{
-	signed long ret = cmpxchg(&amp;sem-&gt;count,
-				  RWSEM_UNLOCKED_VALUE, 
-				  RWSEM_ACTIVE_WRITE_BIAS);
-	if (ret == RWSEM_UNLOCKED_VALUE)
-		return 1;
-	return 0;
-}</code></pre></div><p>downgrade_write 的实现则类似写锁解锁，然后判断是否有必要唤醒等待队列中的项，这里其实和写锁解锁（<code>up_write</code>）的主要差别就是给 <code>sem-&gt;count</code> 加上的偏移量少了 1（可以回去看前面几个 <code>RWSEM_</code> 开头的宏定义），而这个 1 就是读锁占的值</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">/*
- * downgrade write lock to read lock
- */
-static inline void __downgrade_write(struct rw_semaphore *sem)
-{
-	__asm__ __volatile__(
-		&quot;# beginning __downgrade_write\n\t&quot;
-LOCK_PREFIX	&quot;  addl      %[bias],(%%rdi)\n\t&quot; /* transitions 0xZZZZ0001 -&gt; 0xYYYY0001 */
-		&quot;  js        2f\n\t&quot; /* jump if the lock is being waited upon */
-		&quot;1:\n\t&quot;
-		LOCK_SECTION_START(&quot;&quot;)
-		&quot;2:\n\t&quot;
-		&quot;  call	     rwsem_downgrade_thunk\n&quot;
-		&quot;  jmp       1b\n&quot;
+<span class="code-comment">/*</span>
+<span class="code-comment"> * trylock for writing -- returns 1 if successful, 0 if contention</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">int</span> <span class="code-function">__down_write_trylock</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-keyword">signed</span> <span class="code-keyword">long</span> ret <span class="code-operator">=</span> <span class="code-function">cmpxchg</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">count</span><span class="code-punctuation">,</span>
+				  RWSEM_UNLOCKED_VALUE<span class="code-punctuation">,</span> 
+				  RWSEM_ACTIVE_WRITE_BIAS<span class="code-punctuation">);</span>
+	<span class="code-keyword">if</span> <span class="code-punctuation">(</span>ret <span class="code-operator">==</span> RWSEM_UNLOCKED_VALUE<span class="code-punctuation">)</span>
+		<span class="code-keyword">return</span> <span class="code-number">1</span><span class="code-punctuation">;</span>
+	<span class="code-keyword">return</span> <span class="code-number">0</span><span class="code-punctuation">;</span>
+<span class="code-punctuation">}</span></code></pre></div><p>downgrade_write 的实现则类似写锁解锁，然后判断是否有必要唤醒等待队列中的项，这里其实和写锁解锁（<code>up_write</code>）的主要差别就是给 <code>sem-&gt;count</code> 加上的偏移量少了 1（可以回去看前面几个 <code>RWSEM_</code> 开头的宏定义），而这个 1 就是读锁占的值</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-comment">/*</span>
+<span class="code-comment"> * downgrade write lock to read lock</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">void</span> <span class="code-function">__downgrade_write</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-keyword">__asm__</span> _<span class="code-function">_volatile__</span><span class="code-punctuation">(</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string"># beginning __downgrade_write\n\t</span><span class="code-punctuation">&quot;</span>
+LOCK_PREFIX	<span class="code-punctuation">&quot;</span><span class="code-string">  addl      %[bias],(%%rdi)\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* transitions 0xZZZZ0001 -&gt; 0xYYYY0001 */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  js        2f\n\t</span><span class="code-punctuation">&quot;</span><span class="code-comment"> /* jump if the lock is being waited upon */</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">1:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-function">LOCK_SECTION_START</span><span class="code-punctuation">(</span><span class="code-punctuation">&quot;&quot;</span><span class="code-punctuation">)</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">2:\n\t</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  call	     rwsem_downgrade_thunk\n</span><span class="code-punctuation">&quot;</span>
+		<span class="code-punctuation">&quot;</span><span class="code-string">  jmp       1b\n</span><span class="code-punctuation">&quot;</span>
 		LOCK_SECTION_END
-		&quot;# ending __downgrade_write\n&quot;
-		: &quot;=m&quot;(sem-&gt;count)
-		: &quot;D&quot;(sem), [bias] &quot;i&quot;(-RWSEM_WAITING_BIAS), &quot;m&quot;(sem-&gt;count)
-		: &quot;memory&quot;, &quot;cc&quot;);
-}
+		<span class="code-punctuation">&quot;</span><span class="code-string"># ending __downgrade_write\n</span><span class="code-punctuation">&quot;</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">=m</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">count</span><span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">D</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span>sem<span class="code-punctuation">),</span> <span class="code-punctuation">[</span>bias<span class="code-punctuation">]</span> <span class="code-punctuation">&quot;</span><span class="code-string">i</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span><span class="code-operator">-</span>RWSEM_WAITING_BIAS<span class="code-punctuation">),</span> <span class="code-punctuation">&quot;</span><span class="code-string">m</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">(</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">count</span><span class="code-punctuation">)</span>
+		: <span class="code-punctuation">&quot;</span><span class="code-string">memory</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">,</span> <span class="code-punctuation">&quot;</span><span class="code-string">cc</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">);</span>
+<span class="code-punctuation">}</span>
 
-/*
- * downgrade a write lock into a read lock
- * - caller incremented waiting part of count, and discovered it to be still negative
- * - just wake up any readers at the front of the queue
- */
-struct rw_semaphore *rwsem_downgrade_wake(struct rw_semaphore *sem)
-{
-	rwsemtrace(sem,&quot;Entering rwsem_downgrade_wake&quot;);
+<span class="code-comment">/*</span>
+<span class="code-comment"> * downgrade a write lock into a read lock</span>
+<span class="code-comment"> * - caller incremented waiting part of count, and discovered it to be still negative</span>
+<span class="code-comment"> * - just wake up any readers at the front of the queue</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-function">rwsem_downgrade_wake</span><span class="code-punctuation">(</span><span class="code-keyword">struct</span> rw_semaphore <span class="code-operator">*</span><span class="code-variable">sem</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-function">rwsemtrace</span><span class="code-punctuation">(</span>sem<span class="code-punctuation">,</span><span class="code-punctuation">&quot;</span><span class="code-string">Entering rwsem_downgrade_wake</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">);</span>
 
-	spin_lock(&amp;sem-&gt;wait_lock);
+	<span class="code-function">spin_lock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">wait_lock</span><span class="code-punctuation">);</span>
 
-	/* do nothing if list empty */
-	if (!list_empty(&amp;sem-&gt;wait_list))
-		sem = __rwsem_do_wake(sem,0);
+<span class="code-comment">	/* do nothing if list empty */</span>
+	<span class="code-keyword">if</span> <span class="code-punctuation">(</span><span class="code-operator">!</span><span class="code-function">list_empty</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">wait_list</span><span class="code-punctuation">))</span>
+		sem <span class="code-operator">=</span> <span class="code-function">__rwsem_do_wake</span><span class="code-punctuation">(</span>sem<span class="code-punctuation">,</span><span class="code-number">0</span><span class="code-punctuation">);</span>
 
-	spin_unlock(&amp;sem-&gt;wait_lock);
+	<span class="code-function">spin_unlock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">sem</span><span class="code-punctuation">-&gt;</span><span class="code-variable">wait_lock</span><span class="code-punctuation">);</span>
 
-	rwsemtrace(sem,&quot;Leaving rwsem_downgrade_wake&quot;);
-	return sem;
-}</code></pre></div><p>总结一下，读/写信号量和读/写自旋锁类似，两者语义上是相同的，也都是读优先的，只不过信号量是睡眠锁，当有长时间获取不到锁的情况时，不会导致过多的 CPU 开销</p><p><br></p><h2>顺序锁</h2><p>顺序锁和前面两者有个重要的区别，顺序锁是<strong>写优先</strong>的，让我们来分析下它是如何实现的</p><p>首先还是使用方式上：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">// 定义一个顺序锁
-seqlock_t mr_seq_lock = DEFINE_SEQLOCK(mr_seq_lock);
+	<span class="code-function">rwsemtrace</span><span class="code-punctuation">(</span>sem<span class="code-punctuation">,</span><span class="code-punctuation">&quot;</span><span class="code-string">Leaving rwsem_downgrade_wake</span><span class="code-punctuation">&quot;</span><span class="code-punctuation">);</span>
+	<span class="code-keyword">return</span> sem<span class="code-punctuation">;</span>
+<span class="code-punctuation">}</span></code></pre></div><p>总结一下，读/写信号量和读/写自旋锁类似，两者语义上是相同的，也都是读优先的，只不过信号量是睡眠锁，当有长时间获取不到锁的情况时，不会导致过多的 CPU 开销</p><p><br></p><h2>顺序锁</h2><p>顺序锁和前面两者有个重要的区别，顺序锁是<strong>写优先</strong>的，让我们来分析下它是如何实现的</p><p>首先还是使用方式上：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-comment">// 定义一个顺序锁</span>
+<span class="code-builtin">seqlock_t</span> mr_seq_lock <span class="code-operator">=</span> <span class="code-function">DEFINE_SEQLOCK</span><span class="code-punctuation">(</span>mr_seq_lock<span class="code-punctuation">);</span>
 
-write_seqlock(&amp;mr_seq_lock);
-// 读写临界区
-write_sequnlock(&amp;mr_seq_lock);
+<span class="code-function">write_seqlock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_seq_lock</span><span class="code-punctuation">);</span>
+<span class="code-comment">// 读写临界区</span>
+<span class="code-function">write_sequnlock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_seq_lock</span><span class="code-punctuation">);</span>
 
-// 读锁的使用有较大区别
-unsigned long seq;
-do {
-	seq = read_seqbegin(&amp;mr_seq_lock);
-  // 读取数据...
-} while (read_seqretry(&amp;mr_seq_lock, seq));</code></pre></div><p>一个使用例子是内核的 jiffies，它存储了机器启动到当前的时钟节拍，每次时钟中断时都会更新这个值，所以是一个高频写入的场景，<code>get_jiffies_64()</code> 函数用来获取这个值，它的实现是这样的</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">u64 get_jiffies_64(void)
-{
-	unsigned long seq;
-	u64 ret;
+<span class="code-comment">// 读锁的使用有较大区别</span>
+<span class="code-keyword">unsigned</span> <span class="code-keyword">long</span> seq<span class="code-punctuation">;</span>
+<span class="code-keyword">do</span> <span class="code-punctuation">{</span>
+	seq <span class="code-operator">=</span> <span class="code-function">read_seqbegin</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span>mr_seq_lock<span class="code-punctuation">);</span>
+<span class="code-punctuation">  </span><span class="code-comment">// 读取数据...</span>
+<span class="code-punctuation">}</span> <span class="code-keyword">while</span> <span class="code-punctuation">(</span><span class="code-function">read_seqretry</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">mr_seq_lock</span><span class="code-punctuation">,</span> seq<span class="code-punctuation">));</span></code></pre></div><p>一个使用例子是内核的 jiffies，它存储了机器启动到当前的时钟节拍，每次时钟中断时都会更新这个值，所以是一个高频写入的场景，<code>get_jiffies_64()</code> 函数用来获取这个值，它的实现是这样的</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">u64 <span class="code-function">get_jiffies_64</span><span class="code-punctuation">(</span><span class="code-keyword">void</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-keyword">unsigned</span> <span class="code-keyword">long</span> seq<span class="code-punctuation">;</span>
+	u64 ret<span class="code-punctuation">;</span>
 
-	do {
-		seq = read_seqbegin(&amp;xtime_lock);
-		ret = jiffies_64;
-	} while (read_seqretry(&amp;xtime_lock, seq));
-	return ret;
-}</code></pre></div><p>顺序锁在读取时需要一个循环，这是为了判断在这个过程中是否有发生写入，如果没有，那么读取就是安全的，否则需要重试</p><p>实现上，代码位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/linux/seqlock.h#L50" rel="noopener noreferrer" target="_blank">/include/linux/seqlock.h</a>，有比较清晰的注释：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c">#define SEQLOCK_UNLOCKED { 0, SPIN_LOCK_UNLOCKED }
-#define seqlock_init(x)	do { *(x) = (seqlock_t) SEQLOCK_UNLOCKED; } while (0)
+	<span class="code-keyword">do</span> <span class="code-punctuation">{</span>
+		seq <span class="code-operator">=</span> <span class="code-function">read_seqbegin</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span>xtime_lock<span class="code-punctuation">);</span>
+		ret <span class="code-operator">=</span> jiffies_64<span class="code-punctuation">;</span>
+	<span class="code-punctuation">}</span> <span class="code-keyword">while</span> <span class="code-punctuation">(</span><span class="code-function">read_seqretry</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span>xtime_lock<span class="code-punctuation">,</span> seq<span class="code-punctuation">));</span>
+	<span class="code-keyword">return</span> ret<span class="code-punctuation">;</span>
+<span class="code-punctuation">}</span></code></pre></div><p>顺序锁在读取时需要一个循环，这是为了判断在这个过程中是否有发生写入，如果没有，那么读取就是安全的，否则需要重试</p><p>实现上，代码位于 <a href="https://elixir.bootlin.com/linux/v2.6.0/source/include/linux/seqlock.h#L50" rel="noopener noreferrer" target="_blank">/include/linux/seqlock.h</a>，有比较清晰的注释：</p><div class="notion-code-block"><div class="notion-code-header"><span class="notion-code-language">C</span> <button aria-label="复制代码" class="notion-code-copy" title="复制代码"><svg fill="none" viewBox="0 0 24 24" height="16" width="16" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round"><rect height="13" rx="2" ry="2" width="13" x="9" y="9"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg> <span class="copy-text">COPY</span></button></div><pre class="notion-code"><code class="language-c"><span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">SEQLOCK_UNLOCKED</span> <span class="code-punctuation">{</span> <span class="code-number">0</span><span class="code-punctuation">,</span> SPIN_LOCK_UNLOCKED <span class="code-punctuation">}</span>
+<span class="code-punctuation">#</span><span class="code-keyword">define</span> <span class="code-function">seqlock_init</span><span class="code-punctuation">(</span><span class="code-variable">x</span><span class="code-punctuation">)</span>	<span class="code-keyword">do</span> <span class="code-punctuation">{</span> <span class="code-operator">*</span><span class="code-punctuation">(</span>x<span class="code-punctuation">)</span> <span class="code-operator">=</span> <span class="code-punctuation">(</span><span class="code-builtin">seqlock_t</span><span class="code-punctuation">)</span> SEQLOCK_UNLOCKED<span class="code-punctuation">;</span> <span class="code-punctuation">}</span> <span class="code-keyword">while</span> <span class="code-punctuation">(</span><span class="code-number">0</span><span class="code-punctuation">)</span>
 
-/* Lock out other writers and update the count.
- * Acts like a normal spin_lock/unlock.
- * Don&#039;t need preempt_disable() because that is in the spin_lock already.
- */
-static inline void write_seqlock(seqlock_t *sl)
-{
-	spin_lock(&amp;sl-&gt;lock);
-	++sl-&gt;sequence;
-	smp_wmb();			
-}	
+<span class="code-comment">/* Lock out other writers and update the count.</span>
+<span class="code-comment"> * Acts like a normal spin_lock/unlock.</span>
+<span class="code-comment"> * Don&#039;t need preempt_disable() because that is in the spin_lock already.</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">void</span> <span class="code-function">write_seqlock</span><span class="code-punctuation">(</span><span class="code-builtin">seqlock_t</span> <span class="code-operator">*</span><span class="code-variable">sl</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-function">spin_lock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">sl</span><span class="code-punctuation">-&gt;</span><span class="code-variable">lock</span><span class="code-punctuation">);</span>
+	<span class="code-operator">++</span><span class="code-variable">sl</span><span class="code-punctuation">-&gt;</span><span class="code-variable">sequence</span><span class="code-punctuation">;</span>
+	<span class="code-function">smp_wmb</span><span class="code-punctuation">();</span>			
+<span class="code-punctuation">}</span>	
 
-static inline void write_sequnlock(seqlock_t *sl) 
-{
-	smp_wmb();
-	sl-&gt;sequence++;
-	spin_unlock(&amp;sl-&gt;lock);
-}
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">void</span> <span class="code-function">write_sequnlock</span><span class="code-punctuation">(</span><span class="code-builtin">seqlock_t</span> <span class="code-operator">*</span><span class="code-variable">sl</span><span class="code-punctuation">)</span> 
+<span class="code-punctuation">{</span>
+	<span class="code-function">smp_wmb</span><span class="code-punctuation">();</span>
+	<span class="code-variable">sl</span><span class="code-punctuation">-&gt;</span><span class="code-variable">sequence</span><span class="code-operator">++</span><span class="code-punctuation">;</span>
+	<span class="code-function">spin_unlock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">sl</span><span class="code-punctuation">-&gt;</span><span class="code-variable">lock</span><span class="code-punctuation">);</span>
+<span class="code-punctuation">}</span>
 
-static inline int write_tryseqlock(seqlock_t *sl)
-{
-	int ret = spin_trylock(&amp;sl-&gt;lock);
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">int</span> <span class="code-function">write_tryseqlock</span><span class="code-punctuation">(</span><span class="code-builtin">seqlock_t</span> <span class="code-operator">*</span><span class="code-variable">sl</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-keyword">int</span> ret <span class="code-operator">=</span> <span class="code-function">spin_trylock</span><span class="code-punctuation">(</span><span class="code-operator">&amp;</span><span class="code-variable">sl</span><span class="code-punctuation">-&gt;</span><span class="code-variable">lock</span><span class="code-punctuation">);</span>
 
-	if (ret) {
-		++sl-&gt;sequence;
-		smp_wmb();			
-	}
-	return ret;
-}
+	<span class="code-keyword">if</span> <span class="code-punctuation">(</span>ret<span class="code-punctuation">)</span> <span class="code-punctuation">{</span>
+		<span class="code-operator">++</span><span class="code-variable">sl</span><span class="code-punctuation">-&gt;</span><span class="code-variable">sequence</span><span class="code-punctuation">;</span>
+		<span class="code-function">smp_wmb</span><span class="code-punctuation">();</span>			
+	<span class="code-punctuation">}</span>
+	<span class="code-keyword">return</span> ret<span class="code-punctuation">;</span>
+<span class="code-punctuation">}</span>
 
-/* Start of read calculation -- fetch last complete writer token */
-static inline unsigned read_seqbegin(const seqlock_t *sl)
-{
-	unsigned ret = sl-&gt;sequence;
-	smp_rmb();
-	return ret;
-}
+<span class="code-comment">/* Start of read calculation -- fetch last complete writer token */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">unsigned</span> <span class="code-function">read_seqbegin</span><span class="code-punctuation">(</span><span class="code-keyword">const</span> <span class="code-builtin">seqlock_t</span> <span class="code-operator">*</span><span class="code-variable">sl</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-keyword">unsigned</span> ret <span class="code-operator">=</span> <span class="code-variable">sl</span><span class="code-punctuation">-&gt;</span><span class="code-variable">sequence</span><span class="code-punctuation">;</span>
+	<span class="code-function">smp_rmb</span><span class="code-punctuation">();</span>
+	<span class="code-keyword">return</span> ret<span class="code-punctuation">;</span>
+<span class="code-punctuation">}</span>
 
-/* Test if reader processed invalid data.
- * If initial values is odd, 
- *	then writer had already started when section was entered
- * If sequence value changed
- *	then writer changed data while in section
- *    
- * Using xor saves one conditional branch.
- */
-static inline int read_seqretry(const seqlock_t *sl, unsigned iv)
-{
-	smp_rmb();
-	return (iv &amp; 1) | (sl-&gt;sequence ^ iv);
-}</code></pre></div><p>可以看到，顺序锁是基于一个自旋锁实现的。但额外依赖一个序列计数器，当获取写锁时，这个序列值会增加。读取数据时要先调用 <code>read_seqbegin</code>，它会返回这个序列值，读取完成后通过 <code>read_seqretry</code> 检查传入的值 <code>iv</code>，满足以下两个条件则说明读是安全的：</p><ul><li>如果 <code>iv</code> 是偶数（初始值为 0，写锁会加 1）则说明不是处在一个写操作进行的过程中</li><li><code>iv</code> 和序列值相同（相同值异或结果为 0）说明没有写操作发生过</li></ul><p>这两者都满足，读取的值就是有效的</p><p><br></p><p>所以，顺序锁是一种<strong>乐观锁</strong>，是不存在「读锁」的，而是通过类似版本号的机制来读，因此只要没有其他写者，随时都可以获取到写锁，以此实现写优先</p></div><nav class="post-navigation" data-astro-cid-xtreypgh><a href="/post/2023summary" class="nav-link nav-prev" data-astro-cid-xtreypgh><span class="nav-label" data-astro-cid-xtreypgh>← 上一篇</span><span class="nav-title" data-astro-cid-xtreypgh>2023 年度总结</span></a><a href="/post/longhorn" class="nav-link nav-next" data-astro-cid-xtreypgh><span class="nav-label" data-astro-cid-xtreypgh>下一篇 →</span><span class="nav-title" data-astro-cid-xtreypgh>Longhorn 浅析</span></a></nav><footer class="page-footer" data-astro-cid-xtreypgh><a href="/" class="back-link" data-astro-cid-xtreypgh>← 返回首页</a></footer><section class="comments-section" data-astro-cid-xtreypgh><div class="comments-container" data-astro-cid-mf252hzo data-giscus-config="{&quot;slug&quot;:&quot;kernel-rwlock&quot;,&quot;title&quot;:&quot;从 Linux 内核看读写锁设计&quot;,&quot;config&quot;:{&quot;repo&quot;:&quot;xxxuuu/xxxuuu.github.io&quot;,&quot;repoId&quot;:&quot;MDEwOlJlcG9zaXRvcnkxODQ3Mjk3Mjg&quot;,&quot;category&quot;:&quot;Announcements&quot;,&quot;categoryId&quot;:&quot;DIC_kwDOCwLAgM4ChgWc&quot;,&quot;mapping&quot;:&quot;title&quot;,&quot;strict&quot;:&quot;0&quot;,&quot;reactionsEnabled&quot;:&quot;1&quot;,&quot;emitMetadata&quot;:&quot;0&quot;,&quot;inputPosition&quot;:&quot;bottom&quot;,&quot;lang&quot;:&quot;zh-CN&quot;,&quot;lazy&quot;:true}}" data-provider="giscus" id="comments"><div class="comments-loading" data-astro-cid-mf252hzo>加载评论中...</div></div><script type="module">function e(e){return!!e.querySelector("iframe.giscus-frame, #giscus-script")}async function t(t){if(e(t.container))return;let{container:o,slug:a,config:i}=t;if(!i.repo||!i.repoId||!i.categoryId)return console.error("[Giscus] ❌ Missing required configuration",{repo:i.repo,repoId:i.repoId,categoryId:i.categoryId}),void r(o,"评论系统配置不完整，请联系站点管理员");try{await n(o,i,a),console.log("[Giscus] ✅ Initialized successfully")}catch(e){console.error("[Giscus] ❌ Failed to initialize:",e),r(o,"评论加载失败，请刷新页面重试")}}async function n(e,t,r){return new Promise((n,o)=>{let a=document.querySelector("#giscus-script");a&&a.remove();let i=document.createElement("script");i.id="giscus-script",i.src="https://giscus.app/client.js",i.async=!0,i.defer=!0,i.setAttribute("data-repo",t.repo),i.setAttribute("data-repo-id",t.repoId),i.setAttribute("data-category",t.category),i.setAttribute("data-category-id",t.categoryId),i.setAttribute("data-mapping",t.mapping),i.setAttribute("data-strict",t.strict),i.setAttribute("data-reactions-enabled",t.reactionsEnabled),i.setAttribute("data-emit-metadata",t.emitMetadata),i.setAttribute("data-input-position",t.inputPosition),i.setAttribute("data-lang",t.lang),i.setAttribute("data-lazy",t.lazy.toString()),i.setAttribute("data-theme","preferred_color_scheme"),i.setAttribute("data-term",r),i.onload=()=>{let t=e.querySelector(".comments-loading");t&&t.remove(),n()},i.onerror=()=>{o(Error("Failed to load Giscus script"))},e.appendChild(i)})}function r(e,t){e.innerHTML=`\n    <div class="comments-error" style="\n      padding: 1rem;\n      text-align: center;\n      color: var(--color-text-secondary, #666);\n      border: 1px solid var(--color-border, #e0e0e0);\n      border-radius: 0.5rem;\n      background: var(--color-surface, #f5f5f5);\n    ">\n      <p style="margin: 0;">${t}</p>\n      <p style="\n        font-size: 0.85em;\n        margin: 0.5em 0 0 0;\n        color: var(--color-text-tertiary, #999);\n      ">\n        如果问题持续存在，请检查控制台获取更多信息\n      </p>\n    </div>\n  `}document.addEventListener("astro:page-load",()=>{let e=document.querySelector(".comments-container");if(!e)return;let r=e.dataset.provider,n=e.dataset.giscusConfig;if("giscus"===r&&n)try{let{slug:r,title:o,config:a}=JSON.parse(n);t({container:e,slug:r,title:o,config:a})}catch(e){console.error("[Comments] Failed to parse config:",e)}else"waline"===r?console.warn("Waline 评论系统暂未实现"):"utterances"===r&&console.warn("Utterances 评论系统暂未实现")})</script></section></div><aside class="toc-container" data-astro-cid-xtreypgh><div class="toc-wrapper" data-astro-cid-xtreypgh><div class="toc-title" data-astro-cid-xtreypgh>目录</div><nav class="toc-nav" data-astro-cid-xtreypgh></nav></div></aside></div></div></article></main><footer data-astro-cid-6eg4hve5><div class="container" data-astro-cid-6eg4hve5><div class="footer-content" data-astro-cid-6eg4hve5><div class="copyright" data-astro-cid-6eg4hve5><p data-astro-cid-6eg4hve5>&copy; 2018–2026 x³u³. All rights reserved.</p><p data-astro-cid-6eg4hve5 class="powered-by">Powered by <a href="https://github.com/xxxuuu/nopress" rel="noopener noreferrer" target="_blank" data-astro-cid-6eg4hve5>NoPress</a><span class="commit-id" data-astro-cid-6eg4hve5> · <a href="https://github.com/xxxuuu/nopress/commit/dc869c2" rel="noopener noreferrer" target="_blank" data-astro-cid-6eg4hve5>dc869c2</a></span></p></div><div class="social-links" data-astro-cid-6eg4hve5><a href="https://github.com/xxxuuu" class="social-icon" aria-label="github" data-astro-cid-6eg4hve5 rel="noopener noreferrer" target="_blank"><span class="icon-wrapper" data-astro-cid-6eg4hve5><svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></span></a><a href="https://x.com/xxuuu0" class="social-icon" aria-label="twitter" data-astro-cid-6eg4hve5 rel="noopener noreferrer" target="_blank"><span class="icon-wrapper" data-astro-cid-6eg4hve5><svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span></a><a href="mailto:xxuuu0@outlook.com" class="social-icon" aria-label="email" data-astro-cid-6eg4hve5 rel="noopener noreferrer" target="_blank"><span class="icon-wrapper" data-astro-cid-6eg4hve5><svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg></span></a><a href="/rss/feed.xml" class="social-icon rss" aria-label="RSS订阅" data-astro-cid-6eg4hve5><span class="icon-wrapper" data-astro-cid-6eg4hve5><svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg></span></a></div></div></div></footer><dialog aria-label="站内搜索" class="search-dialog"><div class="search-panel"><div class="search-bar"><svg fill="none" viewBox="0 0 24 24" height="15" width="15" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round" class="search-icon" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line></svg><input aria-label="搜索关键词" autocapitalize="off" autocomplete="off" class="search-input" enterkeyhint="search" placeholder="搜索文章与页面…" spellcheck="false" type="text"><button aria-label="关闭搜索" class="search-close" type="button"><svg fill="none" viewBox="0 0 24 24" height="14" width="14" stroke="currentColor" stroke-linecap="round" stroke-width="2" aria-hidden="true"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg></button></div><div class="search-results" aria-label="搜索结果" role="listbox"></div><footer class="search-hint"><span><kbd>↑</kbd><kbd>↓</kbd> 选择</span><span><kbd>Enter</kbd> 打开</span><span><kbd>Esc</kbd> 关闭</span></footer></div></dialog><script type="module" src="/_astro/BaseLayout.astro_astro_type_script_index_0_lang.BJ7T2sSQ.js"></script></body></html><script type="module">function e(){document.addEventListener("astro:page-load",n)}var t=null;function n(){t?.abort(),t=new AbortController;let e=document.querySelector(".toc-container"),n=document.querySelector(".notion-content");if(!e||!n)return;let i=n.querySelectorAll("h1, h2, h3");if(0===i.length)return void e.classList.add("toc-empty");let d=Array.from(i).map((t,e)=>{let n=t;return n.id||=(n.textContent||"").toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g,"-").replace(/^-+|-+$/g,"")||`heading-${e}`,{id:n.id,text:n.textContent||"",level:parseInt(t.tagName[1]),element:n}}),u=r(d),m=e.querySelector(".toc-nav");m&&(m.innerHTML=u),a(e),s(e),c(e),o(e),setTimeout(()=>{l(d,e)},0)}function r(t){if(0===t.length)return"";let e=Math.min(...t.map(t=>t.level)),n=t.map(t=>t.text.length),o=Math.min(...n),l=Math.max(...n)-o||1,r={};t.forEach(t=>{let n=t.level-e;if(!r[n]){let t=44-8*n,e=t-12;r[n]={min:e,max:t}}});let a='<ul class="toc-list">';return t.forEach(t=>{let n=t.level-e,c=1.125*n,s=(t.text.length-o)/l,d=Math.sqrt(s),u=r[n],m=Math.round(u.min+d*(u.max-u.min));a+=`\n      <li class="toc-item toc-level-${t.level}" style="--toc-indent: ${c}rem;" data-bar-width="${m}">\n        <a href="#${t.id}" class="toc-link" data-target="${t.id}">\n          ${i(t.text)}\n        </a>\n      </li>\n    `}),a+="</ul>",a}function i(t){let e=document.createElement("div");return e.textContent=t,e.innerHTML}function a(t){t.querySelectorAll(".toc-item").forEach(t=>{let e=t.getAttribute("data-bar-width"),n=t.querySelector(".toc-link");e&&n&&n.style.setProperty("--bar-width",`${e}px`)})}function o(e){let n=document.querySelector(".page-main");if(!n)return;let i=()=>{let t=n.getBoundingClientRect(),i=e,o=t.top,l=Math.max(100,o+20);i.style.top=`${l}px`;let r=window.innerHeight-l-20,a=i.querySelector(".toc-wrapper");a&&(a.style.maxHeight=`${r}px`)},o=t.signal,l=!1;window.addEventListener("scroll",()=>{l||=(window.requestAnimationFrame(()=>{i(),l=!1}),!0)},{passive:!0,signal:o}),window.addEventListener("resize",()=>{l||=(window.requestAnimationFrame(()=>{i(),l=!1}),!0)},{passive:!0,signal:o}),requestAnimationFrame(()=>{i()})}function s(t){t.addEventListener("click",t=>{let e=t.target.closest(".toc-link");if(!e)return;t.preventDefault();let n=e.getAttribute("data-target");if(!n)return;let i=document.getElementById(n);if(!i)return;let o=i.getBoundingClientRect().top+window.pageYOffset-80;window.scrollTo({top:o,behavior:"smooth"}),history.pushState(null,"",`#${n}`)})}function c(e){let n=document.createElement("div");n.className="toc-tooltip",e.appendChild(n);let i=e.querySelector(".toc-nav");if(!i)return;let o=t=>{let i=(t.textContent||"").trim();if(!i)return;n.textContent=i,n.classList.add("toc-tooltip-visible");let o=e.getBoundingClientRect(),l=t.getBoundingClientRect();n.style.top=l.top-o.top+l.height/2+"px"},l=()=>{n.classList.remove("toc-tooltip-visible")};i.addEventListener("mouseover",t=>{let e=t.target.closest(".toc-link");e?o(e):l()}),i.addEventListener("mouseleave",l),i.addEventListener("focusin",t=>{let e=t.target.closest(".toc-link");e&&o(e)}),i.addEventListener("focusout",l),window.addEventListener("scroll",l,{passive:!0,signal:t.signal})}function l(e,n){let i="",o=()=>{let t=window.innerHeight,n=t/3,o="",l=1/0;for(let i of e){let e=i.element.getBoundingClientRect(),r=Math.abs(e.top-n);e.top<=t&&e.top>=-e.height&&r<l&&(l=r,o=i.id)}if(!o)for(let t=e.length-1;t>=0;t--)if(e[t].element.getBoundingClientRect().top<0){o=e[t].id;break}if(!o&&e.length>0&&(o=e[0].id),o!==i&&(i=o,document.querySelectorAll(".toc-container .toc-link").forEach(t=>{t.classList.remove("toc-active")}),o)){let t=document.querySelector(`.toc-container .toc-link[data-target="${o}"]`);t&&t.classList.add("toc-active")}},l=!1;window.addEventListener("scroll",()=>{l||=(window.requestAnimationFrame(()=>{o(),l=!1}),!0)},{passive:!0,signal:t.signal}),requestAnimationFrame(()=>{o()})}typeof window<"u"&&e(),e()</script>
+<span class="code-comment">/* Test if reader processed invalid data.</span>
+<span class="code-comment"> * If initial values is odd, </span>
+<span class="code-comment"> *	then writer had already started when section was entered</span>
+<span class="code-comment"> * If sequence value changed</span>
+<span class="code-comment"> *	then writer changed data while in section</span>
+<span class="code-comment"> *    </span>
+<span class="code-comment"> * Using xor saves one conditional branch.</span>
+<span class="code-comment"> */</span>
+<span class="code-keyword">static</span> <span class="code-keyword">inline</span> <span class="code-keyword">int</span> <span class="code-function">read_seqretry</span><span class="code-punctuation">(</span><span class="code-keyword">const</span> <span class="code-builtin">seqlock_t</span> <span class="code-operator">*</span><span class="code-variable">sl</span><span class="code-punctuation">,</span> <span class="code-keyword">unsigned</span> <span class="code-variable">iv</span><span class="code-punctuation">)</span>
+<span class="code-punctuation">{</span>
+	<span class="code-function">smp_rmb</span><span class="code-punctuation">();</span>
+	<span class="code-keyword">return</span> <span class="code-punctuation">(</span>iv <span class="code-operator">&amp;</span> <span class="code-number">1</span><span class="code-punctuation">)</span> <span class="code-operator">|</span> <span class="code-punctuation">(</span><span class="code-variable">sl</span><span class="code-punctuation">-&gt;</span><span class="code-variable">sequence</span> <span class="code-operator">^</span> iv<span class="code-punctuation">);</span>
+<span class="code-punctuation">}</span></code></pre></div><p>可以看到，顺序锁是基于一个自旋锁实现的。但额外依赖一个序列计数器，当获取写锁时，这个序列值会增加。读取数据时要先调用 <code>read_seqbegin</code>，它会返回这个序列值，读取完成后通过 <code>read_seqretry</code> 检查传入的值 <code>iv</code>，满足以下两个条件则说明读是安全的：</p><ul><li>如果 <code>iv</code> 是偶数（初始值为 0，写锁会加 1）则说明不是处在一个写操作进行的过程中</li><li><code>iv</code> 和序列值相同（相同值异或结果为 0）说明没有写操作发生过</li></ul><p>这两者都满足，读取的值就是有效的</p><p><br></p><p>所以，顺序锁是一种<strong>乐观锁</strong>，是不存在「读锁」的，而是通过类似版本号的机制来读，因此只要没有其他写者，随时都可以获取到写锁，以此实现写优先</p></div><nav class="post-navigation" data-astro-cid-xtreypgh><a href="/post/2023summary" class="nav-link nav-prev" data-astro-cid-xtreypgh><span class="nav-label" data-astro-cid-xtreypgh>← 上一篇</span><span class="nav-title" data-astro-cid-xtreypgh>2023 年度总结</span></a><a href="/post/longhorn" class="nav-link nav-next" data-astro-cid-xtreypgh><span class="nav-label" data-astro-cid-xtreypgh>下一篇 →</span><span class="nav-title" data-astro-cid-xtreypgh>Longhorn 浅析</span></a></nav><footer class="page-footer" data-astro-cid-xtreypgh><a href="/" class="back-link" data-astro-cid-xtreypgh>← 返回首页</a></footer><section class="comments-section" data-astro-cid-xtreypgh><div class="comments-container" data-astro-cid-mf252hzo data-giscus-config="{&quot;slug&quot;:&quot;kernel-rwlock&quot;,&quot;title&quot;:&quot;从 Linux 内核看读写锁设计&quot;,&quot;config&quot;:{&quot;repo&quot;:&quot;xxxuuu/xxxuuu.github.io&quot;,&quot;repoId&quot;:&quot;MDEwOlJlcG9zaXRvcnkxODQ3Mjk3Mjg&quot;,&quot;category&quot;:&quot;Announcements&quot;,&quot;categoryId&quot;:&quot;DIC_kwDOCwLAgM4ChgWc&quot;,&quot;mapping&quot;:&quot;title&quot;,&quot;strict&quot;:&quot;0&quot;,&quot;reactionsEnabled&quot;:&quot;1&quot;,&quot;emitMetadata&quot;:&quot;0&quot;,&quot;inputPosition&quot;:&quot;bottom&quot;,&quot;lang&quot;:&quot;zh-CN&quot;,&quot;lazy&quot;:true}}" data-provider="giscus" id="comments"><div class="comments-loading" data-astro-cid-mf252hzo>加载评论中...</div></div><script type="module">function e(){return document.documentElement.classList.contains("dark")?"dark":"light"}var t=new Set,n=!1;function r(){let r=e();t.forEach(t=>t(r))}function i(e){t.add(e),!(n||typeof MutationObserver>"u")&&(n=!0,new MutationObserver(r).observe(document.documentElement,{attributes:!0,attributeFilter:["class"]}))}function a(t){return!!t.querySelector("iframe.giscus-frame, #giscus-script")}var o={light:"light",dark:"transparent_dark"};function s(){document.querySelector("iframe.giscus-frame")?.contentWindow?.postMessage({giscus:{setConfig:{theme:o[e()]}}},"https://giscus.app")}async function c(t){if(a(t.container))return;i(s);let{container:e,slug:r,config:n}=t;if(!n.repo||!n.repoId||!n.categoryId)return console.error("[Giscus] ❌ Missing required configuration",{repo:n.repo,repoId:n.repoId,categoryId:n.categoryId}),void u(e,"评论系统配置不完整，请联系站点管理员");try{await l(e,n,r),console.log("[Giscus] ✅ Initialized successfully")}catch(t){console.error("[Giscus] ❌ Failed to initialize:",t),u(e,"评论加载失败，请刷新页面重试")}}async function l(t,r,n){return new Promise((a,i)=>{let c=document.querySelector("#giscus-script");c&&c.remove();let u=document.createElement("script");u.id="giscus-script",u.src="https://giscus.app/client.js",u.async=!0,u.defer=!0,u.setAttribute("data-repo",r.repo),u.setAttribute("data-repo-id",r.repoId),u.setAttribute("data-category",r.category),u.setAttribute("data-category-id",r.categoryId),u.setAttribute("data-mapping",r.mapping),u.setAttribute("data-strict",r.strict),u.setAttribute("data-reactions-enabled",r.reactionsEnabled),u.setAttribute("data-emit-metadata",r.emitMetadata),u.setAttribute("data-input-position",r.inputPosition),u.setAttribute("data-lang",r.lang),u.setAttribute("data-lazy",r.lazy.toString()),u.setAttribute("data-theme",o[e()]),u.setAttribute("data-term",n),u.onload=()=>{let e=t.querySelector(".comments-loading");e&&e.remove(),s(),a()},u.onerror=()=>{i(Error("Failed to load Giscus script"))},t.appendChild(u)})}function u(t,e){t.innerHTML=`\n    <div class="comments-error" style="\n      padding: 1rem;\n      text-align: center;\n      color: var(--color-text-secondary, #666);\n      border: 1px solid var(--color-border, #e0e0e0);\n      border-radius: 0.5rem;\n      background: var(--color-surface, #f5f5f5);\n    ">\n      <p style="margin: 0;">${e}</p>\n      <p style="\n        font-size: 0.85em;\n        margin: 0.5em 0 0 0;\n        color: var(--color-text-tertiary, #999);\n      ">\n        如果问题持续存在，请检查控制台获取更多信息\n      </p>\n    </div>\n  `}document.addEventListener("astro:page-load",()=>{let t=document.querySelector(".comments-container");if(!t)return;let e=t.dataset.provider,r=t.dataset.giscusConfig;if("giscus"===e&&r)try{let{slug:e,title:n,config:a}=JSON.parse(r);c({container:t,slug:e,title:n,config:a})}catch(t){console.error("[Comments] Failed to parse config:",t)}else"waline"===e?console.warn("Waline 评论系统暂未实现"):"utterances"===e&&console.warn("Utterances 评论系统暂未实现")})</script></section></div><aside class="toc-container" data-astro-cid-xtreypgh><div class="toc-wrapper" data-astro-cid-xtreypgh><div class="toc-title" data-astro-cid-xtreypgh>目录</div><nav class="toc-nav" data-astro-cid-xtreypgh></nav></div></aside></div></div></article></main><footer data-astro-cid-6eg4hve5><div class="container" data-astro-cid-6eg4hve5><div class="footer-content" data-astro-cid-6eg4hve5><div class="copyright" data-astro-cid-6eg4hve5><p data-astro-cid-6eg4hve5>&copy; 2018–2026 x³u³. All rights reserved.</p><p data-astro-cid-6eg4hve5 class="powered-by">Powered by <a href="https://github.com/xxxuuu/nopress" rel="noopener noreferrer" target="_blank" data-astro-cid-6eg4hve5>NoPress</a><span class="commit-id" data-astro-cid-6eg4hve5> · <a href="https://github.com/xxxuuu/nopress/commit/1797f9c" rel="noopener noreferrer" target="_blank" data-astro-cid-6eg4hve5>1797f9c</a></span></p></div><div class="social-links" data-astro-cid-6eg4hve5><a href="https://github.com/xxxuuu" class="social-icon" aria-label="github" data-astro-cid-6eg4hve5 rel="noopener noreferrer" target="_blank"><span class="icon-wrapper" data-astro-cid-6eg4hve5><svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg></span></a><a href="https://x.com/xxuuu0" class="social-icon" aria-label="twitter" data-astro-cid-6eg4hve5 rel="noopener noreferrer" target="_blank"><span class="icon-wrapper" data-astro-cid-6eg4hve5><svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></span></a><a href="mailto:xxuuu0@outlook.com" class="social-icon" aria-label="email" data-astro-cid-6eg4hve5 rel="noopener noreferrer" target="_blank"><span class="icon-wrapper" data-astro-cid-6eg4hve5><svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4-8 5-8-5V6l8 5 8-5v2z"/></svg></span></a><a href="/rss/feed.xml" class="social-icon rss" aria-label="RSS订阅" data-astro-cid-6eg4hve5><span class="icon-wrapper" data-astro-cid-6eg4hve5><svg fill="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path d="M6.18 15.64a2.18 2.18 0 0 1 2.18 2.18C8.36 19 7.38 20 6.18 20C5 20 4 19 4 17.82a2.18 2.18 0 0 1 2.18-2.18M4 4.44A15.56 15.56 0 0 1 19.56 20h-2.83A12.73 12.73 0 0 0 4 7.27V4.44m0 5.66a9.9 9.9 0 0 1 9.9 9.9h-2.83A7.07 7.07 0 0 0 4 12.93V10.1z"/></svg></span></a></div></div></div></footer><dialog aria-label="站内搜索" class="search-dialog"><div class="search-panel"><div class="search-bar"><svg fill="none" viewBox="0 0 24 24" height="15" width="15" stroke="currentColor" stroke-linecap="round" stroke-width="2" stroke-linejoin="round" class="search-icon" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="21" x2="16.65" y1="21" y2="16.65"></line></svg><input aria-label="搜索关键词" autocapitalize="off" autocomplete="off" class="search-input" enterkeyhint="search" placeholder="搜索文章与页面…" spellcheck="false" type="text"><button aria-label="关闭搜索" class="search-close" type="button"><svg fill="none" viewBox="0 0 24 24" height="14" width="14" stroke="currentColor" stroke-linecap="round" stroke-width="2" aria-hidden="true"><line x1="18" x2="6" y1="6" y2="18"></line><line x1="6" x2="18" y1="6" y2="18"></line></svg></button></div><div class="search-results" aria-label="搜索结果" role="listbox"></div><footer class="search-hint"><span><kbd>↑</kbd><kbd>↓</kbd> 选择</span><span><kbd>Enter</kbd> 打开</span><span><kbd>Esc</kbd> 关闭</span></footer></div></dialog><script type="module" src="/_astro/BaseLayout.astro_astro_type_script_index_0_lang.BzjRaQ4_.js"></script></body></html><script type="module">function e(){document.addEventListener("astro:page-load",n)}var t=null;function n(){t?.abort(),t=new AbortController;let e=document.querySelector(".toc-container"),n=document.querySelector(".notion-content");if(!e||!n)return;let i=n.querySelectorAll("h1, h2, h3");if(0===i.length)return void e.classList.add("toc-empty");let d=Array.from(i).map((t,e)=>{let n=t;return n.id||=(n.textContent||"").toLowerCase().replace(/[^\w\u4e00-\u9fa5]+/g,"-").replace(/^-+|-+$/g,"")||`heading-${e}`,{id:n.id,text:n.textContent||"",level:parseInt(t.tagName[1]),element:n}}),u=r(d),m=e.querySelector(".toc-nav");m&&(m.innerHTML=u),a(e),s(e),c(e),o(e),setTimeout(()=>{l(d,e)},0)}function r(t){if(0===t.length)return"";let e=Math.min(...t.map(t=>t.level)),n=t.map(t=>t.text.length),o=Math.min(...n),l=Math.max(...n)-o||1,r={};t.forEach(t=>{let n=t.level-e;if(!r[n]){let t=44-8*n,e=t-12;r[n]={min:e,max:t}}});let a='<ul class="toc-list">';return t.forEach(t=>{let n=t.level-e,c=1.125*n,s=(t.text.length-o)/l,d=Math.sqrt(s),u=r[n],m=Math.round(u.min+d*(u.max-u.min));a+=`\n      <li class="toc-item toc-level-${t.level}" style="--toc-indent: ${c}rem;" data-bar-width="${m}">\n        <a href="#${t.id}" class="toc-link" data-target="${t.id}">\n          ${i(t.text)}\n        </a>\n      </li>\n    `}),a+="</ul>",a}function i(t){let e=document.createElement("div");return e.textContent=t,e.innerHTML}function a(t){t.querySelectorAll(".toc-item").forEach(t=>{let e=t.getAttribute("data-bar-width"),n=t.querySelector(".toc-link");e&&n&&n.style.setProperty("--bar-width",`${e}px`)})}function o(e){let n=document.querySelector(".page-main");if(!n)return;let i=()=>{let t=n.getBoundingClientRect(),i=e,o=t.top,l=Math.max(100,o+20);i.style.top=`${l}px`;let r=window.innerHeight-l-20,a=i.querySelector(".toc-wrapper");a&&(a.style.maxHeight=`${r}px`)},o=t.signal,l=!1;window.addEventListener("scroll",()=>{l||=(window.requestAnimationFrame(()=>{i(),l=!1}),!0)},{passive:!0,signal:o}),window.addEventListener("resize",()=>{l||=(window.requestAnimationFrame(()=>{i(),l=!1}),!0)},{passive:!0,signal:o}),requestAnimationFrame(()=>{i()})}function s(t){t.addEventListener("click",t=>{let e=t.target.closest(".toc-link");if(!e)return;t.preventDefault();let n=e.getAttribute("data-target");if(!n)return;let i=document.getElementById(n);if(!i)return;let o=i.getBoundingClientRect().top+window.pageYOffset-80;window.scrollTo({top:o,behavior:"smooth"}),history.pushState(null,"",`#${n}`)})}function c(e){let n=document.createElement("div");n.className="toc-tooltip",e.appendChild(n);let i=e.querySelector(".toc-nav");if(!i)return;let o=t=>{let i=(t.textContent||"").trim();if(!i)return;n.textContent=i,n.classList.add("toc-tooltip-visible");let o=e.getBoundingClientRect(),l=t.getBoundingClientRect();n.style.top=l.top-o.top+l.height/2+"px"},l=()=>{n.classList.remove("toc-tooltip-visible")};i.addEventListener("mouseover",t=>{let e=t.target.closest(".toc-link");e?o(e):l()}),i.addEventListener("mouseleave",l),i.addEventListener("focusin",t=>{let e=t.target.closest(".toc-link");e&&o(e)}),i.addEventListener("focusout",l),window.addEventListener("scroll",l,{passive:!0,signal:t.signal})}function l(e,n){let i="",o=()=>{let t=window.innerHeight,n=t/3,o="",l=1/0;for(let i of e){let e=i.element.getBoundingClientRect(),r=Math.abs(e.top-n);e.top<=t&&e.top>=-e.height&&r<l&&(l=r,o=i.id)}if(!o)for(let t=e.length-1;t>=0;t--)if(e[t].element.getBoundingClientRect().top<0){o=e[t].id;break}if(!o&&e.length>0&&(o=e[0].id),o!==i&&(i=o,document.querySelectorAll(".toc-container .toc-link").forEach(t=>{t.classList.remove("toc-active")}),o)){let t=document.querySelector(`.toc-container .toc-link[data-target="${o}"]`);t&&t.classList.add("toc-active")}},l=!1;window.addEventListener("scroll",()=>{l||=(window.requestAnimationFrame(()=>{o(),l=!1}),!0)},{passive:!0,signal:t.signal}),requestAnimationFrame(()=>{o()})}typeof window<"u"&&e(),e()</script>

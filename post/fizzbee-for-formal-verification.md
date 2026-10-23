@@ -330,7 +330,7 @@ action Init:
 
 删除 `max_actions` 的步数限制后运行：
 
-```diff
+```plain
 ...
 Valid Nodes: 4077 Unique states: 2224
 IsLive: true

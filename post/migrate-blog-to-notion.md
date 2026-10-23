@@ -331,7 +331,7 @@ block
 
 [
 
-![](https://opengraph.githubassets.com/83feaf4f87c6da0d062887ef61d3a0a57bdb1c43781271bbc660930c91ab9969/NotionX/react-notion-x)
+![](https://opengraph.githubassets.com/9a51a3d433a75398c8e8e3833a0139374468c80f3fd471783ba80d8c3a0aeb15/NotionX/react-notion-x)
 
 ![](https://github.githubassets.com/favicons/favicon.svg)
 
@@ -393,7 +393,7 @@ $$\displaystyle \frac{1}{\Bigl(\sqrt{\phi \sqrt{5}}-\phi\Bigr) e^{\frac25 \pi}} 
 
 $$\displaystyle \left( \sum_{k=1}^n a_k b_k \right)^2 \leq \left( \sum_{k=1}^n a_k^2 \right) \left( \sum_{k=1}^n b_k^2 \right)(k=1∑nakbk)2≤(k=1∑nak2)(k=1∑nbk2)$$
 
-$$\displaystyle {1 + \frac{q^2}{(1-q)}+\frac{q^6}{(1-q)(1-q^2)}+\cdots }= \prod_{j=0}^{\infty}\frac{1}{(1-q^{5j+2})(1-q^{5j+3})}, \quad\quad \text{for }\lvert q\rvert<1.1+(1−q)q2+(1−q)(1−q2)q6+⋯=j=0∏∞(1−q5j+2)(1−q5j+3)1,for ∣q∣<1.$$
+$$\displaystyle {1 +  \frac{q^2}{(1-q)}+\frac{q^6}{(1-q)(1-q^2)}+\cdots }= \prod_{j=0}^{\infty}\frac{1}{(1-q^{5j+2})(1-q^{5j+3})}, \quad\quad \text{for }\lvert q\rvert<1.1+(1−q)q2+(1−q)(1−q2)q6+⋯=j=0∏∞(1−q5j+2)(1−q5j+3)1,for ∣q∣<1.$$
 
 
 
@@ -423,7 +423,7 @@ $x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$
 
 PDF
 
-[📄 下载PDF附件.pdf](https://file.notion.so/f/f/4cc04375-345a-4a1e-bdf0-3a7c88ef0425/ded5d0f7-74e1-464b-b9af-ce10adc8b59f/%E4%B8%8B%E8%BD%BDPDF%E9%99%84%E4%BB%B6.pdf?table=block&id=a29b4207-aacf-4513-b7fd-b877a3b38e20&spaceId=4cc04375-345a-4a1e-bdf0-3a7c88ef0425&expirationTimestamp=1792288800000&signature=1VLjMOwgriUw_LryQ-zjiFyvtUUHBZDFvdxa7NZ-RL0)
+[📄 下载PDF附件.pdf](https://file.notion.so/f/f/4cc04375-345a-4a1e-bdf0-3a7c88ef0425/ded5d0f7-74e1-464b-b9af-ce10adc8b59f/%E4%B8%8B%E8%BD%BDPDF%E9%99%84%E4%BB%B6.pdf?table=block&id=a29b4207-aacf-4513-b7fd-b877a3b38e20&spaceId=4cc04375-345a-4a1e-bdf0-3a7c88ef0425&expirationTimestamp=1792771200000&signature=xjABWAOq84_l7Q5WWi97adaKTACT5jIfxf8cuK_pUuc)
 
 
 
