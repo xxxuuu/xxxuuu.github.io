@@ -548,7 +548,7 @@ github.com
 
 [
 
-![](https://opengraph.githubassets.com/f46f2caf015366699d2121552454cc43600651bab39fe545bb4d0d70ee3c2cac/resonatehq/resonate)
+![](https://opengraph.githubassets.com/4bbfc3c4d5a20976852274e917e35358eaeee657e4d43f065e2add00bbacd24d/resonatehq/resonate)
 
 ![](https://github.githubassets.com/favicons/favicon.svg)
 
